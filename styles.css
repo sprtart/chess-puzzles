@@ -16,35 +16,31 @@
 
 
 .corner-btn {
-    position: fixed; /* Фиксируем относительно экрана, а не контейнера */
-    top: 20px;       /* Стандартный отступ для ПК */
-    right: 20px;
-    width: 44px;
-    height: 44px;
-    background: rgba(0, 0, 0, 0.5); /* Немного темнее для контраста */
+    position: absolute; /* Теперь абсолют внутри game-container */
+    /* Используем env(safe-area-inset-top) для обхода челок */
+    top: calc(10px + env(safe-area-inset-top)); 
+    right: 15px;
+    width: 42px;
+    height: 42px;
+    background: #2c2c2c; /* Сделаем сплошной цвет для теста */
+    border: 2px solid gold; /* Золотая рамка, чтобы точно заметить */
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    z-index: 9999;   /* Максимальный приоритет, чтобы была поверх всего */
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    backdrop-filter: blur(5px);
+    z-index: 9999;
+    box-shadow: 0 0 15px rgba(0,0,0,0.5);
     -webkit-tap-highlight-color: transparent;
 }
 
-/* Стили для мобильных устройств */
+/* Если даже так не видно, попробуем опустить еще ниже для мобилок */
 @media screen and (max-width: 600px) {
     .corner-btn {
-        /* На мобилках опускаем ниже, чтобы не попала под статус-бар или кнопку закрытия ВК */
-        top: 50px; 
+        top: calc(60px + env(safe-area-inset-top)); /* Сильно опускаем */
         right: 10px;
-        width: 40px;
-        height: 40px;
-        background: rgba(0, 0, 0, 0.6); /* Еще чуть темнее */
     }
 }
-
 .corner-btn:active {
     transform: scale(0.9); /* Анимация нажатия */
 }
@@ -728,4 +724,5 @@
     gap: 4vw;
 }
 }
+
 
