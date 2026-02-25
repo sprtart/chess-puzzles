@@ -145,14 +145,28 @@ setScore(score) {
     },
 
 showLeaderboard() {
-        if (this.id === 'vk') {
-            // totalScore — это твоя глобальная переменная с очками
-            vkBridge.send('VKWebAppShowLeaderBoardBox', { user_score: totalScore })
-                .catch((error) => { console.error("Ошибка лидерборда:", error); });
-        } else {
-            alert("Лидерборд доступен только в ВК. Очки: " + totalScore);
-        }
-    },
+    if (this.id === 'vk') {
+        console.log("Пытаюсь открыть лидерборд. Текущие очки:", totalScore);
+        
+        vkBridge.send('VKWebAppShowLeaderBoardBox', { 
+            user_score: parseInt(totalScore) || 0 
+        })
+        .then((data) => {
+            console.log("Лидерборд открыт успешно:", data);
+        })
+        .catch((error) => {
+            // ВАЖНО: Смотрим на error.error_data или error.error_type
+            console.error("Детальная ошибка лидерборда:", error);
+            
+            if (error.error_data) {
+                console.log("Код ошибки:", error.error_data.error_code);
+                console.log("Сообщение:", error.error_data.error_msg);
+            }
+        });
+    } else {
+        alert("Лидерборд доступен только в ВК. Очки: " + totalScore);
+    }
+}
     
     setScore(score) {
         if (this.id === 'vk') {
@@ -906,6 +920,7 @@ window.onload = initGame;
 </script>
 </body>
 </html>
+
 
 
 
