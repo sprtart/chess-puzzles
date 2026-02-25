@@ -15,23 +15,34 @@
         }
 
 
-        .corner-btn {
-    position: absolute;
-    top: 15px;      /* Отступ сверху */
-    right: 15px;    /* Отступ справа */
+.corner-btn {
+    position: fixed; /* Фиксируем относительно экрана, а не контейнера */
+    top: 20px;       /* Стандартный отступ для ПК */
+    right: 20px;
     width: 44px;
     height: 44px;
-    background: rgba(0, 0, 0, 0.3); /* Полупрозрачный фон */
+    background: rgba(0, 0, 0, 0.5); /* Немного темнее для контраста */
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    z-index: 1000;  /* Поверх всего */
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    backdrop-filter: blur(4px); /* Размытие фона за кнопкой (модно) */
-    transition: transform 0.1s;
-    -webkit-tap-highlight-color: transparent; /* Убирает синюю рамку при клике на мобилках */
+    z-index: 9999;   /* Максимальный приоритет, чтобы была поверх всего */
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(5px);
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* Стили для мобильных устройств */
+@media screen and (max-width: 600px) {
+    .corner-btn {
+        /* На мобилках опускаем ниже, чтобы не попала под статус-бар или кнопку закрытия ВК */
+        top: 50px; 
+        right: 10px;
+        width: 40px;
+        height: 40px;
+        background: rgba(0, 0, 0, 0.6); /* Еще чуть темнее */
+    }
 }
 
 .corner-btn:active {
@@ -717,3 +728,4 @@
     gap: 4vw;
 }
 }
+
