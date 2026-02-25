@@ -1,0 +1,689 @@
+        :root {
+            --board-light: #f0d9b5;
+            --board-dark: #b58863;
+            --highlight-yellow: rgba(204, 204, 80, 0.7); 
+            --selected-yellow: rgba(204, 204, 80, 0.85);
+            --hint-blue: rgba(34, 197, 94, 0.8);
+            --move-hint: rgba(0, 0, 0, 0.15);
+            --error-overlay: rgba(239, 68, 68, 0.5);
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-400: #9ca3af;
+            --gray-500: #6b7280;
+            --gray-700: #374151;
+            --gray-800: #1f2937;
+        }
+
+/* --- ПРОСТАЯ ПУЛЬСАЦИЯ ЦВЕТОМ --- */
+.square.hint-blink::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 2; /* Слой под фигурой */
+    background-color: rgb(34, 197, 94); /* Чистый зеленый цвет */
+    animation: simplePulse 1.2s ease-in-out infinite;
+    pointer-events: none;
+}
+
+@keyframes simplePulse {
+    0% { 
+        opacity: 0.2; /* Почти прозрачный */
+    }
+    50% { 
+        opacity: 0.7; /* Насыщенный */
+    }
+    100% { 
+        opacity: 0.2; /* Снова прозрачный */
+    }
+}
+
+        * { 
+            touch-action: none; 
+            -webkit-user-select: none; 
+            user-select: none; 
+            box-sizing: border-box; 
+        }
+
+        body { 
+            overscroll-behavior: none; 
+            overflow: hidden; 
+            height: 100vh; 
+            background-color: var(--gray-100); 
+            background-image: radial-gradient(#ecedee 1px, transparent 1px);
+            background-size: 20px 20px;
+            background-attachment: fixed;
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
+            margin: 0; 
+        }
+
+        /* --- ЭКРАН ЗАГРУЗКИ --- */
+        #loading-screen {
+            position: fixed;
+            inset: 0;
+            background-color: var(--gray-100);
+            z-index: 3000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.5s;
+        }
+
+        .loader-logo {
+            width: 160px;
+            height: 160px;
+            object-contain: contain;
+            margin-bottom: 2rem;
+            animation: bounce 1s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(-10%); animation-timing-function: cubic-bezier(0.8,0,1,1); }
+            50% { transform: none; animation-timing-function: cubic-bezier(0,0,0.2,1); }
+        }
+
+        .progress-container {
+            width: 256px;
+            background-color: var(--gray-200);
+            border-radius: 9999px;
+            height: 10px;
+            overflow: hidden;
+            margin-bottom: 8px;
+        }
+
+.square.in-check {
+    background-image: radial-gradient(circle, 
+        rgba(255, 0, 0, 0.9) 0%, 
+        rgba(255, 0, 0, 0.4) 50%, 
+        transparent 100%) !important;
+    /* Не добавляем свойство background, чтобы не сбросить background-color */
+}
+
+        #loading-bar {
+            background-color: #2563eb;
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s;
+        }
+
+        #loading-text {
+            color: var(--gray-500);
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        /* --- ВЕРХНЯЯ ПАНЕЛЬ (КАРТОЧКИ) --- */
+        .game-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 24px;
+            width: 100%;
+        }
+
+        .top-bar {
+            /*width: 100%;*/
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            /*max-width: min(92vw, 72vh);*/
+        }
+
+        .stat-card-left, .stat-card-right {
+            background-color: white;
+            border-bottom: 4px solid var(--gray-200);
+            padding: 8px 20px;
+            display: flex;
+            flex-direction: column;
+            min-width: 110px;
+            transition: all 0.2s;
+        }
+
+        .stat-card-left {
+            border-radius: 16px 8px 8px 16px;
+            align-items: flex-end;
+        }
+
+        .stat-card-right {
+            border-radius: 8px 16px 16px 8px;
+            align-items: flex-start;
+        }
+
+        .stat-label {
+            font-size: 8px;
+            text-transform: uppercase;
+            font-weight: 900;
+            color: var(--gray-400);
+            letter-spacing: 0.05em;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 900;
+            color: var(--gray-700);
+            line-height: 1.2;
+        }
+
+        .vertical-divider {
+            height: 32px;
+            width: 2px;
+            background-color: var(--gray-200);
+            opacity: 0.5;
+        }
+
+        /* --- ДОСКА --- */
+        #board-wrapper { position: relative; }
+
+/* Найти и заменить стиль .chess-board */
+.chess-board { 
+    display: grid; 
+    grid-template-columns: repeat(8, 1fr); 
+    grid-template-rows: repeat(8, 1fr); 
+    width: min(97vw, 85vh); /* Используем одинаковые размеры */
+    height: min(97vw, 85vh);
+    aspect-ratio: 1 / 1; /* Жестко фиксируем пропорции */
+    border-radius: 4px; 
+    overflow: hidden; 
+    position: relative; 
+    box-shadow: 0 1px 10px rgba(0, 0, 0, 0.2);
+    /* Добавляем, чтобы предотвратить схлопывание */
+    min-width: min(97vw, 72vh);
+    min-height: min(97vw, 72vh);
+}
+
+        .square { display: flex; align-items: center; justify-content: center; position: relative; }
+        .square.light { background-color: var(--board-light); }
+        .square.dark { background-color: var(--board-dark); }
+
+        .square.enemy-move::before, .square.selected::before {
+            content: ""; position: absolute; inset: 0; z-index: 0;
+        }
+        .square.enemy-move::before { background-color: var(--highlight-yellow); }
+        .square.selected::before { background-color: var(--selected-yellow); }
+
+        .piece { 
+            width: 100%; height: 100%; 
+            background-size: contain; background-repeat: no-repeat; background-position: center; 
+            z-index: 10; cursor: grab; position: absolute; top: 0; left: 0;
+        }
+
+        /* --- КНОПКА --- */
+/* Найти и заменить эти стили в блоке <style> */
+.btn-hint {
+    background-color: white;
+    border: none;
+    /* Вместо border-bottom используем тень, она не влияет на размер элемента */
+    box-shadow: 0 4px 0 var(--gray-200);
+    color: var(--gray-700);
+    padding: 12px 40px;
+    border-radius: 16px;
+    font-weight: 900;
+    font-size: 18px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    transition: transform 0.1s, box-shadow 0.1s;
+    cursor: pointer;
+    outline: none;
+    position: relative;
+    /*height: 54px; /* Фиксированная высота предотвратит прыжки */
+    display: flex; /* Чтобы иконка и текст были в ряд */
+    align-items: center; /* Центровка по вертикали */
+    justify-content: center; /* Центровка по горизонтали */
+    gap: 2vw; /* Расстояние между иконкой и текстом */
+
+}
+.video-icon svg {
+    width: 6vw;
+    height: 6vw;
+    display: block;
+    fill: currentColor; /* Иконка примет цвет текста кнопки */
+}
+
+.btn-hint:active {
+    /* Не меняем размер, только смещаем и уменьшаем тень */
+    box-shadow: 0 0px 0 var(--gray-200);
+    transform: translateY(4px);
+}
+
+        /* --- ПРОМОУШЕН (ВЫБОР ФИГУРЫ) --- */
+#promotion-dialog {
+    position: fixed;
+    z-index: 10000;
+    background: white;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+    border-radius: 4px;
+    padding: 0; /* Обязательно 0 */
+    margin: 0;  /* Обязательно 0 */
+    overflow: hidden;
+}
+
+.promotion-box {
+    display: flex;
+    flex-direction: column; /* Делаем колонку как на Lichess */
+}
+
+.prom-option {
+    width: 60px; /* Будет подстраиваться через JS */
+    height: 60px;
+    background-size: 80%;
+    background-repeat: no-repeat;
+    background-position: center;
+    cursor: pointer;
+    background-color: #f0f0f0;
+}
+
+.prom-option:hover {
+    background-color: #d0d0d0;
+}
+
+.hidden { display: none !important; }
+        /* Ошибки и анимации */
+        .square.error-move::after {
+            content: ""; position: absolute; inset: 0;
+            background-color: var(--error-overlay); z-index: 2; pointer-events: none;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-1px); }
+            40%, 80% { transform: translateX(1px); }
+        }
+        .shake { animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both; }
+
+        .points-added { 
+            animation: floatUp 1s ease-out forwards; 
+            color: #16a34a; 
+            position: absolute; 
+            font-weight: 900; 
+            font-size: 24px; 
+            pointer-events: none; 
+        }
+        @keyframes floatUp { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-30px); } }
+        
+#drag-follower {
+    position: fixed;
+    pointer-events: none;
+    z-index: 1000;
+    display: none;
+    /* Центрируем фигуру относительно курсора/пальца */
+    transform: translate(-50%, -50%); 
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    /* Можно добавить небольшую прозрачность, чтобы видеть клетку под фигурой */
+    opacity: 0.9;
+    transition: transform 0.05s linear;
+}
+
+/* Точка для пустого поля */
+.hint-dot {
+    position: absolute;
+    width: 25%;
+    height: 25%;
+    background-color: rgba(0, 0, 0, 0.15);
+    border-radius: 50%;
+    z-index: 5; /* Выше подложки ячейки, ниже фигуры */
+    pointer-events: none;
+}
+
+/* Кольцо для захвата фигуры */
+.hint-ring {
+    position: absolute;
+    width: 90%;
+    height: 90%;
+    border: 6px solid rgba(0, 0, 0, 0.15);
+    border-radius: 50%;
+    z-index: 5;
+    pointer-events: none;
+    box-sizing: border-box;
+}
+
+
+
+/* =========================================================
+   АДАПТИВНОСТЬ
+   ========================================================= */
+
+/* -------- БАЗОВАЯ СТРУКТУРА -------- */
+
+.game-container {
+    width: 100vw;
+    height: 100vh;
+    padding: 0vw;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 5vw;
+}
+
+/* Доска */
+.chess-board {
+    width: 100vw;
+    height: 100vw;
+    max-width: 85vh;
+    max-height: 85vh;
+}
+
+/* -------- СТАТИСТИКА -------- */
+
+.side-panel {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1vw;
+    width: 100%;
+}
+
+.top-bar {
+    display: flex;
+    gap: 2vw;
+    justify-content: center;
+}
+
+.stat-card {
+    /*background: white;*/
+    padding: 1.5vw 3vw;
+    border-radius: 1.5vw;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    min-width: 18vw;
+    gap: 3vw;   
+}
+
+/* Шрифты ЧИСТО НА VW */
+
+.stat-label {
+    font-size: 3.7vw;
+    font-weight: 500;
+    text-transform: uppercase;
+}
+
+.stat-value {
+    font-size: 6vw;
+    font-weight: 900;
+}
+
+/* -------- КНОПКА -------- */
+
+.bottom-bar {
+    display: flex;
+    justify-content: center;
+}
+
+.btn-hint {
+    font-size: 5vw;
+    padding: 1.5vw 5vw;
+    border-radius: 2vw;
+}
+
+.text {
+    font-size: 5vw;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: var(--gray-700);
+}
+
+/* =====================================================
+   ГОРИЗОНТАЛЬНАЯ ОРИЕНТАЦИЯ
+   ===================================================== */
+
+@media (orientation: landscape) {
+
+    .game-container {
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        gap: 2vw;
+    }
+
+    .chess-board {
+        width: 85vh;
+        height: 85vh;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    }
+
+    .side-panel {
+        width: 22vw;
+        /*min-width: 220px;*/
+        align-items: stretch;
+        gap: 4vw;
+    }
+
+    .top-bar {
+        flex-direction: column;
+        gap: 1vw;
+    }
+
+    .stat-card {
+        background: white;
+        padding: 1.5vw 3vw;
+        border-radius: 1.5vw;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        /*min-width: 150px; /* Фиксированная минимальная ширина */
+        /*height: 80px;      /* Фиксированная высота */
+        justify-content: center;
+        gap: 0vw;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+
+    
+    .stat-label {
+    font-size: 1.5vh;
+    font-weight: 900;
+    text-transform: uppercase;
+}
+
+.stat-value {
+    font-size: 3.2vw;
+    font-weight: 900;
+}
+
+/* -------- КНОПКА -------- */
+
+.bottom-bar {
+    display: flex;
+    justify-content: center;
+}
+
+.btn-hint {
+    font-size: 1.5vw;
+    padding: 1.5vw 5vw;
+    border-radius: 2vh;
+        width: 100%;
+        gap: 1vw;
+}
+
+    .video-icon svg {
+    width: 3vw;
+    height: 3vw;
+    display: block;
+    fill: currentColor; /* Иконка примет цвет текста кнопки */
+}
+
+.text {
+    display: none;
+}
+}
+
+@media (min-aspect-ratio: 2/3) and (max-aspect-ratio: 4/5) {
+
+    .chess-board {
+        width: 80vw;
+        height: 80vw;
+    }
+    /* Шрифты ЧИСТО НА VW */
+.side-panel {
+    gap: 0vw;
+}
+.stat-label {
+    font-size: 3.7vw;
+    font-weight: 900;
+    text-transform: uppercase;
+}
+
+.stat-value {
+    font-size: 6vw;
+    font-weight: 900;
+}
+
+/* -------- КНОПКА -------- */
+
+.bottom-bar {
+    display: flex;
+    justify-content: center;
+}
+
+.btn-hint {
+    font-size: 4vw;
+    padding: 1.5vw 5vw;
+    border-radius: 2vw;
+}
+.text {
+    display: none;
+}
+.game-container {
+    gap: 4vw;
+}
+}
+
+/* =====================================================
+   ОКОЛОКВАДРАТНЫЕ
+   ===================================================== */
+
+@media (min-aspect-ratio: 4/5) and (max-aspect-ratio: 4/4) {
+
+    .chess-board {
+        width: 80vw;
+        height: 80vw;
+    }
+    /* Шрифты ЧИСТО НА VW */
+.side-panel {
+    gap: 0vw;
+}
+.stat-label {
+    font-size: 3vw;
+    font-weight: 900;
+    text-transform: uppercase;
+}
+
+.stat-value {
+    font-size: 4.5vw;
+    font-weight: 900;
+}
+
+/* -------- КНОПКА -------- */
+
+.bottom-bar {
+    display: flex;
+    justify-content: center;
+}
+
+.btn-hint {
+    font-size: 3vw;
+    padding: 1.5vw 5vw;
+    border-radius: 2vw;
+}
+.text {
+    display: none;
+}
+.game-container {
+    gap: 2vw;
+}
+}
+
+
+@media (aspect-ratio: 4/4) {
+
+    .chess-board {
+        width: 70vw;
+        height: 70vw;
+    }
+    /* Шрифты ЧИСТО НА VW */
+.side-panel {
+    gap: 1vw !important;
+    width: 10vw !important;
+    min-width: 22vw;
+}
+.stat-label {
+    font-size: 3vw !important;
+    font-weight: 900;
+    text-transform: uppercase;
+}
+
+.stat-value {
+    font-size: 3.5vw !important;
+    font-weight: 900;
+}
+
+/* -------- КНОПКА -------- */
+
+.bottom-bar {
+    display: flex;
+    justify-content: center;
+}
+
+.btn-hint {
+    font-size: 2vw !important;
+    padding: 1vw 5vw !important;
+    border-radius: 2vw !important;
+}
+.text {
+    display: none;
+}
+.game-container {
+    gap: 4vw;
+}
+}
+
+@media (min-aspect-ratio: 4/4) and (max-aspect-ratio: 5/4) {
+
+    .chess-board {
+        width: 70vw;
+        height: 70vw;
+    }
+    /* Шрифты ЧИСТО НА VW */
+.side-panel {
+    gap: 3vw;
+    width: 10vw !important;
+    min-width: 22vw;
+}
+.stat-label {
+    font-size: 1.5vw;
+    font-weight: 900;
+    text-transform: uppercase;
+}
+
+.stat-value {
+    font-size: 3.2vw;
+    font-weight: 900;
+}
+
+/* -------- КНОПКА -------- */
+
+.bottom-bar {
+    display: flex;
+    justify-content: center;
+}
+
+.btn-hint {
+    font-size: 1.5vw;
+    padding: 1.5vw 5vw;
+    border-radius: 2vw;
+}
+.text {
+    display: none;
+}
+.game-container {
+    gap: 4vw;
+}
+}

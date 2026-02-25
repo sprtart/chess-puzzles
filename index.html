@@ -1,0 +1,839 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <!-- Мета-тег для мобильных устройств -->
+    <meta name="mobile-web-app-capable" content="yes">
+
+    <!-- ПОДКЛЮЧАЕМ ТОЛЬКО SDK ВКОНТАКТЕ -->
+    <script src="https://unpkg.com/@vkontakte/vk-bridge/dist/browser.min.js"></script>
+    
+    <title id="page-title">Шахматные задачи, найди лучший ход</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .btn-hint.disabled {
+            opacity: 0.6;
+            pointer-events: none;
+            background-color: #888;
+        }
+    </style>
+</head>
+<body>
+
+<div id="loading-screen">
+    <img src="img/logo.png" alt="Logo" class="loader-logo">
+    <div class="progress-container">
+        <div id="loading-bar"></div>
+    </div>
+    <span id="loading-text">Загрузка: 0%</span>
+</div>
+
+<div class="game-container">
+    <div id="board-wrapper">
+        <div id="board" class="chess-board"></div>
+    </div>
+
+    <div class="side-panel">
+        <div class="top-bar">
+            <div class="stat-card">
+                <span class="stat-label" id="label-rating">Рейтинг</span>
+                <span id="puzzle-elo" class="stat-value">---</span>
+            </div>
+            <div class="stat-card" style="position: relative;">
+                <span id="score-display" class="stat-value">0</span>
+                <div id="points-anim-container"
+                     style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center; pointer-events:none;">
+                </div>
+                <span class="stat-label" id="label-score">Очки</span>
+            </div>
+        </div>
+        <div class="bottom-bar">
+<button id="hint-btn" onclick="requestHint()" class="btn-hint">
+    <div class="video-icon">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M21 4H3C1.895 4 1 4.895 1 6V18C1 19.105 1.895 20 3 20H21C22.105 20 23 19.105 23 18V6C23 4.895 22.105 4 21 4ZM21 18H3V6H21V18ZM9.5 15L16 11.5L9.5 8V15Z"/>
+        </svg>
+    </div>
+    <span id="hint-btn-text">Подсказка</span>
+</button>
+        </div>
+    </div>
+</div>
+
+<div id="promotion-dialog" class="hidden">
+    <div class="promotion-box">
+        <div onclick="selectPromotion('q')" class="prom-option" id="prom-q"></div>
+        <div onclick="selectPromotion('r')" class="prom-option" id="prom-r"></div>
+        <div onclick="selectPromotion('b')" class="prom-option" id="prom-b"></div>
+        <div onclick="selectPromotion('n')" class="prom-option" id="prom-n"></div>
+    </div>
+</div>
+
+<div id="drag-follower"></div>
+
+<script>
+// ==========================================
+// ОБЪЕКТ PLATFORM (ТОЛЬКО VK И LOCAL)
+// ==========================================
+const Platform = {
+    id: 'local', // По умолчанию работаем локально
+
+    async init() {
+        // Проверяем ВКонтакте
+        if (typeof vkBridge !== 'undefined' && vkBridge.supports('VKWebAppInit')) {
+            try {
+                await vkBridge.send('VKWebAppInit');
+                this.id = 'vk';
+                return console.log("Платформа: ВКонтакте");
+            } catch (e) { console.warn("VK init failed"); }
+        }
+
+        console.log("Платформа: Локальная (без SDK)");
+    },
+
+    getLang() {
+        if (this.id === 'vk') {
+            const urlParams = new URLSearchParams(window.location.search);
+            const vkLang = urlParams.get('language'); // 0 - ру, 3 - англ
+            if (vkLang === '0' || vkLang === 'ru') return 'ru';
+            if (vkLang === '3' || vkLang === 'en') return 'en';
+        }
+        return navigator.language.slice(0, 2) === 'ru' ? 'ru' : 'en';
+    },
+
+    async getScore() {
+        if (this.id === 'vk') {
+            try {
+                const data = await vkBridge.send('VKWebAppStorageGet', { keys:['totalScore'] });
+                if (data.keys && data.keys[0].value) return parseInt(data.keys[0].value, 10);
+            } catch(e) {}
+        }
+        return 0;
+    },
+
+    setScore(score) {
+        if (this.id === 'vk') {
+            vkBridge.send('VKWebAppStorageSet', { key: 'totalScore', value: String(score) }).catch(()=>{});
+        }
+    },
+
+    showInterstitial(onClose) {
+        if (this.id === 'vk') {
+            vkBridge.send('VKWebAppShowNativeAds', { ad_format: 'interstitial' })
+                .then(() => onClose())
+                .catch(() => onClose()); // Если рекламы нет, просто продолжаем игру
+        } else {
+            onClose(); // Локально просто запускаем игру
+        }
+    },
+
+    showRewarded(onRewarded, onClose, onError) {
+        if (this.id === 'vk') {
+            vkBridge.send('VKWebAppShowNativeAds', { ad_format: 'reward' })
+                .then(data => {
+                    if (data.result) onRewarded();
+                    onClose();
+                })
+                .catch(() => onError());
+        } else {
+            onRewarded(); // Локально даем награду сразу
+            onClose();
+        }
+    },
+
+    // Пустышки (ВК не требует явного старта/стопа геймплея как Яндекс)
+    gameplayStart() {},
+    gameplayStop() {},
+    loadingReady() {}
+};
+// ==========================================
+
+let lang = 'ru'; 
+
+const i18n = {
+    ru: {
+        title: "Шахматные задачи, найди лучший ход",
+        loading: "Загрузка:",
+        preparing: "Подготовка шахмат...",
+        errorLoad: "Ошибка загрузки данных",
+        rating: "Рейтинг",
+        score: "Очки",
+        hintBtn: "Подсказка",
+        adLoading: "Загрузка..."
+    },
+    en: {
+        title: "Chess puzzles: find the best move",
+        loading: "Loading:",
+        preparing: "Preparing chess...",
+        errorLoad: "Error loading data",
+        rating: "Rating",
+        score: "Score",
+        hintBtn: "Hint",
+        adLoading: "Loading..."
+    }
+};
+
+function applyTranslations() {
+    const t = i18n[lang];
+    document.getElementById('page-title').textContent = t.title;
+    document.getElementById('label-rating').textContent = t.rating;
+    document.getElementById('label-score').textContent = t.score;
+    document.getElementById('hint-btn-text').textContent = t.hintBtn; 
+    document.getElementById('loading-text').textContent = t.preparing;
+}
+
+function safePlaySound(audioObj) {
+    if (!audioObj) return;
+    const promise = audioObj.play();
+    if (promise !== undefined) {
+        promise.catch(error => { /* Игнорируем */ });
+    }
+}
+
+async function initGame() {
+    await Platform.init(); // Ждем инициализацию
+
+    lang = Platform.getLang();
+    if (lang !== 'ru' && lang !== 'en') lang = 'en'; 
+    applyTranslations();
+
+    totalScore = await Platform.getScore();
+    if (totalScore) {
+        console.log("Общий счет подгружен:", totalScore);
+    }
+    
+    loadData(); 
+}
+
+function submitScore(newTotalScore) {
+    Platform.setScore(newTotalScore);
+}
+
+const audioMove = new Audio('sounds/Move.ogg');
+const audioCapture = new Audio('sounds/Capture.ogg');
+const audioError = new Audio('sounds/Error.ogg');
+
+const PIECE_IMAGES = {
+    'P': 'img/Chess_plt45.svg', 'R': 'img/Chess_rlt45.svg', 'N': 'img/Chess_nlt45.svg', 'B': 'img/Chess_blt45.svg', 'Q': 'img/Chess_qlt45.svg', 'K': 'img/Chess_klt45.svg',
+    'p': 'img/Chess_pdt45.svg', 'r': 'img/Chess_rdt45.svg', 'n': 'img/Chess_ndt45.svg', 'b': 'img/Chess_bdt45.svg', 'q': 'img/Chess_qdt45.svg', 'k': 'img/Chess_kdt45.svg'
+};
+
+let puzzles =[], currentPuzzleIndex = 0, currentStep = 0;
+let boardState =[], isLocked = true, selectedSq = null, playerColor = 'w';
+let lastMoveSquares =[], hintSquare = null;
+
+let currentElo = 400;
+let sessionScore = 0; 
+let totalScore = 0;   
+let previousPuzzleElo = null;
+let hasMistake = false;
+let hasHint = false;
+let isAdLoading = false; 
+
+const boardEl = document.getElementById('board');
+const follower = document.getElementById('drag-follower');
+
+async function loadData() {
+    const loadingBar = document.getElementById('loading-bar');
+    const loadingText = document.getElementById('loading-text');
+
+    try {
+        let progress = 0;
+        const simInterval = setInterval(() => {
+            progress += 10;
+            if(progress > 90) progress = 90;
+            loadingBar.style.width = `${progress}%`;
+            loadingText.textContent = `${i18n[lang].loading} ${progress}%`;
+        }, 50);
+
+        const response = await fetch('puzzles.json');
+        puzzles = await response.json();
+        
+        Object.values(PIECE_IMAGES).forEach(src => {
+            const img = new Image();
+            img.src = src;
+        });
+
+        clearInterval(simInterval);
+        puzzles.sort((a, b) => Number(a.elo) - Number(b.elo));
+        loadingBar.style.width = "100%";
+        loadingText.textContent = `${i18n[lang].loading} 100%`;
+
+        Platform.loadingReady();
+
+        let adGameStarted = false;
+        Platform.showInterstitial(() => {
+            if (!adGameStarted) {
+                adGameStarted = true;
+                startGameAfterAd();
+            }
+        });
+
+    } catch (e) {
+        console.error("Ошибка загрузки:", e);
+        loadingText.textContent = i18n[lang].errorLoad;
+        loadingText.classList.add('text-red-500');
+    }
+}
+
+function startGameAfterAd() {
+    Platform.gameplayStart();
+
+    const loadingScreen = document.getElementById('loading-screen');
+    loadingScreen.style.opacity = '0';
+    
+    setTimeout(() => {
+        loadingScreen.style.display = 'none';
+        startPuzzle();
+    }, 500);
+}
+
+function requestHint() {
+    if (isLocked || hasHint || isAdLoading) return;
+    
+    const hintBtn = document.getElementById('hint-btn');
+    const hintText = document.getElementById('hint-btn-text'); 
+    
+    isAdLoading = true;
+    hintBtn.classList.add('disabled');
+    hintText.textContent = i18n[lang].adLoading; 
+
+    Platform.gameplayStop();
+
+    Platform.showRewarded(
+        () => { applyHint(); }, 
+        () => { 
+            isAdLoading = false;
+            hintBtn.classList.remove('disabled');
+            hintText.textContent = i18n[lang].hintBtn;
+            Platform.gameplayStart();
+        },
+        () => { 
+            isAdLoading = false;
+            hintBtn.classList.remove('disabled');
+            hintText.textContent = i18n[lang].hintBtn;
+            applyHint(); 
+            Platform.gameplayStart();
+        }
+    );
+}
+
+function startPuzzle() {
+    hasMistake = false;
+    hasHint = false;
+
+    if (!puzzles || puzzles.length === 0) return;
+
+    let minDiff = Infinity;
+    for (let p of puzzles) {
+        const diff = Math.abs(Number(p.elo) - currentElo);
+        if (diff < minDiff) minDiff = diff;
+    }
+    const closestPuzzles = puzzles.filter(p => Math.abs(Number(p.elo) - currentElo) === minDiff);
+    const selectedPuzzle = closestPuzzles[Math.floor(Math.random() * closestPuzzles.length)];
+
+    currentPuzzleIndex = puzzles.indexOf(selectedPuzzle);
+    document.getElementById('puzzle-elo').textContent = selectedPuzzle.elo;
+
+    boardState = parseFEN(selectedPuzzle.fen);
+    currentStep = 0;
+    lastMoveSquares =[];
+    hintSquare = null;
+
+    const sideToMoveInFen = selectedPuzzle.fen.split(' ')[1];
+    playerColor = (sideToMoveInFen === 'w') ? 'b' : 'w';
+
+    isLocked = true;
+
+    renderBoard();
+
+    let lastWidth = 0;
+    let stableTicks = 0;
+
+    let checkStability = setInterval(() => {
+        const boardEl = document.getElementById('board');
+        const currentWidth = boardEl.getBoundingClientRect().width;
+
+        if (currentWidth > 0 && currentWidth === lastWidth) {
+            stableTicks++;
+        } else {
+            stableTicks = 0;
+        }
+        
+        lastWidth = currentWidth;
+
+        if (stableTicks > 3) {
+            clearInterval(checkStability);
+            
+            renderBoard(); 
+            
+            setTimeout(() => {
+                if (puzzles[currentPuzzleIndex] && puzzles[currentPuzzleIndex].moves) {
+                    playMove(puzzles[currentPuzzleIndex].moves[currentStep], true);
+                }
+            }, 100);
+        }
+    }, 100);
+}
+
+function isSquareUnderAttack(targetR, targetC, attackerIsWhite) {
+    for (let r = 0; r < 8; r++) {
+        for (let c = 0; c < 8; c++) {
+            const piece = boardState[r][c];
+            if (!piece) continue;
+
+            const isPieceWhite = piece === piece.toUpperCase();
+            if (isPieceWhite !== attackerIsWhite) continue;
+
+            const p = piece.toLowerCase();
+            const dr = Math.abs(targetR - r);
+            const dc = Math.abs(targetC - c);
+
+            if (p === 'p') {
+                const dir = isPieceWhite ? -1 : 1;
+                if (targetR - r === dir && dc === 1) return true;
+            } else {
+                if (isPossibleMove(r, c, targetR, targetC, piece, true)) return true;
+            }
+        }
+    }
+    return false;
+}
+
+function renderBoard() {
+    boardEl.innerHTML = '';
+    const range = (playerColor === 'b') ?[7, 6, 5, 4, 3, 2, 1, 0] :[0, 1, 2, 3, 4, 5, 6, 7];
+    
+    let checkedSquares =[];
+    for (let r = 0; r < 8; r++) {
+        for (let c = 0; c < 8; c++) {
+            const piece = boardState[r][c];
+            if (piece === 'K' && isSquareUnderAttack(r, c, false)) {
+                checkedSquares.push(idxToPos(r, c));
+            }
+            if (piece === 'k' && isSquareUnderAttack(r, c, true)) {
+                checkedSquares.push(idxToPos(r, c));
+            }
+        }
+    }
+
+    for (let r of range) {
+        for (let c of range) {
+            const sq = document.createElement('div');
+            const pos = idxToPos(r, c);
+            sq.className = `square ${(r + c) % 2 === 0 ? 'light' : 'dark'}`;
+            sq.dataset.pos = pos;
+            sq.dataset.r = r; 
+            sq.dataset.c = c;
+            
+            if (lastMoveSquares.includes(pos)) sq.classList.add('enemy-move');
+            if (selectedSq && selectedSq.pos === pos) sq.classList.add('selected');
+            if (hintSquare === pos) sq.classList.add('hint-blink');
+            if (checkedSquares.includes(pos)) sq.classList.add('in-check');
+
+            const piece = boardState[r][c];
+            if (piece) {
+                const pEl = document.createElement('div');
+                pEl.className = 'piece';
+                pEl.style.backgroundImage = `url('${PIECE_IMAGES[piece]}')`;
+                sq.appendChild(pEl);
+            }
+            
+            sq.onmousedown = sq.ontouchstart = (e) => handleStart(e, r, c);
+            boardEl.appendChild(sq);
+        }
+    }
+    
+    if (selectedSq) {
+        const piece = boardState[selectedSq.r][selectedSq.c];
+        if (piece) showHints(selectedSq.r, selectedSq.c, piece);
+    }
+}
+
+function handleStart(e, r, c) {
+    if (isLocked) return;
+
+    if (hintSquare) {
+        hintSquare = null;
+        document.querySelectorAll('.hint-blink').forEach(el => el.classList.remove('hint-blink'));
+    }
+
+    const clickedPiece = boardState[r][c];
+    const isMyPiece = clickedPiece && (
+        (playerColor === 'w' && clickedPiece === clickedPiece.toUpperCase()) || 
+        (playerColor === 'b' && clickedPiece !== clickedPiece.toUpperCase())
+    );
+
+    if (selectedSq && !isMyPiece) {
+        const fromPiece = boardState[selectedSq.r][selectedSq.c];
+        if (isPossibleMove(selectedSq.r, selectedSq.c, r, c, fromPiece)) {
+            if (e.cancelable) e.preventDefault();
+            checkLogicMove(r, c);
+            selectedSq = null; 
+            return;
+        }
+    }
+
+    if (!isMyPiece) {
+        if (selectedSq) { selectedSq = null; renderBoard(); }
+        return;
+    }
+
+    if (e.cancelable) e.preventDefault();
+
+    const currentSqEl = document.querySelector(`[data-pos="${idxToPos(r, c)}"]`);
+    const rect = currentSqEl.getBoundingClientRect();
+    const squareSize = rect.width; 
+
+    const piece = clickedPiece;
+    const startR = r; 
+    const startC = c;
+    selectedSq = { r, c, pos: idxToPos(r, c) };
+    
+    follower.style.width = (squareSize * 1.2) + 'px';
+    follower.style.height = (squareSize * 1.2) + 'px';
+    follower.style.backgroundImage = `url('${PIECE_IMAGES[piece]}')`;
+    follower.style.display = 'block';
+
+    let clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    let clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    updateFollower(clientX, clientY);
+
+    document.querySelectorAll('.selected').forEach(el => el.classList.remove('selected'));
+    document.querySelectorAll('.hint-dot, .hint-ring').forEach(el => el.remove());
+    showHints(r, c, piece);
+
+    const pInBoard = currentSqEl.querySelector('.piece');
+    if (pInBoard) pInBoard.style.opacity = '0.4';
+
+    let isDragging = false;
+
+    const onMove = (me) => {
+        if (me.cancelable) me.preventDefault();
+        isDragging = true;
+        clientX = me.touches ? me.touches[0].clientX : me.clientX;
+        clientY = me.touches ? me.touches[0].clientY : me.clientY;
+        updateFollower(clientX, clientY);
+    };
+
+    const onEnd = (ue) => {
+        document.removeEventListener('mousemove', onMove);
+        document.removeEventListener('mouseup', onEnd);
+        document.removeEventListener('touchmove', onMove, { passive: false });
+        document.removeEventListener('touchend', onEnd);
+        document.removeEventListener('touchcancel', onEnd);
+        
+        follower.style.display = 'none';
+        if (pInBoard) pInBoard.style.opacity = '1';
+        
+        let ux = clientX;
+        let uy = clientY;
+        
+        if (ue && ue.changedTouches && ue.changedTouches.length > 0) {
+            ux = ue.changedTouches[0].clientX;
+            uy = ue.changedTouches[0].clientY;
+        }
+
+        const target = document.elementFromPoint(ux, uy)?.closest('.square');
+        let moveMade = false;
+
+        if (target) {
+            const tr = parseInt(target.dataset.r);
+            const tc = parseInt(target.dataset.c);
+            
+            if (tr === startR && tc === startC) {
+                renderBoard();
+                return; 
+            }
+
+            if (isPossibleMove(startR, startC, tr, tc, piece)) {
+                checkLogicMove(tr, tc);
+                selectedSq = null; 
+                moveMade = true;
+            }
+        }
+        
+        if (!moveMade) {
+             if (isDragging) selectedSq = null;
+             renderBoard();
+        }
+    };
+
+    document.addEventListener('mousemove', onMove, { passive: false });
+    document.addEventListener('mouseup', onEnd);
+    document.addEventListener('touchmove', onMove, { passive: false });
+    document.addEventListener('touchend', onEnd);
+    document.addEventListener('touchcancel', onEnd);
+}
+
+let pendingPromotion = null;
+
+function checkLogicMove(tr, tc) {
+    const toPos = idxToPos(tr, tc);
+    const fromPiece = boardState[selectedSq.r][selectedSq.c];
+    const correctMove = puzzles[currentPuzzleIndex].moves[currentStep];
+
+    if (fromPiece.toLowerCase() === 'p' && (tr === 0 || tr === 7)) {
+        pendingPromotion = { tr, tc, toPos, fromPos: selectedSq.pos };
+
+        const targetSqEl = document.querySelector(`[data-pos="${toPos}"]`);
+        const rect = targetSqEl.getBoundingClientRect();
+        const dialog = document.getElementById('promotion-dialog');
+
+        dialog.style.width = rect.width + 'px';
+        dialog.style.left = rect.left + 'px';
+
+        const isVisualTop = (playerColor === 'w' && tr === 0) || (playerColor === 'b' && tr === 7);
+
+        if (isVisualTop) {
+            dialog.style.top = rect.top + 'px';
+            document.querySelector('.promotion-box').style.flexDirection = 'column';
+        } else {
+            dialog.style.top = (rect.top - rect.height * 3) + 'px';
+            document.querySelector('.promotion-box').style.flexDirection = 'column-reverse';
+        }
+
+        document.querySelectorAll('.prom-option').forEach(opt => {
+            opt.style.width = rect.width + 'px';
+            opt.style.height = rect.width + 'px';
+        });
+
+        const isWhite = (fromPiece === 'P');
+        const pieces = isWhite ?['Q', 'R', 'B', 'N'] : ['q', 'r', 'b', 'n'];
+        document.getElementById('prom-q').style.backgroundImage = `url('${PIECE_IMAGES[pieces[0]]}')`;
+        document.getElementById('prom-r').style.backgroundImage = `url('${PIECE_IMAGES[pieces[1]]}')`;
+        document.getElementById('prom-b').style.backgroundImage = `url('${PIECE_IMAGES[pieces[2]]}')`;
+        document.getElementById('prom-n').style.backgroundImage = `url('${PIECE_IMAGES[pieces[3]]}')`;
+
+        dialog.classList.remove('hidden');
+        return; 
+    }
+
+    const movePlayed = selectedSq.pos + toPos;
+    if (movePlayed === correctMove) {
+        playMove(correctMove, false);
+        selectedSq = null; 
+    } else {
+        handleMoveError(selectedSq.pos, toPos);
+    }
+}
+
+function handleMoveError(fromPos, toPos) {
+    hasMistake = true;
+    safePlaySound(audioError); 
+
+    const fromSq = document.querySelector(`[data-pos="${fromPos}"]`);
+    const toSq = document.querySelector(`[data-pos="${toPos}"]`);
+
+    if (fromSq) fromSq.classList.add('error-move');
+    if (toSq) toSq.classList.add('error-move');
+
+    const boardWrapper = document.getElementById('board-wrapper');
+    boardWrapper.classList.add('shake');
+
+    setTimeout(() => {
+        boardWrapper.classList.remove('shake');
+        if (fromSq) fromSq.classList.remove('error-move');
+        if (toSq) toSq.classList.remove('error-move');
+        selectedSq = null;
+        renderBoard();
+    }, 400);
+}
+
+function selectPromotion(type) {
+    document.getElementById('promotion-dialog').classList.add('hidden');
+    
+    if (!pendingPromotion) return;
+
+    const moveWithPromotion = pendingPromotion.fromPos + pendingPromotion.toPos + type;
+    const correctMove = puzzles[currentPuzzleIndex].moves[currentStep];
+
+    if (moveWithPromotion === correctMove) {
+        playMove(correctMove, false);
+    } else {
+        handleMoveError(pendingPromotion.fromPos, pendingPromotion.toPos);
+    }
+
+    pendingPromotion = null;
+    selectedSq = null;
+}
+
+function playMove(moveStr, isOpponent) {
+    const from = moveStr.substring(0, 2), to = moveStr.substring(2, 4);
+    const f = posToIdx(from), t = posToIdx(to);
+    lastMoveSquares = [from, to];
+
+    if (isOpponent) {
+        const fromSq = document.querySelector(`[data-pos="${from}"]`);
+        const toSq = document.querySelector(`[data-pos="${to}"]`);
+        const pieceEl = fromSq?.querySelector('.piece');
+        if (pieceEl) {
+            const fR = fromSq.getBoundingClientRect(), tR = toSq.getBoundingClientRect();
+            fromSq.style.zIndex = "1000";
+            pieceEl.style.transition = "transform 0.25s ease-in-out";
+            pieceEl.style.transform = `translate(${tR.left - fR.left}px, ${tR.top - fR.top}px)`;
+            setTimeout(() => finalizeMove(moveStr, isOpponent, f, t), 250);
+            return;
+        }
+    }
+    finalizeMove(moveStr, isOpponent, f, t);
+}
+
+function showPointsAnimation(points) {
+    const container = document.getElementById('points-anim-container');
+    if (!container) return;
+    const animEl = document.createElement('div');
+    animEl.className = 'points-added';
+    animEl.textContent = `+${points}`;
+    container.appendChild(animEl);
+    setTimeout(() => animEl.remove(), 1000);
+}
+
+function finalizeMove(moveStr, isOpponent, f, t) {
+    if (boardState[t.r][t.c] !== "") safePlaySound(audioCapture);
+    else safePlaySound(audioMove);
+
+    let piece = boardState[f.r][f.c];
+    if (moveStr.length === 5) {
+        const prom = moveStr[4];
+        piece = (piece === piece.toUpperCase()) ? prom.toUpperCase() : prom.toLowerCase();
+    }
+    
+    if (piece.toLowerCase() === 'k' && Math.abs(f.c - t.c) === 2) {
+        const rookCol = t.c > f.c ? [7, 5] : [0, 3];
+        boardState[f.r][rookCol[1]] = boardState[f.r][rookCol[0]];
+        boardState[f.r][rookCol[0]] = "";
+    }
+    
+    boardState[t.r][t.c] = piece; boardState[f.r][f.c] = "";
+    currentStep++;
+    renderBoard(); 
+    
+    if (isOpponent) { 
+        isLocked = false; 
+    } else if (currentStep < puzzles[currentPuzzleIndex].moves.length) {
+        isLocked = true;
+        setTimeout(() => playMove(puzzles[currentPuzzleIndex].moves[currentStep], true), 600);
+    } else {
+        const thisElo = Number(puzzles[currentPuzzleIndex].elo);
+        const randomDelta = Math.floor(Math.random() * 16) + 100; 
+
+        if (!hasHint && !hasMistake) {
+            currentElo += randomDelta;
+            let pointsToAdd = (previousPuzzleElo === null) ? 15 : Math.max(5, Math.abs(thisElo - previousPuzzleElo));
+            
+            sessionScore += pointsToAdd;
+            document.getElementById('score-display').textContent = sessionScore;
+            
+            totalScore += pointsToAdd;
+            showPointsAnimation(pointsToAdd); 
+            
+            submitScore(totalScore); 
+        } else if (hasMistake && !hasHint) {
+            currentElo = Math.max(100, currentElo - randomDelta); 
+        }
+
+        previousPuzzleElo = thisElo;
+        setTimeout(startPuzzle, 800);
+    }
+}
+
+function applyHint() {
+    hasHint = true;
+    const correctMove = puzzles[currentPuzzleIndex].moves[currentStep];
+    hintSquare = correctMove.substring(0, 2);
+    renderBoard();
+}
+
+function showHints(r, c, piece) {
+    const currentSq = document.querySelector(`[data-pos="${idxToPos(r, c)}"]`);
+    if (currentSq) currentSq.classList.add('selected');
+
+    for (let tr = 0; tr < 8; tr++) {
+        for (let tc = 0; tc < 8; tc++) {
+            if (isPossibleMove(r, c, tr, tc, piece)) {
+                const targetPos = idxToPos(tr, tc);
+                const targetSq = document.querySelector(`[data-pos="${targetPos}"]`);
+                
+                if (targetSq) {
+                    if (targetSq.querySelector('.hint-dot, .hint-ring')) continue;
+                    const h = document.createElement('div');
+                    h.className = boardState[tr][tc] ? 'hint-ring' : 'hint-dot';
+                    targetSq.appendChild(h);
+                }
+            }
+        }
+    }
+}
+
+function isPossibleMove(fr, fc, tr, tc, piece, isCheckTest = false) {
+    if (fr === tr && fc === tc) return false;
+    const p = piece.toLowerCase();
+    const isW = piece === piece.toUpperCase();
+    const dr = Math.abs(tr - fr);
+    const dc = Math.abs(tc - fc);
+
+    if (!isCheckTest) {
+        if (boardState[tr][tc] !== "" && (boardState[tr][tc] === boardState[tr][tc].toUpperCase()) === isW) return false;
+    }
+
+    const clearPath = () => {
+        const sR = Math.sign(tr - fr);
+        const sC = Math.sign(tc - fc);
+        let r = fr + sR;
+        let c = fc + sC;
+        while (r !== tr || c !== tc) {
+            if (boardState[r][c] !== "") return false;
+            r += sR; c += sC;
+        }
+        return true;
+    };
+
+    switch(p) {
+        case 'p': 
+            const dir = isW ? -1 : 1;
+            if (!isCheckTest) {
+                if (dc === 0 && tr - fr === dir && boardState[tr][tc] === "") return true;
+                if (dc === 0 && tr - fr === 2 * dir && ((isW && fr === 6) || (!isW && fr === 1))) {
+                    return boardState[tr][tc] === "" && boardState[fr + dir][fc] === "";
+                }
+            }
+            if (dc === 1 && tr - fr === dir && (boardState[tr][tc] !== "" || isCheckTest)) return true;
+            return false;
+        case 'r': return (dr === 0 || dc === 0) && clearPath();
+        case 'n': return (dr === 2 && dc === 1) || (dr === 1 && dc === 2);
+        case 'b': return dr === dc && clearPath();
+        case 'q': return (dr === dc || dr === 0 || dc === 0) && clearPath();
+        case 'k': 
+            if (dr <= 1 && dc <= 1) {
+                if (isCheckTest) return true;
+                if (isSquareUnderAttack(tr, tc, !isW)) return false;
+                return true;
+            }
+            return false;
+    }
+    return false;
+}
+
+function parseFEN(f) {
+    return f.split(' ')[0].split('/').map(r => {
+        const row =[];
+        for (let char of r) { if (isNaN(char)) row.push(char); else for (let i = 0; i < parseInt(char); i++) row.push(""); }
+        return row;
+    });
+}
+
+function posToIdx(p) { return { r: 8 - parseInt(p[1]), c: p.charCodeAt(0) - 97 }; }
+function idxToPos(r, c) { return String.fromCharCode(97 + c) + (8 - r); }
+function updateFollower(x, y) { follower.style.left = x + 'px'; follower.style.top = y + 'px'; }
+
+document.addEventListener('contextmenu', e => e.preventDefault());
+document.addEventListener('dragstart', e => e.preventDefault());
+document.addEventListener('touchmove', e => { if (e.scale !== 1) e.preventDefault(); }, { passive: false });
+
+window.onload = initGame;
+
+</script>
+</body>
+</html>
