@@ -258,6 +258,9 @@ async function initGame() {
     if (lang !== 'ru' && lang !== 'en') lang = 'en'; 
     applyTranslations();
 
+    // ВОТ СЮДА ДОБАВЛЯЕМ ЛОГ:
+    console.log("Кнопка лидерборда в DOM:", document.getElementById('leaderboard-btn'));
+
     totalScore = await Platform.getScore();
     if (totalScore) {
         console.log("Общий счет подгружен:", totalScore);
@@ -903,4 +906,5 @@ window.onload = initGame;
 </script>
 </body>
 </html>
+
 
