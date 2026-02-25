@@ -14,6 +14,36 @@
             --gray-800: #1f2937;
         }
 
+
+        .corner-btn {
+    position: absolute;
+    top: 15px;      /* Отступ сверху */
+    right: 15px;    /* Отступ справа */
+    width: 44px;
+    height: 44px;
+    background: rgba(0, 0, 0, 0.3); /* Полупрозрачный фон */
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 1000;  /* Поверх всего */
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(4px); /* Размытие фона за кнопкой (модно) */
+    transition: transform 0.1s;
+    -webkit-tap-highlight-color: transparent; /* Убирает синюю рамку при клике на мобилках */
+}
+
+.corner-btn:active {
+    transform: scale(0.9); /* Анимация нажатия */
+}
+
+.corner-btn svg {
+    width: 26px;
+    height: 26px;
+    fill: #ffd700; /* Золотой цвет кубка */
+}
+
 /* --- ПРОСТАЯ ПУЛЬСАЦИЯ ЦВЕТОМ --- */
 .square.hint-blink::after {
     content: "";
