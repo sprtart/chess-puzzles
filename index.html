@@ -21,6 +21,12 @@
 </head>
 <body>
 
+    <div id="leaderboard-btn" class="corner-btn" onclick="Platform.showLeaderboard()">
+    <svg viewBox="0 0 24 24">
+        <path d="M19 5h-2V3H7v2H5c-1.1 0-2 .9-2 2v3c0 2.55 1.92 4.63 4.39 4.94.63 1.5 1.98 2.63 3.61 2.96V19H7v2h10v-2h-4v-3.1c1.63-.33 2.98-1.46 3.61-2.96C19.08 12.63 21 10.55 21 8V7c0-1.1-.9-2-2-2zM5 8V7h2v3.82C5.84 10.4 5 9.3 5 8zm14 0c0 1.3-.84 2.4-2 2.82V7h2v1z"/>
+    </svg>
+</div>
+
 <div id="loading-screen">
     <img src="img/logo.png" alt="Logo" class="loader-logo">
     <div class="progress-container">
@@ -80,17 +86,29 @@ const Platform = {
     id: 'local', // По умолчанию работаем локально
 
     async init() {
-        // Проверяем ВКонтакте
-        if (typeof vkBridge !== 'undefined' && vkBridge.supports('VKWebAppInit')) {
-            try {
-                await vkBridge.send('VKWebAppInit');
-                this.id = 'vk';
-                return console.log("Платформа: ВКонтакте");
-            } catch (e) { console.warn("VK init failed"); }
-        }
+            // 1. Проверяем наличие моста
+            if (typeof vkBridge !== 'undefined') {
+                try {
+                    // 2. Инициализация (сообщаем ВК, что приложение запустилось)
+                    await vkBridge.send('VKWebAppInit');
+                    this.id = 'vk';
 
-        console.log("Платформа: Локальная (без SDK)");
-    },
+                    // 3. Сразу запрашиваем данные пользователя
+                    // Это важно сделать в начале, чтобы потом не ждать
+                    const userData = await vkBridge.send('VKWebAppGetUserInfo');
+                    this.user = userData; // Сохраняем объект пользователя внутри Platform
+
+                    console.log("Платформа: ВКонтакте. Игрок:", this.user.first_name);
+                    return; 
+                } catch (e) {
+                    console.warn("Ошибка при инициализации VK SDK:", e);
+                    // Если произошла ошибка, проваливаемся в local
+                }
+            }
+
+            this.id = 'local';
+            console.log("Платформа: Локальная (без SDK)");
+        },
 
     getLang() {
         if (this.id === 'vk') {
@@ -112,19 +130,52 @@ const Platform = {
         return 0;
     },
 
-    setScore(score) {
+setScore(score) {
         if (this.id === 'vk') {
+            // 1. Сохраняем в личное хранилище (как и было)
             vkBridge.send('VKWebAppStorageSet', { key: 'totalScore', value: String(score) }).catch(()=>{});
+            
+            // 2. Отправляем в глобальный рейтинг ВК
+            // Важно: ВК принимает только целые числа
+            vkBridge.send('VKWebAppSetScore', { score: parseInt(score) })
+                .then((data) => { console.log("Рекорд обновлен в ВК:", data); })
+                .catch((error) => { console.error("Ошибка SetScore:", error); });
         }
     },
 
-    showInterstitial(onClose) {
+showLeaderboard() {
         if (this.id === 'vk') {
-            vkBridge.send('VKWebAppShowNativeAds', { ad_format: 'interstitial' })
-                .then(() => onClose())
-                .catch(() => onClose()); // Если рекламы нет, просто продолжаем игру
+            // totalScore — это твоя глобальная переменная с очками
+            vkBridge.send('VKWebAppShowLeaderBoardBox', { user_score: totalScore })
+                .catch((error) => { console.error("Ошибка лидерборда:", error); });
         } else {
-            onClose(); // Локально просто запускаем игру
+            alert("Лидерборд доступен только в ВК. Очки: " + totalScore);
+        }
+    },
+    
+    setScore(score) {
+        if (this.id === 'vk') {
+            vkBridge.send('VKWebAppStorageSet', { key: 'totalScore', value: String(score) }).catch(()=>{});
+            // Обязательно дублируем в глобальный рейтинг ВК:
+            vkBridge.send('VKWebAppSetScore', { score: parseInt(score) }).catch(()=>{});
+        }
+    },
+
+showInterstitial(onClose) {
+        if (this.id === 'vk') {
+            this.gameplayStop(); // ОСТАНАВЛИВАЕМ звук перед рекламой
+            
+            vkBridge.send('VKWebAppShowNativeAds', { ad_format: 'interstitial' })
+                .then(() => {
+                    this.gameplayStart(); // ВКЛЮЧАЕМ звук после
+                    onClose();
+                })
+                .catch(() => {
+                    this.gameplayStart(); // ВКЛЮЧАЕМ звук, если реклама не загрузилась
+                    onClose();
+                });
+        } else {
+            onClose();
         }
     },
 
@@ -143,8 +194,15 @@ const Platform = {
     },
 
     // Пустышки (ВК не требует явного старта/стопа геймплея как Яндекс)
-    gameplayStart() {},
-    gameplayStop() {},
+    gameplayStart() {
+            console.log("Геймплей возобновлен");
+            setAllAudioMute(false); // Включаем звук
+        },
+
+        gameplayStop() {
+            console.log("Геймплей приостановлен (реклама)");
+            setAllAudioMute(true); // Выключаем звук
+        },
     loadingReady() {}
 };
 // ==========================================
@@ -191,6 +249,7 @@ function safePlaySound(audioObj) {
     }
 }
 
+
 async function initGame() {
     await Platform.init(); // Ждем инициализацию
 
@@ -213,6 +272,12 @@ function submitScore(newTotalScore) {
 const audioMove = new Audio('sounds/Move.ogg');
 const audioCapture = new Audio('sounds/Capture.ogg');
 const audioError = new Audio('sounds/Error.ogg');
+
+function setAllAudioMute(isMuted) {
+    audioMove.muted = isMuted;
+    audioCapture.muted = isMuted;
+    audioError.muted = isMuted;
+}
 
 const PIECE_IMAGES = {
     'P': 'img/Chess_plt45.svg', 'R': 'img/Chess_rlt45.svg', 'N': 'img/Chess_nlt45.svg', 'B': 'img/Chess_blt45.svg', 'Q': 'img/Chess_qlt45.svg', 'K': 'img/Chess_klt45.svg',
