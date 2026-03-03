@@ -146,31 +146,24 @@ setScore(score) {
 
 showLeaderboard() {
     if (this.id === 'vk') {
-        console.log("Пытаюсь открыть лидерборд. Текущие очки:", totalScore);
-        
-        vkBridge.send('VKWebAppShowLeaderBoardBox', { 
-            user_score: parseInt(totalScore) || 0 
-        })
-        .then((data) => {
-            console.log("Лидерборд открыт успешно:", data);
-        })
-        .catch((error) => {
-            // Код 5 значит, что юзер просто закрыл окно или отменил приглашение друзей. Это не баг.
-            if (error?.error_data?.error_code === 5) {
-                console.log("Пользователь закрыл окно лидерборда/приглашений.");
-                return;
-            }
-            
-            // Если ошибка другая (например, не поддерживается на mobile_web)
-            console.warn("Лидерборд не может быть показан на этой платформе (например, в браузере с телефона).", error);
-            
-            // Здесь можно показать кастомный alert или всплывающее окно внутри самой игры:
-            if (window.innerWidth <= 768) {
-                alert("Рейтинг доступен только в официальном приложении ВКонтакте или на компьютере!\nВаши очки: " + totalScore);
-            }
-        });
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
+        if (isMobile) {
+            // На мобилках окно лидерборда сломано у ВК, поэтому открываем окно ПРИГЛАШЕНИЯ ДРУЗЕЙ
+            vkBridge.send("VKWebAppShowInviteBox", {})
+                .then(data => console.log("Окно приглашений открыто", data))
+                .catch(err => {
+                    alert("Ваш рекорд: " + totalScore + " очков!");
+                });
+        } else {
+            // На ПК открываем Лидерборд
+            vkBridge.send('VKWebAppShowLeaderBoardBox', { user_score: parseInt(totalScore) || 0 })
+                .catch(err => {
+                    if (err?.error_data?.error_code !== 5) alert("Ваш рекорд: " + totalScore + " очков!");
+                });
+        }
     } else {
-        alert("Лидерборд доступен только в ВК. Очки: " + totalScore);
+        alert("Очки: " + totalScore);
     }
 },
     
