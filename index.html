@@ -44,7 +44,7 @@
     <div class="side-panel">
         <div class="top-bar">
             <div class="stat-card">
-                <span class="stat-label" id="label-rating">Рейтинг</span>
+                <span class="stat-label" id="label-rating">Эло</span>
                 <span id="puzzle-elo" class="stat-value">---</span>
             </div>
             <div class="stat-card" style="position: relative;">
@@ -257,8 +257,8 @@ const i18n = {
         loading: "Загрузка:",
         preparing: "Подготовка шахмат...",
         errorLoad: "Ошибка загрузки данных",
-        rating: "Рейтинг",
-        score: "Очки?",
+        rating: "Эло",
+        score: "Очки",
         hintBtn: "Подсказка",
         adLoading: "Загрузка..."
     },
@@ -267,7 +267,7 @@ const i18n = {
         loading: "Loading:",
         preparing: "Preparing chess...",
         errorLoad: "Error loading data",
-        rating: "Rating",
+        rating: "Elo",
         score: "Score",
         hintBtn: "Hint",
         adLoading: "Loading..."
@@ -801,8 +801,13 @@ function showPointsAnimation(points) {
 }
 
 function finalizeMove(moveStr, isOpponent, f, t) {
-    if (boardState[t.r][t.c] !== "") safePlaySound(audioCapture);
-    else safePlaySound(audioMove);
+    if (boardState[t.r][t.c] !== "") {
+        safePlaySound(audioCapture);
+        if (!isOpponent) Platform.vibrate('capture'); // <--- ДОБАВИТЬ ЭТУ СТРОКУ (ВЗЯТИЕ)
+    } else {
+        safePlaySound(audioMove);
+        if (!isOpponent) Platform.vibrate('move'); // <--- ДОБАВИТЬ ЭТУ СТРОКУ (ОБЫЧНЫЙ ХОД)
+    }
 
     let piece = boardState[f.r][f.c];
     if (moveStr.length === 5) {
