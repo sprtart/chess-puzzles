@@ -152,7 +152,7 @@
     .right-column {
         display: flex; 
         flex-direction: column;
-        gap: 2vw; /* Отступ между профилем и нижней статистикой */
+        gap: 4vw; /* Отступ между профилем и нижней статистикой */
         width: 25vw; 
         min-width: 240px;
     }
@@ -644,6 +644,7 @@
         gap: 0vw;
         width: 100%;
         box-sizing: border-box;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
     }
 
 
