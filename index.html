@@ -146,32 +146,28 @@ setScore(score) {
 
 showLeaderboard() {
     if (this.id === 'vk') {
+        console.log("Пытаюсь открыть лидерборд. Очки:", totalScore);
+        
         vkBridge.send('VKWebAppShowLeaderBoardBox', { 
             user_score: parseInt(totalScore) || 0 
         })
         .then((data) => {
-            // Сработает на ПК (откроется нативное окно ВК)
             console.log("Лидерборд открыт успешно:", data);
         })
         .catch((error) => {
-            // Сработает на СМАРТФОНЕ или если юзер закрыл окно на ПК
-            console.warn("ВК отказался открывать окно лидерборда:", error);
+            console.warn("Ошибка лидерборда:", error);
             
-            // Проверяем, если это мобилка, показываем просто Alert
-            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-            
-            if (isMobile) {
-                alert("Ваш рекорд: " + totalScore + " очков!\n(Подробная таблица лидеров доступна при игре с компьютера)");
-            } else if (error?.error_data?.error_code === 5) {
-                // Юзер на ПК сам нажал крестик
-                console.log("Окно закрыто пользователем");
+            // Если ошибка 5 - юзер просто закрыл окно или оно не смогло открыться из-за отсутствия друзей
+            if (error?.error_data?.error_code === 5) {
+                // Выводим свое красивое окно средствами HTML/JS
+                alert("Пока никто из ваших друзей не играл!\nВаш рекорд: " + totalScore);
             } else {
-                // Любая другая ошибка
-                alert("Ваш рекорд: " + totalScore + " очков!");
+                // Для остальных системных ошибок
+                alert("Рейтинг сейчас недоступен.\nВаш рекорд: " + totalScore);
             }
         });
     } else {
-        alert("Ваш рекорд: " + totalScore);
+        alert("Очки: " + totalScore);
     }
 },
     
