@@ -29,8 +29,8 @@
     justify-content: space-between;
     align-items: center;
     width: 100%;
-    margin-bottom: 8px; /* Отступ от доски */
-    padding: 0 4px;
+    margin-bottom: 2vh; /* Отступ от доски */
+    padding: 0 6vw;
 }
 
 .user-info {
