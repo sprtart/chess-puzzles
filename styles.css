@@ -619,7 +619,7 @@
 
 /* --- Ультра-длинные (21:9, 20:9) --- */
 /* Соотношение до 0.52 */
-@media (max-aspect-ratio: 52/100) { 
+@media (max-aspect-ratio: 32/100) { 
         .chess-board {
         width: 100vw;
         height: 100vw;
