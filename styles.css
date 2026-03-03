@@ -670,7 +670,7 @@
 @media (min-aspect-ratio: 63/100) { 
     .chess-board {
         width: 85vw;
-        height: 5vw;
+        height: 85vw;
         border-radius: 1vw;
     }
         /* Шрифты ЧИСТО НА VW */
