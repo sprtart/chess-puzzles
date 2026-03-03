@@ -146,24 +146,32 @@ setScore(score) {
 
 showLeaderboard() {
     if (this.id === 'vk') {
-        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-
-        if (isMobile) {
-            // На мобилках окно лидерборда сломано у ВК, поэтому открываем окно ПРИГЛАШЕНИЯ ДРУЗЕЙ
-            vkBridge.send("VKWebAppShowInviteBox", {})
-                .then(data => console.log("Окно приглашений открыто", data))
-                .catch(err => {
-                    alert("Ваш рекорд: " + totalScore + " очков!");
-                });
-        } else {
-            // На ПК открываем Лидерборд
-            vkBridge.send('VKWebAppShowLeaderBoardBox', { user_score: parseInt(totalScore) || 0 })
-                .catch(err => {
-                    if (err?.error_data?.error_code !== 5) alert("Ваш рекорд: " + totalScore + " очков!");
-                });
-        }
+        vkBridge.send('VKWebAppShowLeaderBoardBox', { 
+            user_score: parseInt(totalScore) || 0 
+        })
+        .then((data) => {
+            // Сработает на ПК (откроется нативное окно ВК)
+            console.log("Лидерборд открыт успешно:", data);
+        })
+        .catch((error) => {
+            // Сработает на СМАРТФОНЕ или если юзер закрыл окно на ПК
+            console.warn("ВК отказался открывать окно лидерборда:", error);
+            
+            // Проверяем, если это мобилка, показываем просто Alert
+            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+            
+            if (isMobile) {
+                alert("Ваш рекорд: " + totalScore + " очков!\n(Подробная таблица лидеров доступна при игре с компьютера)");
+            } else if (error?.error_data?.error_code === 5) {
+                // Юзер на ПК сам нажал крестик
+                console.log("Окно закрыто пользователем");
+            } else {
+                // Любая другая ошибка
+                alert("Ваш рекорд: " + totalScore + " очков!");
+            }
+        });
     } else {
-        alert("Очки: " + totalScore);
+        alert("Ваш рекорд: " + totalScore);
     }
 },
     
