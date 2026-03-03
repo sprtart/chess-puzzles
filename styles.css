@@ -162,7 +162,7 @@
         width: 100%;
         margin-bottom: 0;
         background: white; 
-        padding: 1.5vw 3vw; /* Делаем такой же отступ как у карточек статы */
+        padding: 1.5vw 2vw; /* Делаем такой же отступ как у карточек статы */
         border-radius: 1.5vw;
         min-width: min(22vw, 85vh);
         box-shadow: 0 4px 15px rgba(0,0,0,0.05); /* Легкая тень карточки */
@@ -620,7 +620,7 @@
     }
 
     .side-panel {
-        width: 22vw;
+        /*width: 22vw;*/
         /*min-width: 220px;*/
         align-items: stretch;
         gap: 4vw;
