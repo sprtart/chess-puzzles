@@ -22,15 +22,17 @@
 }
 
 #profile-header {
-    order: -1; /* Ставим профиль ПЕРЕД доской */
+    order: -1;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    width: min(97vw, 85vh); /* Ширина как у доски */
-    min-width: min(97vw, 72vh);
+    width: min(85vw, 85vh);
+    min-width: min(85vw, 72vh);
     margin-bottom: 8px;
-    padding: 0 6vw;
+    padding: 2vh 6vw;
     box-sizing: border-box;
+    background-color: #ffffff;
+    border-radius: 30px;
 }
 
 #board-wrapper {
@@ -546,7 +548,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 1vw;
+    gap: 2vw;
     width: 100%;
 }
 
@@ -589,8 +591,8 @@
 
 .btn-hint {
     font-size: 5vw;
-    padding: 1.5vw 5vw;
-    border-radius: 2vw;
+    padding: 4vw 7vw;
+    border-radius: 6vw;
 }
 
 .text {
