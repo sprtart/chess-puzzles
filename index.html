@@ -79,7 +79,11 @@
     <div class="modal-box">
         <h2 id="modal-title">Статистика</h2>
         <div class="stat-row"><span id="t-score">Общий счет:</span> <b id="mdl-score">0</b></div>
-        <div class="stat-row"><span id="t-solved">Решено задач:</span> <b id="mdl-solved">0</b></div>
+        
+        <div class="stat-row"><span id="t-solved">Всего решено:</span> <b id="mdl-solved">0</b></div>
+        <!-- НОВАЯ СТРОКА: -->
+        <div class="stat-row"><span id="t-flawless">Решено без ошибок:</span> <b id="mdl-flawless" style="color:#16a34a;">0</b></div>
+        
         <div class="stat-row"><span id="t-mistakes">Сделано ошибок:</span> <b id="mdl-mistakes">0</b></div>
         <div class="stat-row"><span id="t-max">Макс. рейтинг:</span> <b id="mdl-max-elo">0</b></div>
         <button class="btn-close-modal" onclick="hideStatsModal()" id="t-close">Закрыть</button>
@@ -308,6 +312,7 @@ function saveCurrentStats() {
     Platform.saveStats({
         score: totalScore,
         solved: statsTotalSolved,
+        flawless: statsFlawless,
         mistakes: statsTotalMistakes,
         maxElo: statsMaxElo
     });
@@ -333,6 +338,7 @@ async function initGame() {
     const savedStats = await Platform.getStats();
     totalScore = savedStats.score || 0;
     statsTotalSolved = savedStats.solved || 0;
+    statsFlawless = savedStats.flawless || 0;
     statsTotalMistakes = savedStats.mistakes || 0;
     statsMaxElo = savedStats.maxElo || 0;
     
@@ -382,6 +388,7 @@ let isAdLoading = false;
 // --- НОВЫЕ ПЕРЕМЕННЫЕ СТАТИСТИКИ ---
 let totalScore = 0;   
 let statsTotalSolved = 0;
+let statsFlawless = 0;
 let statsTotalMistakes = 0;
 let statsMaxElo = 0;
 
@@ -878,11 +885,21 @@ function finalizeMove(moveStr, isOpponent, f, t) {
     } else if (currentStep < puzzles[currentPuzzleIndex].moves.length) {
         isLocked = true;
         setTimeout(() => playMove(puzzles[currentPuzzleIndex].moves[currentStep], true), 600);
-    } else {
+} else {
+        // ЗАДАЧА ЗАВЕРШЕНА
         const thisElo = Number(puzzles[currentPuzzleIndex].elo);
         const randomDelta = Math.floor(Math.random() * 16) + 100; 
 
-if (!hasHint && !hasMistake) {
+        // 1. Считаем ЛЮБУЮ решенную задачу (даже если были ошибки)
+        statsTotalSolved++; 
+        if (thisElo > statsMaxElo) statsMaxElo = thisElo; // Обновляем рекордный ЭЛО
+
+        // 2. Проверяем, была ли задача решена ИДЕАЛЬНО (без ошибок и подсказок)
+        if (!hasHint && !hasMistake) {
+            if (Platform.vibrate) Platform.vibrate('success'); // Вибрация победы
+            
+            statsFlawless++; // <--- ПЛЮС ИДЕАЛЬНАЯ ЗАДАЧА
+            
             currentElo += randomDelta;
             let pointsToAdd = (previousPuzzleElo === null) ? 15 : Math.max(5, Math.abs(thisElo - previousPuzzleElo));
             
@@ -890,15 +907,14 @@ if (!hasHint && !hasMistake) {
             document.getElementById('score-display').textContent = sessionScore;
             
             totalScore += pointsToAdd;
-            statsTotalSolved++; // Считаем решенную задачу
-            if (thisElo > statsMaxElo) statsMaxElo = thisElo; // Обновляем максимальный рейтинг
-
             showPointsAnimation(pointsToAdd); 
-            saveCurrentStats(); // Сохраняем стату
+            
         } else if (hasMistake && !hasHint) {
+            // Если были ошибки, понижаем рейтинг, очки не даем
             currentElo = Math.max(100, currentElo - randomDelta); 
         }
 
+        saveCurrentStats(); // Сохраняем всю статистику разом
         previousPuzzleElo = thisElo;
         setTimeout(startPuzzle, 800);
     }
@@ -1001,6 +1017,7 @@ document.addEventListener('touchmove', e => { if (e.scale !== 1) e.preventDefaul
 function showStatsModal() {
     document.getElementById('mdl-score').textContent = totalScore;
     document.getElementById('mdl-solved').textContent = statsTotalSolved;
+    document.getElementById('mdl-flawless').textContent = statsFlawless; // <--- ДОБАВЛЕНО
     document.getElementById('mdl-mistakes').textContent = statsTotalMistakes;
     document.getElementById('mdl-max-elo').textContent = statsMaxElo;
     document.getElementById('stats-modal').classList.remove('hidden');
@@ -1010,18 +1027,18 @@ function hideStatsModal() {
     document.getElementById('stats-modal').classList.add('hidden');
 }
 
-// Добавляем переводы для модального окна в applyTranslations()
+// Переводы для нового пункта
 const translationsExtensions = {
-    ru: { mTitle: "Статистика", mScore: "Общий счет:", mSolv: "Решено задач:", mMist: "Сделано ошибок:", mMax: "Макс. рейтинг задачи:", mClose: "Закрыть" },
-    en: { mTitle: "Statistics", mScore: "Total Score:", mSolv: "Puzzles Solved:", mMist: "Mistakes Made:", mMax: "Max Puzzle Rating:", mClose: "Close" }
+    ru: { mTitle: "Статистика", mScore: "Общий счет:", mSolv: "Всего решено:", mFlaw: "Решено без ошибок:", mMist: "Сделано ошибок:", mMax: "Макс. рейтинг задачи:", mClose: "Закрыть" },
+    en: { mTitle: "Statistics", mScore: "Total Score:", mSolv: "Total Solved:", mFlaw: "Flawlessly Solved:", mMist: "Mistakes Made:", mMax: "Max Puzzle Rating:", mClose: "Close" }
 };
 
-// Чтобы текст в окне тоже переводился:
 function updateModalTexts() {
     const txt = translationsExtensions[lang];
     document.getElementById('modal-title').textContent = txt.mTitle;
     document.getElementById('t-score').textContent = txt.mScore;
     document.getElementById('t-solved').textContent = txt.mSolv;
+    document.getElementById('t-flawless').textContent = txt.mFlaw; // <--- ДОБАВЛЕНО
     document.getElementById('t-mistakes').textContent = txt.mMist;
     document.getElementById('t-max').textContent = txt.mMax;
     document.getElementById('t-close').textContent = txt.mClose;
