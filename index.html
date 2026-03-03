@@ -33,10 +33,17 @@
 
 <div class="game-container">
 
-        <div id="leaderboard-btn" class="corner-btn" onclick="Platform.showLeaderboard()">
-        <svg viewBox="0 0 24 24"><path d="M19 5h-2V3H7v2H5c-1.1 0-2 .9-2 2v3c0 2.55 1.92 4.63 4.39 4.94.63 1.5 1.98 2.63 3.61 2.96V19H7v2h10v-2h-4v-3.1c1.63-.33 2.98-1.46 3.61-2.96C19.08 12.63 21 10.55 21 8V7c0-1.1-.9-2-2-2zM5 8V7h2v3.82C5.84 10.4 5 9.3 5 8zm14 0c0 1.3-.84 2.4-2 2.82V7h2v1z"/></svg>
-    </div>
-    
+        <div id="profile-header">
+            <div class="user-info">
+                <img id="user-avatar" src='data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%239ca3af"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>' alt="Аватар">
+                <span id="user-name">Игрок</span>
+            </div>
+            <button class="btn-stats" onclick="showStatsModal()">
+                <!-- Иконка статистики -->
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 11V3H8v6H2v12h20V11h-6zm-6-6h4v14h-4V5zm-6 6h4v8H4v-8zm16 8h-4v-6h4v6z"/></svg>
+            </button>
+        </div>
+
     <div id="board-wrapper">
         <div id="board" class="chess-board"></div>
     </div>
@@ -65,6 +72,17 @@
     <span id="hint-btn-text">Подсказка</span>
 </button>
         </div>
+    </div>
+</div>
+
+<div id="stats-modal" class="modal-overlay hidden">
+    <div class="modal-box">
+        <h2 id="modal-title">Статистика</h2>
+        <div class="stat-row"><span id="t-score">Общий счет:</span> <b id="mdl-score">0</b></div>
+        <div class="stat-row"><span id="t-solved">Решено задач:</span> <b id="mdl-solved">0</b></div>
+        <div class="stat-row"><span id="t-mistakes">Сделано ошибок:</span> <b id="mdl-mistakes">0</b></div>
+        <div class="stat-row"><span id="t-max">Макс. рейтинг:</span> <b id="mdl-max-elo">0</b></div>
+        <button class="btn-close-modal" onclick="hideStatsModal()" id="t-close">Закрыть</button>
     </div>
 </div>
 
@@ -121,26 +139,29 @@ const Platform = {
         return navigator.language.slice(0, 2) === 'ru' ? 'ru' : 'en';
     },
 
-    async getScore() {
+ async getStats() {
+        let stats = { score: 0, solved: 0, mistakes: 0, maxElo: 0 };
         if (this.id === 'vk') {
             try {
-                const data = await vkBridge.send('VKWebAppStorageGet', { keys:['totalScore'] });
-                if (data.keys && data.keys[0].value) return parseInt(data.keys[0].value, 10);
+                // Запрашиваем новый ключ и старый для переноса очков
+                const data = await vkBridge.send('VKWebAppStorageGet', { keys: ['chessStats', 'totalScore'] });
+                const statsStr = data.keys.find(k => k.key === 'chessStats')?.value;
+                const oldScoreStr = data.keys.find(k => k.key === 'totalScore')?.value;
+                
+                if (statsStr) {
+                    stats = JSON.parse(statsStr); // Если уже есть новая стата
+                } else if (oldScoreStr) {
+                    stats.score = parseInt(oldScoreStr, 10); // Переносим старые очки игрока!
+                }
             } catch(e) {}
         }
-        return 0;
+        return stats;
     },
 
-setScore(score) {
+    saveStats(statsObj) {
         if (this.id === 'vk') {
-            // 1. Сохраняем в личное хранилище (как и было)
-            vkBridge.send('VKWebAppStorageSet', { key: 'totalScore', value: String(score) }).catch(()=>{});
-            
-            // 2. Отправляем в глобальный рейтинг ВК
-            // Важно: ВК принимает только целые числа
-            vkBridge.send('VKWebAppSetScore', { score: parseInt(score) })
-                .then((data) => { console.log("Рекорд обновлен в ВК:", data); })
-                .catch((error) => { console.error("Ошибка SetScore:", error); });
+            vkBridge.send('VKWebAppStorageSet', { key: 'chessStats', value: JSON.stringify(statsObj) }).catch(()=>{});
+            vkBridge.send('VKWebAppSetScore', { score: parseInt(statsObj.score) }).catch(()=>{});
         }
     },
 
@@ -283,6 +304,15 @@ function applyTranslations() {
     document.getElementById('loading-text').textContent = t.preparing;
 }
 
+function saveCurrentStats() {
+    Platform.saveStats({
+        score: totalScore,
+        solved: statsTotalSolved,
+        mistakes: statsTotalMistakes,
+        maxElo: statsMaxElo
+    });
+}
+
 function safePlaySound(audioObj) {
     if (!audioObj) return;
     const promise = audioObj.play();
@@ -293,20 +323,29 @@ function safePlaySound(audioObj) {
 
 
 async function initGame() {
-    await Platform.init(); // Ждем инициализацию
+    await Platform.init();
 
     lang = Platform.getLang();
     if (lang !== 'ru' && lang !== 'en') lang = 'en'; 
     applyTranslations();
 
-    // ВОТ СЮДА ДОБАВЛЯЕМ ЛОГ:
-    console.log("Кнопка лидерборда в DOM:", document.getElementById('leaderboard-btn'));
-
-    totalScore = await Platform.getScore();
-    if (totalScore) {
-        console.log("Общий счет подгружен:", totalScore);
-    }
+    // Загружаем статистику из ВК
+    const savedStats = await Platform.getStats();
+    totalScore = savedStats.score || 0;
+    statsTotalSolved = savedStats.solved || 0;
+    statsTotalMistakes = savedStats.mistakes || 0;
+    statsMaxElo = savedStats.maxElo || 0;
     
+    // Подставляем аватарку и имя, если играем в ВК
+    if (Platform.id === 'vk' && Platform.user) {
+        document.getElementById('user-name').textContent = Platform.user.first_name;
+        if (Platform.user.photo_100) {
+            document.getElementById('user-avatar').src = Platform.user.photo_100;
+        }
+    } else {
+        document.getElementById('user-name').textContent = (lang === 'ru') ? 'Игрок' : 'Player';
+    }
+
     loadData(); 
 }
 
@@ -335,11 +374,16 @@ let lastMoveSquares =[], hintSquare = null;
 
 let currentElo = 400;
 let sessionScore = 0; 
-let totalScore = 0;   
 let previousPuzzleElo = null;
 let hasMistake = false;
 let hasHint = false;
 let isAdLoading = false; 
+
+// --- НОВЫЕ ПЕРЕМЕННЫЕ СТАТИСТИКИ ---
+let totalScore = 0;   
+let statsTotalSolved = 0;
+let statsTotalMistakes = 0;
+let statsMaxElo = 0;
 
 const boardEl = document.getElementById('board');
 const follower = document.getElementById('drag-follower');
@@ -732,6 +776,10 @@ function checkLogicMove(tr, tc) {
 function handleMoveError(fromPos, toPos) {
     hasMistake = true;
     safePlaySound(audioError); 
+
+    statsTotalMistakes++; // Считаем ошибку
+    saveCurrentStats();   // Сохраняем
+
     Platform.vibrate('error');
     const fromSq = document.querySelector(`[data-pos="${fromPos}"]`);
     const toSq = document.querySelector(`[data-pos="${toPos}"]`);
@@ -834,7 +882,7 @@ function finalizeMove(moveStr, isOpponent, f, t) {
         const thisElo = Number(puzzles[currentPuzzleIndex].elo);
         const randomDelta = Math.floor(Math.random() * 16) + 100; 
 
-        if (!hasHint && !hasMistake) {
+if (!hasHint && !hasMistake) {
             currentElo += randomDelta;
             let pointsToAdd = (previousPuzzleElo === null) ? 15 : Math.max(5, Math.abs(thisElo - previousPuzzleElo));
             
@@ -842,9 +890,11 @@ function finalizeMove(moveStr, isOpponent, f, t) {
             document.getElementById('score-display').textContent = sessionScore;
             
             totalScore += pointsToAdd;
+            statsTotalSolved++; // Считаем решенную задачу
+            if (thisElo > statsMaxElo) statsMaxElo = thisElo; // Обновляем максимальный рейтинг
+
             showPointsAnimation(pointsToAdd); 
-            
-            submitScore(totalScore); 
+            saveCurrentStats(); // Сохраняем стату
         } else if (hasMistake && !hasHint) {
             currentElo = Math.max(100, currentElo - randomDelta); 
         }
@@ -946,6 +996,37 @@ function updateFollower(x, y) { follower.style.left = x + 'px'; follower.style.t
 document.addEventListener('contextmenu', e => e.preventDefault());
 document.addEventListener('dragstart', e => e.preventDefault());
 document.addEventListener('touchmove', e => { if (e.scale !== 1) e.preventDefault(); }, { passive: false });
+
+
+function showStatsModal() {
+    document.getElementById('mdl-score').textContent = totalScore;
+    document.getElementById('mdl-solved').textContent = statsTotalSolved;
+    document.getElementById('mdl-mistakes').textContent = statsTotalMistakes;
+    document.getElementById('mdl-max-elo').textContent = statsMaxElo;
+    document.getElementById('stats-modal').classList.remove('hidden');
+}
+
+function hideStatsModal() {
+    document.getElementById('stats-modal').classList.add('hidden');
+}
+
+// Добавляем переводы для модального окна в applyTranslations()
+const translationsExtensions = {
+    ru: { mTitle: "Статистика", mScore: "Общий счет:", mSolv: "Решено задач:", mMist: "Сделано ошибок:", mMax: "Макс. рейтинг задачи:", mClose: "Закрыть" },
+    en: { mTitle: "Statistics", mScore: "Total Score:", mSolv: "Puzzles Solved:", mMist: "Mistakes Made:", mMax: "Max Puzzle Rating:", mClose: "Close" }
+};
+
+// Чтобы текст в окне тоже переводился:
+function updateModalTexts() {
+    const txt = translationsExtensions[lang];
+    document.getElementById('modal-title').textContent = txt.mTitle;
+    document.getElementById('t-score').textContent = txt.mScore;
+    document.getElementById('t-solved').textContent = txt.mSolv;
+    document.getElementById('t-mistakes').textContent = txt.mMist;
+    document.getElementById('t-max').textContent = txt.mMax;
+    document.getElementById('t-close').textContent = txt.mClose;
+}
+// Вызовите updateModalTexts() внутри вашей applyTranslations()
 
 window.onload = initGame;
 
