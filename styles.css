@@ -16,22 +16,31 @@
 
 
 /* --- ПРОФИЛЬ НАД ДОСКОЙ --- */
-.board-area {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: min(97vw, 85vh); /* Ширина равна ширине доски */
-    min-width: min(97vw, 72vh);
+/* --- БАЗОВЫЕ СТИЛИ ПРОФИЛЯ (СМАРТФОН) --- */
+.right-column {
+    display: contents; /* Растворяет саму колонку, элементы встают в общую очередь */
 }
 
 #profile-header {
+    order: -1; /* Ставим профиль ПЕРЕД доской */
     display: flex;
     justify-content: space-between;
     align-items: center;
-    width: 100%;
-    margin-bottom: 2vh; /* Отступ от доски */
-    padding: 0 6vw;
+    width: min(97vw, 85vh); /* Ширина как у доски */
+    min-width: min(97vw, 72vh);
+    margin-bottom: 8px;
+    padding: 0 4px;
+    box-sizing: border-box;
 }
+
+#board-wrapper {
+    order: 0; /* Доска посередине */
+}
+
+.side-panel {
+    order: 1; /* Статистика под доской */
+}
+
 
 .user-info {
     display: flex;
@@ -133,6 +142,46 @@
 }
 .btn-close-modal:active { background: var(--gray-400); }
 
+
+
+
+@media (orientation: landscape) {
+    /* ... ваши стили game-container ... */
+
+    /* Включаем колонку на ПК */
+    .right-column {
+        display: flex; 
+        flex-direction: column;
+        gap: 2vw; /* Отступ между профилем и нижней статистикой */
+        width: 25vw; 
+        min-width: 240px;
+    }
+
+    #profile-header {
+        order: unset; /* Возвращаем на место */
+        width: 100%;
+        margin-bottom: 0;
+        background: white; 
+        padding: 1.5vw 3vw; /* Делаем такой же отступ как у карточек статы */
+        border-radius: 1.5vw;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05); /* Легкая тень карточки */
+    }
+
+    /* Адаптируем размеры профиля для ПК */
+    #user-avatar { width: 3.5vw; height: 3.5vw; min-width: 40px; min-height: 40px; }
+    .btn-stats { width: 3.5vw; height: 3.5vw; min-width: 40px; min-height: 40px; border-radius: 1vw;}
+    #user-name { font-size: 1.5vw; max-width: 12vw;}
+    
+    .side-panel {
+        width: 100%;
+        align-items: stretch;
+        gap: 2vw;
+    }
+}
+
+
+
+
 /* --- ПРОСТАЯ ПУЛЬСАЦИЯ ЦВЕТОМ --- */
 .square.hint-blink::after {
     content: "";
@@ -143,6 +192,8 @@
     animation: simplePulse 1.2s ease-in-out infinite;
     pointer-events: none;
 }
+
+
 
 @keyframes simplePulse {
     0% { 

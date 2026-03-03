@@ -32,47 +32,51 @@
 </div>
 
 <div class="game-container">
+    
+    <!-- КОЛОНКА 1 (ЛЕВАЯ НА ПК): Только доска -->
+    <div id="board-wrapper">
+        <div id="board" class="chess-board"></div>
+    </div>
 
+    <!-- КОЛОНКА 2 (ПРАВАЯ НА ПК): Профиль + Панель -->
+    <div class="right-column">
+        
+        <!-- Блок профиля -->
         <div id="profile-header">
             <div class="user-info">
                 <img id="user-avatar" src='data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%239ca3af"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>' alt="Аватар">
                 <span id="user-name">Игрок</span>
             </div>
             <button class="btn-stats" onclick="showStatsModal()">
-                <!-- Иконка статистики -->
                 <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 11V3H8v6H2v12h20V11h-6zm-6-6h4v14h-4V5zm-6 6h4v8H4v-8zm16 8h-4v-6h4v6z"/></svg>
             </button>
         </div>
 
-    <div id="board-wrapper">
-        <div id="board" class="chess-board"></div>
-    </div>
-
-    <div class="side-panel">
-        <div class="top-bar">
-            <div class="stat-card">
-                <span class="stat-label" id="label-rating">Эло</span>
-                <span id="puzzle-elo" class="stat-value">---</span>
-            </div>
-            <div class="stat-card" style="position: relative;">
-                <span id="score-display" class="stat-value">0</span>
-                <div id="points-anim-container"
-                     style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center; pointer-events:none;">
+        <!-- Нижняя панель статистики -->
+        <div class="side-panel">
+            <div class="top-bar">
+                <div class="stat-card">
+                    <span class="stat-label" id="label-rating">Рейтинг</span>
+                    <span id="puzzle-elo" class="stat-value">---</span>
                 </div>
-                <span class="stat-label" id="label-score">Очки</span>
+                <div class="stat-card" style="position: relative;">
+                    <span id="score-display" class="stat-value">0</span>
+                    <div id="points-anim-container" style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center; pointer-events:none;"></div>
+                    <span class="stat-label" id="label-score">Очки</span>
+                </div>
+            </div>
+            <div class="bottom-bar">
+                <button id="hint-btn" onclick="requestHint()" class="btn-hint">
+                    <div class="video-icon">
+                        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M21 4H3C1.895 4 1 4.895 1 6V18C1 19.105 1.895 20 3 20H21C22.105 20 23 19.105 23 18V6C23 4.895 22.105 4 21 4ZM21 18H3V6H21V18ZM9.5 15L16 11.5L9.5 8V15Z"/></svg>
+                    </div>
+                    <span id="hint-btn-text">Подсказка</span>
+                </button>
             </div>
         </div>
-        <div class="bottom-bar">
-<button id="hint-btn" onclick="requestHint()" class="btn-hint">
-    <div class="video-icon">
-        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path d="M21 4H3C1.895 4 1 4.895 1 6V18C1 19.105 1.895 20 3 20H21C22.105 20 23 19.105 23 18V6C23 4.895 22.105 4 21 4ZM21 18H3V6H21V18ZM9.5 15L16 11.5L9.5 8V15Z"/>
-        </svg>
-    </div>
-    <span id="hint-btn-text">Подсказка</span>
-</button>
-        </div>
-    </div>
+
+    </div> <!-- Конец right-column -->
+
 </div>
 
 <div id="stats-modal" class="modal-overlay hidden">
