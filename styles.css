@@ -351,22 +351,22 @@
         /* --- ДОСКА --- */
         #board-wrapper { position: relative; }
 
-        /* Найти и заменить стиль .chess-board */
-        .chess-board { 
-            display: grid; 
-            grid-template-columns: repeat(8, 1fr); 
-            grid-template-rows: repeat(8, 1fr); 
-            width: min(97vw, 85vh); /* Используем одинаковые размеры */
-            height: min(97vw, 85vh);
-            aspect-ratio: 1 / 1; /* Жестко фиксируем пропорции */
-            /*border-radius: 4px; */
-            overflow: hidden; 
-            position: relative; 
-            box-shadow: 0 1px 10px rgba(0, 0, 0, 0.2);
-            /* Добавляем, чтобы предотвратить схлопывание */
-            min-width: min(97vw, 72vh);
-            min-height: min(97vw, 72vh);
-        }
+/* Найти и заменить стиль .chess-board */
+.chess-board { 
+    display: grid; 
+    grid-template-columns: repeat(8, 1fr); 
+    grid-template-rows: repeat(8, 1fr); 
+    width: min(97vw, 85vh); /* Используем одинаковые размеры */
+    height: min(97vw, 85vh);
+    aspect-ratio: 1 / 1; /* Жестко фиксируем пропорции */
+    /*border-radius: 4px; */
+    overflow: hidden; 
+    position: relative; 
+    box-shadow: 0 1px 10px rgba(0, 0, 0, 0.2);
+    /* Добавляем, чтобы предотвратить схлопывание */
+    min-width: min(97vw, 72vh);
+    min-height: min(97vw, 72vh);
+}
 
         .square { display: flex; align-items: center; justify-content: center; position: relative; }
         .square.light { background-color: var(--board-light); }
@@ -602,11 +602,254 @@
     color: var(--gray-700);
 }
 
+
+
+@media (min-aspect-ratio: 2/3) and (max-aspect-ratio: 4/5) {
+
+
+}
+
+/* =====================================================
+   ОКОЛОКВАДРАТНЫЕ
+   ===================================================== */
+
+@media (min-aspect-ratio: 4/5) and (max-aspect-ratio: 4/4) {
+
+}
+
+/* --- Ультра-длинные (21:9, 20:9) --- */
+/* Соотношение до 0.52 */
+@media (max-aspect-ratio: 52/100) { 
+    /* Доска может быть 95vw. Места для UI очень много. */
+}
+
+/* --- Стандартные смартфоны (16:9, 18:9) --- */
+/* Соотношение 0.53 - 0.62 */
+@media (min-aspect-ratio: 53/100) and (max-aspect-ratio: 62/100) { 
+    .chess-board {
+        width: 80vw;
+        height: 80vw;
+    }
+        /* Шрифты ЧИСТО НА VW */
+    .side-panel {
+        gap: 0vw;
+    }
+    .stat-label {
+        font-size: 3.7vw;
+        font-weight: 900;
+        text-transform: uppercase;
+    }
+
+    .stat-value {
+        font-size: 6vw;
+        font-weight: 900;
+    }
+
+/* -------- КНОПКА -------- */
+
+    .bottom-bar {
+        display: flex;
+        justify-content: center;
+    }
+
+    .btn-hint {
+        font-size: 4vw;
+        padding: 1.5vw 5vw;
+        border-radius: 2vw;
+    }
+    .text {
+        display: none;
+    }
+    .game-container {
+        gap: 4vw;
+    }
+}
+
+/* --- Широкие смартфоны (iPhone 8, старые Android 3:2) --- */
+/* Соотношение 0.63 - 0.72 */
+@media (min-aspect-ratio: 63/100) and (max-aspect-ratio: 72/100) { 
+    .chess-board {
+        width: 80vw;
+        height: 80vw;
+    }
+        /* Шрифты ЧИСТО НА VW */
+    .side-panel {
+        gap: 0vw;
+    }
+    .stat-label {
+        font-size: 3.7vw;
+        font-weight: 900;
+        text-transform: uppercase;
+    }
+
+    .stat-value {
+        font-size: 6vw;
+        font-weight: 900;
+    }
+
+/* -------- КНОПКА -------- */
+
+    .bottom-bar {
+        display: flex;
+        justify-content: center;
+    }
+
+    .btn-hint {
+        font-size: 4vw;
+        padding: 1.5vw 5vw;
+        border-radius: 2vw;
+    }
+    .text {
+        display: none;
+    }
+    .game-container {
+        gap: 4vw;
+    }
+}
+
+/* --- Планшеты Портрет (iPad 3:4, складные Fold) --- */
+/* Соотношение 0.73 - 0.99 (Пред-квадрат) */
+@media (min-aspect-ratio: 73/100) and (max-aspect-ratio: 99/100) { 
+    /* КРИТИЧЕСКАЯ ТОЧКА: Доска должна ориентироваться на ВЫСОТУ (vh).
+       Например: width: 60vh; height: 60vh; Чтобы UI влез сверху и снизу. */
+
+           .chess-board {
+        width: 80vw;
+        height: 80vw;
+    }
+        /* Шрифты ЧИСТО НА VW */
+    .side-panel {
+        gap: 0vw;
+    }
+    .stat-label {
+        font-size: 3vw;
+        font-weight: 900;
+        text-transform: uppercase;
+    }
+
+    .stat-value {
+        font-size: 4.5vw;
+        font-weight: 900;
+    }
+
+    /* -------- КНОПКА -------- */
+
+    .bottom-bar {
+        display: flex;
+        justify-content: center;
+    }
+
+    .btn-hint {
+        font-size: 3vw;
+        padding: 1.5vw 5vw;
+        border-radius: 2vw;
+    }
+    .text {
+        display: none;
+    }
+    .game-container {
+        gap: 2vw;
+    }
+}
+
+
+
+@media (aspect-ratio: 4/4) {
+
+    .chess-board {
+        width: 70vw;
+        height: 70vw;
+    }
+    /* Шрифты ЧИСТО НА VW */
+    .side-panel {
+        gap: 1vw !important;
+        width: 10vw !important;
+        min-width: 22vw;
+    }
+    .stat-label {
+        font-size: 3vw !important;
+        font-weight: 900;
+        text-transform: uppercase;
+    }
+
+    .stat-value {
+        font-size: 3.5vw !important;
+        font-weight: 900;
+    }
+
+    /* -------- КНОПКА -------- */
+
+    .bottom-bar {
+        display: flex;
+        justify-content: center;
+    }
+
+    .btn-hint {
+        font-size: 2vw !important;
+        padding: 1vw 5vw !important;
+        border-radius: 2vw !important;
+    }
+    .text {
+        display: none;
+    }
+    .game-container {
+        gap: 4vw;
+    }
+}
+
+@media (min-aspect-ratio: 4/4) and (max-aspect-ratio: 5/4) {
+
+    .chess-board {
+        width: 70vw;
+        height: 70vw;
+    }
+    /* Шрифты ЧИСТО НА VW */
+    .side-panel {
+        gap: 3vw;
+        width: 10vw !important;
+        min-width: 22vw;
+    }
+    .stat-label {
+        font-size: 1.5vw;
+        font-weight: 900;
+        text-transform: uppercase;
+    }
+
+    .stat-value {
+        font-size: 3.2vw;
+        font-weight: 900;
+    }
+
+    /* -------- КНОПКА -------- */
+
+    .bottom-bar {
+        display: flex;
+        justify-content: center;
+    }
+
+    .btn-hint {
+        font-size: 1.5vw;
+        padding: 1.5vw 5vw;
+        border-radius: 2vw;
+    }
+    .text {
+        display: none;
+    }
+    .game-container {
+        gap: 4vw;
+    }
+}
+
 /* =====================================================
    ГОРИЗОНТАЛЬНАЯ ОРИЕНТАЦИЯ
    ===================================================== */
 
 @media (orientation: landscape) {
+
+
+    .chess-board { 
+        border-radius: 5px;
+    }
 
     .game-container {
         flex-direction: row;
@@ -619,7 +862,6 @@
         width: 85vh;
         height: 85vh;
         box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-        border-radius: 5px;
     }
 
     .side-panel {
@@ -688,234 +930,4 @@
     .text {
         display: none;
     }
-}
-
-@media (min-aspect-ratio: 2/3) and (max-aspect-ratio: 4/5) {
-
-    .chess-board {
-        width: 80vw;
-        height: 80vw;
-    }
-        /* Шрифты ЧИСТО НА VW */
-    .side-panel {
-        gap: 0vw;
-    }
-    .stat-label {
-        font-size: 3.7vw;
-        font-weight: 900;
-        text-transform: uppercase;
-    }
-
-    .stat-value {
-        font-size: 6vw;
-        font-weight: 900;
-    }
-
-/* -------- КНОПКА -------- */
-
-    .bottom-bar {
-        display: flex;
-        justify-content: center;
-    }
-
-    .btn-hint {
-        font-size: 4vw;
-        padding: 1.5vw 5vw;
-        border-radius: 2vw;
-    }
-    .text {
-        display: none;
-    }
-    .game-container {
-        gap: 4vw;
-    }
-}
-
-/* =====================================================
-   ОКОЛОКВАДРАТНЫЕ
-   ===================================================== */
-
-@media (min-aspect-ratio: 4/5) and (max-aspect-ratio: 4/4) {
-
-    .chess-board {
-        width: 80vw;
-        height: 80vw;
-    }
-    /* Шрифты ЧИСТО НА VW */
-    .side-panel {
-        gap: 0vw;
-    }
-    .stat-label {
-        font-size: 3vw;
-        font-weight: 900;
-        text-transform: uppercase;
-    }
-
-    .stat-value {
-        font-size: 4.5vw;
-        font-weight: 900;
-    }
-
-    /* -------- КНОПКА -------- */
-
-    .bottom-bar {
-        display: flex;
-        justify-content: center;
-    }
-
-    .btn-hint {
-        font-size: 3vw;
-        padding: 1.5vw 5vw;
-        border-radius: 2vw;
-    }
-    .text {
-        display: none;
-    }
-    .game-container {
-        gap: 2vw;
-    }
-}
-
-
-@media (aspect-ratio: 4/4) {
-
-    .chess-board {
-        width: 70vw;
-        height: 70vw;
-    }
-    /* Шрифты ЧИСТО НА VW */
-    .side-panel {
-        gap: 1vw !important;
-        width: 10vw !important;
-        min-width: 22vw;
-    }
-    .stat-label {
-        font-size: 3vw !important;
-        font-weight: 900;
-        text-transform: uppercase;
-    }
-
-    .stat-value {
-        font-size: 3.5vw !important;
-        font-weight: 900;
-    }
-
-    /* -------- КНОПКА -------- */
-
-    .bottom-bar {
-        display: flex;
-        justify-content: center;
-    }
-
-    .btn-hint {
-        font-size: 2vw !important;
-        padding: 1vw 5vw !important;
-        border-radius: 2vw !important;
-    }
-    .text {
-        display: none;
-    }
-    .game-container {
-        gap: 4vw;
-    }
-}
-
-@media (min-aspect-ratio: 73/100) and (max-aspect-ratio: 99/100) { 
-    /* КРИТИЧЕСКАЯ ТОЧКА: Доска должна ориентироваться на ВЫСОТУ (vh).
-       Например: width: 60vh; height: 60vh; Чтобы UI влез сверху и снизу. */
-    .chess-board {
-        width: 70vw;
-        height: 70vw;
-    }
-        /* Шрифты ЧИСТО НА VW */
-    .side-panel {
-        gap: 3vw;
-        width: 10vw !important;
-        min-width: 22vw;
-    }
-    .stat-label {
-        font-size: 1.5vw;
-        font-weight: 900;
-        text-transform: uppercase;
-    }
-
-    .stat-value {
-        font-size: 3.2vw;
-        font-weight: 900;
-    }
-
-    /* -------- КНОПКА -------- */
-
-    .bottom-bar {
-        display: flex;
-        justify-content: center;
-    }
-
-    .btn-hint {
-        font-size: 1.5vw;
-        padding: 1.5vw 5vw;
-        border-radius: 2vw;
-    }
-    .text {
-        display: none;
-    }
-    .game-container {
-        gap: 4vw;
-    }
-}
-
-/* --- Широкие смартфоны (iPhone 8, старые Android 3:2) --- */
-@media (min-aspect-ratio: 63/100) and (max-aspect-ratio: 72/100) { 
-    /* ВНИМАНИЕ: Здесь доска уже может начать выталкивать кнопки. 
-       Можно чуть уменьшить доску: width: 90vw; height: 90vw; */
-
-    .chess-board {
-        width: 70vw;
-        height: 70vw;
-    }
-
-        /* Шрифты ЧИСТО НА VW */
-    .side-panel {
-        gap: 3vw;
-        width: 10vw !important;
-        min-width: 22vw;
-    }
-    .stat-label {
-        font-size: 1.5vw;
-        font-weight: 900;
-        text-transform: uppercase;
-    }
-
-    .stat-value {
-        font-size: 3.2vw;
-        font-weight: 900;
-    }
-
-    /* -------- КНОПКА -------- */
-
-    .bottom-bar {
-        display: flex;
-        justify-content: center;
-    }
-
-    .btn-hint {
-        font-size: 1.5vw;
-        padding: 1.5vw 5vw;
-        border-radius: 2vw;
-    }
-    .text {
-        display: none;
-    }
-    .game-container {
-        gap: 4vw;
-    }
-}
-
-/* --- Стандартные смартфоны (16:9, 18:9) --- */
-@media (min-aspect-ratio: 53/100) and (max-aspect-ratio: 62/100) { 
-    /* Немного поджимаем отступы между профилем и доской. */
-}
-
-@media (max-aspect-ratio: 52/100) { 
-    /* Доска может быть 95vw. Места для UI очень много. */
 }
