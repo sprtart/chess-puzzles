@@ -155,12 +155,18 @@ showLeaderboard() {
             console.log("Лидерборд открыт успешно:", data);
         })
         .catch((error) => {
-            // ВАЖНО: Смотрим на error.error_data или error.error_type
-            console.error("Детальная ошибка лидерборда:", error);
+            // Код 5 значит, что юзер просто закрыл окно или отменил приглашение друзей. Это не баг.
+            if (error?.error_data?.error_code === 5) {
+                console.log("Пользователь закрыл окно лидерборда/приглашений.");
+                return;
+            }
             
-            if (error.error_data) {
-                console.log("Код ошибки:", error.error_data.error_code);
-                console.log("Сообщение:", error.error_data.error_msg);
+            // Если ошибка другая (например, не поддерживается на mobile_web)
+            console.warn("Лидерборд не может быть показан на этой платформе (например, в браузере с телефона).", error);
+            
+            // Здесь можно показать кастомный alert или всплывающее окно внутри самой игры:
+            if (window.innerWidth <= 768) {
+                alert("Рейтинг доступен только в официальном приложении ВКонтакте или на компьютере!\nВаши очки: " + totalScore);
             }
         });
     } else {
