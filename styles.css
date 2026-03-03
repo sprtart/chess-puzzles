@@ -608,11 +608,6 @@
 
 @media (orientation: landscape) {
 
-
-    .chess-board { 
-        border-radius: 5px;
-    }
-
     .game-container {
         flex-direction: row;
         justify-content: center;
@@ -624,6 +619,7 @@
         width: 85vh;
         height: 85vh;
         box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        border-radius: 5px;
     }
 
     .side-panel {
@@ -746,38 +742,38 @@
         height: 80vw;
     }
     /* Шрифты ЧИСТО НА VW */
-.side-panel {
-    gap: 0vw;
-}
-.stat-label {
-    font-size: 3vw;
-    font-weight: 900;
-    text-transform: uppercase;
-}
+    .side-panel {
+        gap: 0vw;
+    }
+    .stat-label {
+        font-size: 3vw;
+        font-weight: 900;
+        text-transform: uppercase;
+    }
 
-.stat-value {
-    font-size: 4.5vw;
-    font-weight: 900;
-}
+    .stat-value {
+        font-size: 4.5vw;
+        font-weight: 900;
+    }
 
-/* -------- КНОПКА -------- */
+    /* -------- КНОПКА -------- */
 
-.bottom-bar {
-    display: flex;
-    justify-content: center;
-}
+    .bottom-bar {
+        display: flex;
+        justify-content: center;
+    }
 
-.btn-hint {
-    font-size: 3vw;
-    padding: 1.5vw 5vw;
-    border-radius: 2vw;
-}
-.text {
-    display: none;
-}
-.game-container {
-    gap: 2vw;
-}
+    .btn-hint {
+        font-size: 3vw;
+        padding: 1.5vw 5vw;
+        border-radius: 2vw;
+    }
+    .text {
+        display: none;
+    }
+    .game-container {
+        gap: 2vw;
+    }
 }
 
 
@@ -872,6 +868,47 @@
 @media (min-aspect-ratio: 63/100) and (max-aspect-ratio: 72/100) { 
     /* ВНИМАНИЕ: Здесь доска уже может начать выталкивать кнопки. 
        Можно чуть уменьшить доску: width: 90vw; height: 90vw; */
+
+    .chess-board {
+        width: 70vw;
+        height: 70vw;
+    }
+
+        /* Шрифты ЧИСТО НА VW */
+    .side-panel {
+        gap: 3vw;
+        width: 10vw !important;
+        min-width: 22vw;
+    }
+    .stat-label {
+        font-size: 1.5vw;
+        font-weight: 900;
+        text-transform: uppercase;
+    }
+
+    .stat-value {
+        font-size: 3.2vw;
+        font-weight: 900;
+    }
+
+    /* -------- КНОПКА -------- */
+
+    .bottom-bar {
+        display: flex;
+        justify-content: center;
+    }
+
+    .btn-hint {
+        font-size: 1.5vw;
+        padding: 1.5vw 5vw;
+        border-radius: 2vw;
+    }
+    .text {
+        display: none;
+    }
+    .game-container {
+        gap: 4vw;
+    }
 }
 
 /* --- Стандартные смартфоны (16:9, 18:9) --- */
