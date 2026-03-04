@@ -65,6 +65,7 @@
     flex-direction: column;
     justify-content: center;
     line-height: 1.2;
+    gap: 0.1vh;
 }
 
 #user-name {
@@ -85,7 +86,7 @@
 }
 
 #user-max-rating {
-    color: #2563eb; /* Цвет акцента для цифр рекорда */
+    color: #374151; /* Цвет акцента для цифр рекорда */
     font-weight: 800;
 }
 
@@ -995,19 +996,27 @@
 
     .side-panel {
         align-items: stretch;
-        gap: 4vw;
+        gap: 3vw;
     }
 
     #user-name {
         font-size: 1.5vw;
         max-width: 9vw;
     }
-
-        .right-column {
+    .btn-stats {
+        width: 6vh;
+        height: 5vh;
+        border-radius: 1vw;
+    }
+    .right-column {
         display: flex;
         flex-direction: column;
-        gap: 2vw;
+        gap: 3vw;
         width: 26vw;
+    }
+    .btn-stats svg {
+        width: 29px;
+        height: 29px;
     }
 
     .top-bar {
@@ -1046,9 +1055,9 @@
     }
 
     .btn-hint {
-        font-size: 1.5vw;
-        padding: 1.5vw 5vw;
-        border-radius: 2vh;
+        font-size: 1.8vw;
+        padding: 2vw 3vw;
+        border-radius: 1.5vw;
         width: 100%;
         gap: 1vw;
     }
@@ -1060,6 +1069,13 @@
         fill: currentColor; /* Иконка примет цвет текста кнопки */
     }
 
+    #profile-header {
+        order: -1;
+        display: flex;
+        margin-bottom: 0;
+        padding: 2vh 2vw;
+        border-radius: 1.4vw;
+    }
     
 }
 
@@ -1076,7 +1092,7 @@
         display: flex;
         margin-bottom: 8px;
         padding: 2vh 2vw;
-        border-radius: 25px;
+        border-radius: 1.4vw;
     }
 }
 
