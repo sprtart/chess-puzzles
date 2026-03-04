@@ -443,17 +443,29 @@ async function loadData() {
             loadingText.textContent = `${i18n[lang].loading} ${progress}%`;
         }, 50);
 
-        // ЗАГРУЖАЕМ ОБА ФАЙЛА СРАЗУ
-        const [responseEnd, responseMid] = await Promise.all([
-            fetch('endgames.json'),
-            fetch('middlegames.json')
-        ]);
+const [resEnd, resMid] = await Promise.all([
+    fetch('endgames.json'),
+    fetch('middlegames.json')
+]);
 
-        const endPuzzles = await responseEnd.json();
-        const midPuzzles = await responseMid.json();
+// Проверка: успешно ли сервер отдал файлы?
+if (!resEnd.ok || !resMid.ok) {
+    throw new Error(`Ошибка сервера: Endgames=${resEnd.status}, Middlegames=${resMid.status}`);
+}
 
-        // ОБЪЕДИНЯЕМ ИХ В ОДИН МАССИВ
-        puzzles = endPuzzles.concat(midPuzzles);
+// Читаем текст из файлов перед тем как парсить JSON
+const textEnd = await resEnd.text();
+const textMid = await resMid.text();
+
+if (!textEnd || !textMid) {
+    throw new Error("Один из JSON файлов пуст!");
+}
+
+// И только теперь превращаем текст в объекты
+const endPuzzles = JSON.parse(textEnd);
+const midPuzzles = JSON.parse(textMid);
+
+puzzles = endPuzzles.concat(midPuzzles);
         
         // Предзагрузка картинок (оставляем как было)
         Object.values(PIECE_IMAGES).forEach(src => {
