@@ -1106,3 +1106,56 @@
         border-radius: 5px;
     }
 }
+
+
+
+
+/* --- ТЕМНАЯ ТЕМА --- */
+body.dark-mode {
+    --gray-100: #111827; /* Почти черный фон */
+    --gray-200: #374151;
+    --gray-400: #9ca3af;
+    --gray-500: #d1d5db;
+    --gray-700: #f3f4f6; /* Светлый текст */
+    --gray-800: #ffffff;
+    
+    /* Цвета доски для темной темы (более приглушенные) */
+    --board-light: #4b5563; 
+    --board-dark: #1f2937;
+    
+    background-image: radial-gradient(#1f2937 1px, transparent 1px);
+}
+
+/* Корректировка карточек и модалок */
+body.dark-mode #profile-header,
+body.dark-mode .stat-card,
+body.dark-mode .modal-box,
+body.dark-mode .btn-stats,
+body.dark-mode .btn-hint,
+body.dark-mode #promotion-dialog {
+    background-color: #1f2937;
+    color: var(--gray-700);
+    border-color: #374151;
+    box-shadow: 0 4px 0 #000000;
+}
+
+body.dark-mode .btn-stats:active,
+body.dark-mode .btn-hint:active {
+    box-shadow: 0 0px 0 #000000;
+}
+
+body.dark-mode .stat-label {
+    color: var(--gray-400);
+}
+
+body.dark-mode .prom-option {
+    background-color: #374151;
+}
+
+body.dark-mode .prom-option:hover {
+    background-color: #4b5563;
+}
+
+/* Подсветка ходов в темной теме */
+body.dark-mode .square.enemy-move::before { background-color: rgba(245, 158, 11, 0.4); }
+body.dark-mode .square.selected::before { background-color: rgba(245, 158, 11, 0.6); }

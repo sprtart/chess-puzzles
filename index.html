@@ -127,8 +127,22 @@ const Platform = {
                     await vkBridge.send('VKWebAppInit');
                     this.id = 'vk';
 
+
+
+                // 1. СЛУШАЕМ ТЕМУ ОТ ВК
+                vkBridge.subscribe((e) => {
+                    if (e.detail.type === 'VKWebAppUpdateConfig') {
+                        const data = e.detail.data;
+                        // Если тема темная (space_gray, dark или другие)
+                        if (data.appearance === 'dark' || data.appearance === 'space_gray') {
+                            document.body.classList.add('dark-mode');
+                        } else {
+                            document.body.classList.remove('dark-mode');
+                        }
+                    }
+                });
+
                     // 3. Сразу запрашиваем данные пользователя
-                    // Это важно сделать в начале, чтобы потом не ждать
                     const userData = await vkBridge.send('VKWebAppGetUserInfo');
                     this.user = userData; // Сохраняем объект пользователя внутри Platform
 
@@ -139,6 +153,11 @@ const Platform = {
                     // Если произошла ошибка, проваливаемся в local
                 }
             }
+
+                    // 2. ДЛЯ ЛОКАЛЬНОЙ ВЕРСИИ (проверка системной темы)
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            document.body.classList.add('dark-mode');
+        }
 
             this.id = 'local';
             console.log("Платформа: Локальная (без SDK)");
@@ -349,6 +368,13 @@ function safePlaySound(audioObj) {
 
 async function initGame() {
     await Platform.init();
+    
+// Принудительно проверяем тему из URL параметров ВК при старте
+        const urlParams = new URLSearchParams(window.location.search);
+    const vkAppearance = urlParams.get('vk_appearance');
+    if (vkAppearance === 'dark' || vkAppearance === 'space_gray') {
+        document.body.classList.add('dark-mode');
+    }
 
     lang = Platform.getLang();
     if (lang !== 'ru' && lang !== 'en') lang = 'en'; 
