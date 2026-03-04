@@ -26,7 +26,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    width: min(70vw, 45vh);
+    width: min(80vw, 45vh);
     /*min-width: min(85vw, 72vh);*/
     margin-bottom: 8px;
     padding: 1.5vh 4vw;
@@ -97,7 +97,7 @@
 }
 
 .btn-stats {
-    width: 11vw;
+    width: 10vw;
     height: 10vw;
     border-radius: 3vw;
     background: white;
@@ -1154,7 +1154,7 @@
     background-color: #ebebeb; /* Фирменный цвет панелей Chess.com */
     color: #161512;
     border: none;
-    box-shadow: 0 4px 0 #1a1917; /* Темная тень под кнопками */
+    box-shadow: 0 0 0 #1a1917; /* Темная тень под кнопками */
 }
 .dark-mode .btn-stats {
 background: #769656;
