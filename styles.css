@@ -249,7 +249,7 @@
             overflow: hidden; 
             height: 100vh; 
             background-color: var(--gray-100); 
-            background-image: radial-gradient(#ecedee 1px, transparent 1px);
+            /*background-image: radial-gradient(#ecedee 1px, transparent 1px);*/
             background-size: 20px 20px;
             background-attachment: fixed;
             display: flex; 
@@ -1130,7 +1130,6 @@
 
 /* Карточки и панели в стиле Chess.com */
 .dark-mode #profile-header,
-.dark-mode .stat-card,
 .dark-mode .modal-box,
 .dark-mode .btn-stats,
 .dark-mode .btn-hint,
@@ -1154,9 +1153,9 @@
 
 /* Специальный стиль для кнопки подсказки в темной теме (зеленоватая) */
 .dark-mode .btn-hint {
-    background-color: #81b64c; /* Зеленая кнопка как на чесс ком */
+    background-color: #769656;
     color: #fff;
-    box-shadow: 0 4px 0 #457520;
+    box-shadow: 0 4px 0 #637d49;
 }
 .dark-mode .btn-hint:active {
     box-shadow: 0 0px 0 #457520;
@@ -1167,3 +1166,8 @@
 
 .square.light .coord { color: var(--board-dark); }
 .square.dark .coord { color: var(--board-light); }
+
+.dark-mode #user-max-rating {
+    color: #ebebeb;
+    font-weight: 800;
+}
