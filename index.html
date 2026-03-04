@@ -414,7 +414,8 @@ function saveCurrentStats() {
         solved: statsTotalSolved,
         flawless: statsFlawless,
         mistakes: statsTotalMistakes,
-        maxElo: statsMaxElo
+        maxElo: statsMaxElo,
+        currentElo: currentElo
     });
 }
 
@@ -449,6 +450,8 @@ async function initGame() {
     statsFlawless = savedStats.flawless || 0;
     statsTotalMistakes = savedStats.mistakes || 0;
     statsMaxElo = savedStats.maxElo || 0;
+
+    currentElo = savedStats.currentElo || 400; 
 
     document.getElementById('user-max-rating').textContent = statsMaxElo;
     
