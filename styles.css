@@ -1180,10 +1180,6 @@
 .square.light .coord { color: var(--board-dark); }
 .square.dark .coord { color: var(--board-light); }
 
-.dark-mode #user-max-rating {
-    color: #ebebeb;
-    font-weight: 800;
-}
 
 .dark-mode .stat-value {
     color: #ebebeb;
