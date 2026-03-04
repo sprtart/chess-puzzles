@@ -889,11 +889,7 @@
         height: 62vw;
     }
     .right-column {
-        display: flex;
-        flex-direction: column;
-        gap: 2vw;
         width: 30vw;
-        /* min-width: 240px; */
     }
     
         /* Шрифты ЧИСТО НА VW */
