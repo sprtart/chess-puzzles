@@ -1091,10 +1091,10 @@
 
 /* --- Стандартный альбом (Ноутбуки, мониторы 16:10) --- */
 /* Соотношение 1.26 - 1.45 */
-@media (min-aspect-ratio: 131/100) { 
+@media (min-aspect-ratio: 111/100) { 
     .chess-board {
-        width: 82vh;
-        height: 82vh;
+        width: 85vh;
+        height: 85vh;
         box-shadow: 0 10px 30px rgba(0,0,0,0.3);
         border-radius: 5px;
     }
