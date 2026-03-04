@@ -1020,3 +1020,184 @@
    ===================================================== */
 
 
+/* --- "Тесный" альбом (iPad альбом, мониторы 4:3) --- */
+/* Соотношение 1.01 - 1.25 */
+@media (min-aspect-ratio: 101/100) and (max-aspect-ratio: 125/100) { 
+    /* UI уже сбоку, но колонка должна быть узкой (20vw), 
+       а доска всё еще не на всю высоту. */
+           .chess-board {
+        width: 70vw;
+        height: 70vw;
+    }
+    /* Шрифты ЧИСТО НА VW */
+    .side-panel {
+        gap: 3vw;
+        width: 10vw !important;
+        min-width: 22vw;
+    }
+    .stat-label {
+        font-size: 1.5vw;
+        font-weight: 900;
+        text-transform: uppercase;
+    }
+
+    .stat-value {
+        font-size: 3.2vw;
+        font-weight: 900;
+    }
+
+    /* -------- КНОПКА -------- */
+
+    .bottom-bar {
+        display: flex;
+        justify-content: center;
+    }
+
+    .btn-hint {
+        font-size: 1.5vw;
+        padding: 1.5vw 5vw;
+        border-radius: 2vw;
+    }
+    .text {
+        display: none;
+    }
+    .game-container {
+        gap: 4vw;
+    }
+}
+
+/* --- Стандартный альбом (Ноутбуки, мониторы 16:10) --- */
+/* Соотношение 1.26 - 1.45 */
+@media (min-aspect-ratio: 126/100) and (max-aspect-ratio: 145/100) { 
+    /* Комфортный режим. Доска ~80vh. */
+        .chess-board {
+        width: 70vw;
+        height: 70vw;
+    }
+    /* Шрифты ЧИСТО НА VW */
+    .side-panel {
+        gap: 3vw;
+        width: 10vw !important;
+        min-width: 22vw;
+    }
+    .stat-label {
+        font-size: 1.5vw;
+        font-weight: 900;
+        text-transform: uppercase;
+    }
+
+    .stat-value {
+        font-size: 3.2vw;
+        font-weight: 900;
+    }
+
+    /* -------- КНОПКА -------- */
+
+    .bottom-bar {
+        display: flex;
+        justify-content: center;
+    }
+
+    .btn-hint {
+        font-size: 1.5vw;
+        padding: 1.5vw 5vw;
+        border-radius: 2vw;
+    }
+    .text {
+        display: none;
+    }
+    .game-container {
+        gap: 4vw;
+    }
+}
+
+/* --- Широкий формат (Full HD 16:9) --- */
+/* Соотношение 1.46 - 1.80 */
+@media (min-aspect-ratio: 146/100) and (max-aspect-ratio: 180/100) { 
+    /* Здесь можно разгуляться: большие шрифты, доска 85vh. */
+        .chess-board {
+        width: 70vw;
+        height: 70vw;
+    }
+    /* Шрифты ЧИСТО НА VW */
+    .side-panel {
+        gap: 3vw;
+        width: 10vw !important;
+        min-width: 22vw;
+    }
+    .stat-label {
+        font-size: 1.5vw;
+        font-weight: 900;
+        text-transform: uppercase;
+    }
+
+    .stat-value {
+        font-size: 3.2vw;
+        font-weight: 900;
+    }
+
+    /* -------- КНОПКА -------- */
+
+    .bottom-bar {
+        display: flex;
+        justify-content: center;
+    }
+
+    .btn-hint {
+        font-size: 1.5vw;
+        padding: 1.5vw 5vw;
+        border-radius: 2vw;
+    }
+    .text {
+        display: none;
+    }
+    .game-container {
+        gap: 4vw;
+    }
+}
+
+/* --- Ультра-широкие мониторы (21:9 и более) --- */
+/* Соотношение выше 1.81 */
+@media (min-aspect-ratio: 181/100) { 
+    /* Ограничиваем максимальную ширину контейнера, 
+       чтобы статы не улетели слишком далеко от доски. */
+           .chess-board {
+        width: 70vw;
+        height: 70vw;
+    }
+    /* Шрифты ЧИСТО НА VW */
+    .side-panel {
+        gap: 3vw;
+        width: 10vw !important;
+        min-width: 22vw;
+    }
+    .stat-label {
+        font-size: 1.5vw;
+        font-weight: 900;
+        text-transform: uppercase;
+    }
+
+    .stat-value {
+        font-size: 3.2vw;
+        font-weight: 900;
+    }
+
+    /* -------- КНОПКА -------- */
+
+    .bottom-bar {
+        display: flex;
+        justify-content: center;
+    }
+
+    .btn-hint {
+        font-size: 1.5vw;
+        padding: 1.5vw 5vw;
+        border-radius: 2vw;
+    }
+    .text {
+        display: none;
+    }
+    .game-container {
+        gap: 4vw;
+    }
+}
