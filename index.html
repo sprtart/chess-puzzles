@@ -419,22 +419,35 @@ async function loadData() {
     try {
         let progress = 0;
         const simInterval = setInterval(() => {
-            progress += 10;
+            progress += 5; // Чуть медленнее прогресс, так как файлов два
             if(progress > 90) progress = 90;
             loadingBar.style.width = `${progress}%`;
             loadingText.textContent = `${i18n[lang].loading} ${progress}%`;
         }, 50);
 
-        const response = await fetch('puzzles.json');
-        puzzles = await response.json();
+        // ЗАГРУЖАЕМ ОБА ФАЙЛА СРАЗУ
+        const [responseEnd, responseMid] = await Promise.all([
+            fetch('endgames.json'),
+            fetch('middlegames.json')
+        ]);
+
+        const endPuzzles = await responseEnd.json();
+        const midPuzzles = await responseMid.json();
+
+        // ОБЪЕДИНЯЕМ ИХ В ОДИН МАССИВ
+        puzzles = endPuzzles.concat(midPuzzles);
         
+        // Предзагрузка картинок (оставляем как было)
         Object.values(PIECE_IMAGES).forEach(src => {
             const img = new Image();
             img.src = src;
         });
 
         clearInterval(simInterval);
+        
+        // Сортируем общий массив по рейтингу
         puzzles.sort((a, b) => Number(a.elo) - Number(b.elo));
+        
         loadingBar.style.width = "100%";
         loadingText.textContent = `${i18n[lang].loading} 100%`;
 
@@ -449,9 +462,8 @@ async function loadData() {
         });
 
     } catch (e) {
-        console.error("Ошибка загрузки:", e);
+        console.error("Ошибка загрузки данных:", e);
         loadingText.textContent = i18n[lang].errorLoad;
-        loadingText.classList.add('text-red-500');
     }
 }
 
