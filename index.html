@@ -260,27 +260,20 @@ showInterstitial(onClose) {
     loadingReady() {},
 
     // --- НОВАЯ ФУНКЦИЯ ДЛЯ ВИБРАЦИИ ---
-    vibrate(type) {
-        if (this.id === 'vk') {
-            try {
-                if (type === 'error') {
-                    // Два резких удара (ошибка)
-                    vkBridge.send('VKWebAppTapticNotificationOccurred', { type: 'error' });
-                } else if (type === 'success') {
-                    // Приятная вибрация успеха (когда решили задачу)
-                    vkBridge.send('VKWebAppTapticNotificationOccurred', { type: 'success' });
-                } else if (type === 'capture') {
-                    // Сильный одиночный толчок (когда срубили фигуру)
-                    vkBridge.send('VKWebAppTapticImpactOccurred', { style: 'heavy' });
-                } else {
-                    // Легкий щелчок (обычный тихий ход)
-                    vkBridge.send('VKWebAppTapticImpactOccurred', { style: 'light' });
-                }
-            } catch (e) {
-                // Игнорируем ошибки (например, если браузер не поддерживает вибрацию)
-            }
+vibrate(type) {
+    if (this.id === 'vk') {
+        // try/catch здесь не ловит ошибки промисов, нужны именно .catch()
+        if (type === 'error') {
+            vkBridge.send('VKWebAppTapticNotificationOccurred', { type: 'error' }).catch(()=>{});
+        } else if (type === 'success') {
+            vkBridge.send('VKWebAppTapticNotificationOccurred', { type: 'success' }).catch(()=>{});
+        } else if (type === 'capture') {
+            vkBridge.send('VKWebAppTapticImpactOccurred', { style: 'heavy' }).catch(()=>{});
+        } else {
+            vkBridge.send('VKWebAppTapticImpactOccurred', { style: 'light' }).catch(()=>{});
         }
-    },
+    }
+},
 
 async getSolvedIds() {
     try {
