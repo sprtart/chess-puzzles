@@ -730,14 +730,14 @@
 }
 
 /* --- Стандартные смартфоны (16:9, 18:9) --- */
-@media (min-aspect-ratio: 53/100) { 
+@media (min-aspect-ratio: 43/100) { 
     .chess-board {
         width: 100vw;
         height: 100vw;
     }
         /* Шрифты ЧИСТО НА VW */
     .side-panel {
-        gap: 0vw;
+        gap: 2vw;
     }
     .stat-label {
         font-size: 3.7vw;
