@@ -657,8 +657,11 @@ function handleStart(e, r, c) {
     const startC = c;
     selectedSq = { r, c, pos: idxToPos(r, c) };
     
-    follower.style.width = (squareSize * 1.2) + 'px';
-    follower.style.height = (squareSize * 1.2) + 'px';
+        const isPortrait = window.innerHeight > window.innerWidth;
+        const scale = isPortrait ? 1.6 : 1.0;
+
+        follower.style.width = (squareSize * scale) + 'px';
+        follower.style.height = (squareSize * scale) + 'px';
     follower.style.backgroundImage = `url('${PIECE_IMAGES[piece]}')`;
     follower.style.display = 'block';
 
