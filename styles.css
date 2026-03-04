@@ -1129,12 +1129,12 @@ body.dark-mode {
 }
 
 /* Карточки и панели в стиле Chess.com */
-body.dark-mode #profile-header,
-body.dark-mode .stat-card,
-body.dark-mode .modal-box,
-body.dark-mode .btn-stats,
-body.dark-mode .btn-hint,
-body.dark-mode #promotion-dialog {
+.dark-mode #profile-header,
+.dark-mode .stat-card,
+.dark-mode .modal-box,
+.dark-mode .btn-stats,
+.dark-mode .btn-hint,
+.dark-mode #promotion-dialog {
     background-color: #262421; /* Фирменный цвет панелей Chess.com */
     color: #ffffff;
     border: none;
@@ -1142,25 +1142,28 @@ body.dark-mode #promotion-dialog {
 }
 
 /* Кнопки при нажатии */
-body.dark-mode .btn-stats:active,
-body.dark-mode .btn-hint:active {
+.dark-mode .btn-stats:active,
+.dark-mode .btn-hint:active {
     box-shadow: 0 0px 0 #1a1917;
     transform: translateY(4px);
 }
 
 /* Координаты на доске */
-body.dark-mode .square.light .coord { color: #769656; } /* Цвет темной клетки */
-body.dark-mode .square.dark .coord { color: #eeeed2; }  /* Цвет светлой клетки */
+.dark-mode .square.light .coord { color: #769656; } /* Цвет темной клетки */
+.dark-mode .square.dark .coord { color: #eeeed2; }  /* Цвет светлой клетки */
 
 /* Специальный стиль для кнопки подсказки в темной теме (зеленоватая) */
-body.dark-mode .btn-hint {
+.dark-mode .btn-hint {
     background-color: #81b64c; /* Зеленая кнопка как на чесс ком */
     color: #fff;
     box-shadow: 0 4px 0 #457520;
 }
-body.dark-mode .btn-hint:active {
+.dark-mode .btn-hint:active {
     box-shadow: 0 0px 0 #457520;
 }
-body.dark-mode .btn-hint svg {
+.dark-mode .btn-hint svg {
     fill: #fff;
 }
+
+.square.light .coord { color: var(--board-dark); }
+.square.dark .coord { color: var(--board-light); }

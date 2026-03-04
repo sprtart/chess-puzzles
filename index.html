@@ -122,26 +122,23 @@ const Platform = {
     async init() {
             // 1. Проверяем наличие моста
             if (typeof vkBridge !== 'undefined') {
-                try {
-                    // 2. Инициализация (сообщаем ВК, что приложение запустилось)
-                    await vkBridge.send('VKWebAppInit');
-                    this.id = 'vk';
-
-
-
-                // 1. СЛУШАЕМ ТЕМУ ОТ ВК
-                vkBridge.subscribe((e) => {
-                    if (e.detail.type === 'VKWebAppUpdateConfig') {
-                        const data = e.detail.data;
-                        // Если тема темная (space_gray, dark или другие)
-                        if (data.appearance === 'dark' || data.appearance === 'space_gray') {
-                            document.body.classList.add('dark-mode');
-                        } else {
-                            document.body.classList.remove('dark-mode');
-                        }
+                
+            // 1. Сначала ПОДПИСЫВАЕМСЯ
+            vkBridge.subscribe((e) => {
+                if (e.detail.type === 'VKWebAppUpdateConfig') {
+                    const data = e.detail.data;
+                    if (data.appearance === 'dark' || data.appearance === 'space_gray') {
+                        document.documentElement.classList.add('dark-mode');
+                    } else {
+                        document.documentElement.classList.remove('dark-mode');
                     }
-                });
+                }
+            });
 
+            try {
+                // 2. Только потом ИНИЦИАЛИЗИРУЕМ
+                await vkBridge.send('VKWebAppInit');
+                this.id = 'vk';
                     // 3. Сразу запрашиваем данные пользователя
                     const userData = await vkBridge.send('VKWebAppGetUserInfo');
                     this.user = userData; // Сохраняем объект пользователя внутри Platform
@@ -310,6 +307,14 @@ saveSolvedIds(idsArray) {
 };
 // ==========================================
 
+(function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const appearance = urlParams.get('vk_appearance');
+    if (appearance === 'dark' || appearance === 'space_gray') {
+        document.documentElement.classList.add('dark-mode'); // Применяем к html
+    }
+})();
+
 let lang = 'ru'; 
 
 const i18n = {
@@ -368,7 +373,7 @@ function safePlaySound(audioObj) {
 
 async function initGame() {
     await Platform.init();
-    
+
 // Принудительно проверяем тему из URL параметров ВК при старте
         const urlParams = new URLSearchParams(window.location.search);
     const vkAppearance = urlParams.get('vk_appearance');
