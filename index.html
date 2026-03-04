@@ -280,7 +280,20 @@ showInterstitial(onClose) {
                 // Игнорируем ошибки (например, если браузер не поддерживает вибрацию)
             }
         }
-    }
+    },
+
+async getSolvedIds() {
+    try {
+        const saved = localStorage.getItem('chess_solved_ids');
+        return saved ? JSON.parse(saved) : [];
+    } catch (e) { return []; }
+},
+
+saveSolvedIds(idsArray) {
+    try {
+        localStorage.setItem('chess_solved_ids', JSON.stringify(idsArray));
+    } catch (e) { console.error("Ошибка сохранения прогресса"); }
+}
 
 };
 // ==========================================
@@ -368,6 +381,9 @@ async function initGame() {
         document.getElementById('user-name').textContent = (lang === 'ru') ? 'Игрок' : 'Player';
     }
 
+    const savedIds = await Platform.getSolvedIds();
+    solvedIds = new Set(savedIds); 
+
     loadData(); 
 }
 
@@ -408,6 +424,8 @@ let statsTotalSolved = 0;
 let statsFlawless = 0;
 let statsTotalMistakes = 0;
 let statsMaxElo = 0;
+
+let solvedIds = new Set();
 
 const boardEl = document.getElementById('board');
 const follower = document.getElementById('drag-follower');
@@ -515,12 +533,24 @@ function startPuzzle() {
 
     if (!puzzles || puzzles.length === 0) return;
 
+    // 1. ФИЛЬТРУЕМ: оставляем только те, что еще не решены
+    let availablePuzzles = puzzles.filter(p => !solvedIds.has(p.id));
+
+    // Если вдруг решили ВООБЩЕ всё (маловероятно), очищаем список и начинаем заново
+    if (availablePuzzles.length === 0) {
+        solvedIds.clear();
+        Platform.saveSolvedIds([]);
+        availablePuzzles = puzzles;
+    }
+
+    // 2. Ищем ближайшую по рейтингу среди ДОСТУПНЫХ
     let minDiff = Infinity;
-    for (let p of puzzles) {
+    for (let p of availablePuzzles) {
         const diff = Math.abs(Number(p.elo) - currentElo);
         if (diff < minDiff) minDiff = diff;
     }
-    const closestPuzzles = puzzles.filter(p => Math.abs(Number(p.elo) - currentElo) === minDiff);
+    
+    const closestPuzzles = availablePuzzles.filter(p => Math.abs(Number(p.elo) - currentElo) === minDiff);
     const selectedPuzzle = closestPuzzles[Math.floor(Math.random() * closestPuzzles.length)];
 
     currentPuzzleIndex = puzzles.indexOf(selectedPuzzle);
@@ -951,6 +981,12 @@ function finalizeMove(moveStr, isOpponent, f, t) {
             
             statsFlawless++; 
             
+            const currentPuzzle = puzzles[currentPuzzleIndex];
+            if (currentPuzzle && currentPuzzle.id) {
+                solvedIds.add(currentPuzzle.id);
+                Platform.saveSolvedIds(Array.from(solvedIds)); // Сохраняем в память
+            }
+
             // ОБНОВЛЯЕМ РЕКОРД ТОЛЬКО ПРИ ИДЕАЛЬНОМ РЕШЕНИИ
             if (thisElo > statsMaxElo) {
                 statsMaxElo = thisElo;
