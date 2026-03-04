@@ -97,7 +97,7 @@
 }
 
 .btn-stats {
-    width: 10vw;
+    width: 11vw;
     height: 10vw;
     border-radius: 3vw;
     background: white;
@@ -1144,7 +1144,6 @@
 /* Карточки и панели в стиле Chess.com */
 .dark-mode #profile-header,
 .dark-mode .modal-box,
-.dark-mode .btn-stats,
 .dark-mode .btn-hint,
 .dark-mode #promotion-dialog {
     background-color: #ebebeb; /* Фирменный цвет панелей Chess.com */
@@ -1152,7 +1151,11 @@
     border: none;
     box-shadow: 0 4px 0 #1a1917; /* Темная тень под кнопками */
 }
-
+.dark-mode .btn-stats {
+background: #769656;
+    color: white;
+    box-shadow: 0 4px 0 #637d49;
+}
 /* Кнопки при нажатии */
 .dark-mode .btn-stats:active,
 .dark-mode .btn-hint:active {
