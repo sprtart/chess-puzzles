@@ -557,7 +557,7 @@ function startPuzzle() {
     
     const closestPuzzles = availablePuzzles.filter(p => Math.abs(Number(p.elo) - currentElo) === minDiff);
     const selectedPuzzle = closestPuzzles[Math.floor(Math.random() * closestPuzzles.length)];
-
+    console.log(`Задача: https://lichess.org/training/${selectedPuzzle.id} [Elo: ${selectedPuzzle.elo}]`);
     currentPuzzleIndex = puzzles.indexOf(selectedPuzzle);
     document.getElementById('puzzle-elo').textContent = selectedPuzzle.elo;
 
