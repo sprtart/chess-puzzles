@@ -1060,16 +1060,26 @@
 
 /* --- Стандартный альбом (Ноутбуки, мониторы 16:10) --- */
 /* Соотношение 1.26 - 1.45 */
-@media (min-aspect-ratio: 126/100) and (max-aspect-ratio: 145/100) { 
-    /* Комфортный режим. Доска ~80vh. */
+@media (min-aspect-ratio: 131/100) { 
+    .chess-board {
+        width: 82vh;
+        height: 82vh;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        border-radius: 5px;
+    }
 
 }
 
 /* --- Широкий формат (Full HD 16:9) --- */
 /* Соотношение 1.46 - 1.80 */
-@media (min-aspect-ratio: 146/100) and (max-aspect-ratio: 180/100) { 
+@media (min-aspect-ratio: 140/100) { 
     /* Здесь можно разгуляться: большие шрифты, доска 85vh. */
-
+    .chess-board {
+        width: 85vh;
+        height: 85vh;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        border-radius: 5px;
+    }
 }
 
 /* --- Ультра-широкие мониторы (21:9 и более) --- */
