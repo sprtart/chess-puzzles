@@ -28,8 +28,8 @@
     align-items: center;
     width: min(70vw, 45vh);
     /*min-width: min(85vw, 72vh);*/
-    margin-bottom: 8px;
-    padding: 2vh 5vw;
+    /*margin-bottom: 8px;*/
+    padding: 1.5vh 4vw;
     box-sizing: border-box;
     background-color: #ffffff;
     border-radius: 8vw;
@@ -732,7 +732,7 @@
 /* --- Стандартные смартфоны (16:9, 18:9) --- */
 @media (min-aspect-ratio: 43/100) { 
     .chess-board {
-        width: 100vw;
+        width: 100vw;   
         height: 100vw;
     }
         /* Шрифты ЧИСТО НА VW */
@@ -756,8 +756,8 @@
 
     .btn-hint {
         font-size: 5vw;
-        padding: 3vw 6vw;
-        border-radius: 4vw;
+        padding: 4vw 8vw;
+        border-radius: 7vw;
     }
     .game-container {
         gap: 5vw;
@@ -1147,8 +1147,8 @@
 .dark-mode .btn-stats,
 .dark-mode .btn-hint,
 .dark-mode #promotion-dialog {
-    background-color: #262421; /* Фирменный цвет панелей Chess.com */
-    color: #ffffff;
+    background-color: #ebebeb; /* Фирменный цвет панелей Chess.com */
+    color: #161512;
     border: none;
     box-shadow: 0 4px 0 #1a1917; /* Темная тень под кнопками */
 }
