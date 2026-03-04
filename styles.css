@@ -968,45 +968,6 @@
 
 @media (min-aspect-ratio: 4/4) and (max-aspect-ratio: 5/4) {
 
-    .chess-board {
-        width: 70vw;
-        height: 70vw;
-    }
-    /* Шрифты ЧИСТО НА VW */
-    .side-panel {
-        gap: 3vw;
-        width: 10vw !important;
-        min-width: 22vw;
-    }
-    .stat-label {
-        font-size: 1.5vw;
-        font-weight: 900;
-        text-transform: uppercase;
-    }
-
-    .stat-value {
-        font-size: 3.2vw;
-        font-weight: 900;
-    }
-
-    /* -------- КНОПКА -------- */
-
-    .bottom-bar {
-        display: flex;
-        justify-content: center;
-    }
-
-    .btn-hint {
-        font-size: 1.5vw;
-        padding: 1.5vw 5vw;
-        border-radius: 2vw;
-    }
-    .text {
-        display: none;
-    }
-    .game-container {
-        gap: 4vw;
-    }
 }
 
 /* =====================================================
@@ -1027,8 +988,8 @@
     }
 
     .chess-board {
-        width: 85vh;
-        height: 85vh;
+        width: 70vh;
+        height: 70vh;
         box-shadow: 0 10px 30px rgba(0,0,0,0.3);
         border-radius: 5px;
     }
@@ -1094,9 +1055,7 @@
         fill: currentColor; /* Иконка примет цвет текста кнопки */
     }
 
-    .text {
-        display: none;
-    }
+    
 }
 
 /* --- Стандартный альбом (Ноутбуки, мониторы 16:10) --- */
