@@ -799,8 +799,8 @@
        Например: width: 60vh; height: 60vh; Чтобы UI влез сверху и снизу. */
 
     .chess-board {
-        width: 70vw;
-        height: 70vw;
+        width: 65vh;
+        height: 65vh;
     }
         /* Шрифты ЧИСТО НА VW */
     .side-panel {
@@ -842,8 +842,8 @@
     /* КРИТИЧЕСКАЯ ТОЧКА: Доска должна ориентироваться на ВЫСОТУ (vh).
        Например: width: 60vh; height: 60vh; Чтобы UI влез сверху и снизу. */
     .chess-board {
-        width: 70vw;
-        height: 70vw;
+        width: 65vh;
+        height: 65vh;
     }
         /* Шрифты ЧИСТО НА VW */
     .side-panel {
@@ -885,12 +885,20 @@
     /* КРИТИЧЕСКАЯ ТОЧКА: Доска должна ориентироваться на ВЫСОТУ (vh).
        Например: width: 60vh; height: 60vh; Чтобы UI влез сверху и снизу. */
     .chess-board {
-        width: 65vw;
-        height: 65vw;
+        width: 62vw;
+        height: 62vw;
     }
+    .right-column {
+        display: flex;
+        flex-direction: column;
+        gap: 2vw;
+        width: 30vw;
+        /* min-width: 240px; */
+    }
+    
         /* Шрифты ЧИСТО НА VW */
     .side-panel {
-        gap: 0vw;
+        gap: 1vw;
     }
     .stat-label {
         font-size: 3vw;
@@ -920,6 +928,22 @@
     }
     .game-container {
         gap: 2vw;
+    }
+
+    #profile-header {
+        order: -1;
+        display: flex;
+        width: min(70vw, 45vh);
+        /* min-width: min(85vw, 72vh); */
+        margin-bottom: 8px;
+        padding: 1.5vh 3vw;
+        border-radius: 25px;
+    }
+
+    .btn-stats {
+        width: 7vh;
+        height: 7vh;
+        border-radius: 2vw;
     }
 }
 
@@ -999,6 +1023,19 @@
         /*min-width: 220px;*/
         align-items: stretch;
         gap: 4vw;
+    }
+
+    #user-name {
+        font-size: 1.5vw;
+        max-width: 9vw;
+    }
+
+        .right-column {
+        display: flex;
+        flex-direction: column;
+        gap: 2vw;
+        width: 25vw;
+        /* min-width: 240px; */
     }
 
     .top-bar {
