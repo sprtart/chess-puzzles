@@ -701,8 +701,8 @@
 
     .btn-hint {
         font-size: 4vw;
-        padding: 1.5vw 5vw;
-        border-radius: 2vw;
+        padding: 2.5vw 5vw;
+        border-radius: 3vw;
     }
     .text {
         display: none;
@@ -746,8 +746,8 @@
 
     .btn-hint {
         font-size: 3vw;
-        padding: 1.5vw 5vw;
-        border-radius: 2vw;
+        padding: 2vw 5vw;
+        border-radius: 3vw;
     }
     .text {
         display: none;
@@ -800,6 +800,48 @@
     }
 }
 
+
+@media (min-aspect-ratio: 92/100) { 
+    /* КРИТИЧЕСКАЯ ТОЧКА: Доска должна ориентироваться на ВЫСОТУ (vh).
+       Например: width: 60vh; height: 60vh; Чтобы UI влез сверху и снизу. */
+    .chess-board {
+        width: 65vw;
+        height: 65vw;
+    }
+        /* Шрифты ЧИСТО НА VW */
+    .side-panel {
+        gap: 0vw;
+    }
+    .stat-label {
+        font-size: 3vw;
+        font-weight: 900;
+        text-transform: uppercase;
+    }
+
+    .stat-value {
+        font-size: 4.5vw;
+        font-weight: 900;
+    }
+
+    /* -------- КНОПКА -------- */
+
+    .bottom-bar {
+        display: flex;
+        justify-content: center;
+    }
+
+    .btn-hint {
+        font-size: 3vw;
+        padding: 1.5vw 5vw;
+        border-radius: 2vw;
+    }
+    .text {
+        display: none;
+    }
+    .game-container {
+        gap: 2vw;
+    }
+}
 
 @media (aspect-ratio: 4/4) {
 
