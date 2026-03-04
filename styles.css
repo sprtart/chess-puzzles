@@ -929,8 +929,6 @@
     #profile-header {
         order: -1;
         display: flex;
-        width: min(70vw, 45vh);
-        /* min-width: min(85vw, 72vh); */
         margin-bottom: 8px;
         padding: 1.5vh 3vw;
         border-radius: 25px;
