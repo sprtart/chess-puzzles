@@ -1154,12 +1154,12 @@
     background-color: #ebebeb; /* Фирменный цвет панелей Chess.com */
     color: #161512;
     border: none;
-    box-shadow: 0 0 0 #1a1917; /* Темная тень под кнопками */
+    box-shadow: 0 4px 0 #1a1917; /* Темная тень под кнопками */
 }
 .dark-mode .btn-stats {
 background: #769656;
     color: white;
-    box-shadow: 0 4px 0 #637d49;
+    box-shadow: 0 0 0 #637d49;
 }
 /* Кнопки при нажатии */
 .dark-mode .btn-stats:active,
