@@ -45,7 +45,14 @@
         <div id="profile-header">
             <div class="user-info">
                 <img id="user-avatar" src='data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%239ca3af"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>' alt="Аватар">
-                <span id="user-name">Игрок</span>
+                <!-- Оборачиваем имя и рейтинг в контейнер -->
+                <div class="user-text-wrapper">
+                    <span id="user-name">Игрок</span>
+                    <div id="user-best-elo-container">
+                        <span id="label-best-elo">Рекорд:</span>
+                        <span id="user-max-rating">0</span>
+                    </div>
+                </div>
             </div>
             <button class="btn-stats" onclick="showStatsModal()">
                 <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 11V3H8v6H2v12h20V11h-6zm-6-6h4v14h-4V5zm-6 6h4v8H4v-8zm16 8h-4v-6h4v6z"/></svg>
@@ -289,7 +296,8 @@ const i18n = {
         rating: "Эло",
         score: "Очки",
         hintBtn: "Подсказка",
-        adLoading: "Загрузка..."
+        adLoading: "Загрузка...",
+        bestElo: "Рекорд:"
     },
     en: {
         title: "Chess puzzles: find the best move",
@@ -299,7 +307,8 @@ const i18n = {
         rating: "Elo",
         score: "Score",
         hintBtn: "Hint",
-        adLoading: "Loading..."
+        adLoading: "Loading...",
+        bestElo: "Best:"
     }
 };
 
@@ -310,6 +319,7 @@ function applyTranslations() {
     document.getElementById('label-score').textContent = t.score;
     document.getElementById('hint-btn-text').textContent = t.hintBtn; 
     document.getElementById('loading-text').textContent = t.preparing;
+    document.getElementById('label-best-elo').textContent = t.bestElo;
 }
 
 function saveCurrentStats() {
@@ -345,6 +355,8 @@ async function initGame() {
     statsFlawless = savedStats.flawless || 0;
     statsTotalMistakes = savedStats.mistakes || 0;
     statsMaxElo = savedStats.maxElo || 0;
+
+    document.getElementById('user-max-rating').textContent = statsMaxElo;
     
     // Подставляем аватарку и имя, если играем в ВК
     if (Platform.id === 'vk' && Platform.user) {
@@ -920,6 +932,7 @@ function finalizeMove(moveStr, isOpponent, f, t) {
         // 1. Считаем ЛЮБУЮ решенную задачу (даже если были ошибки)
         statsTotalSolved++; 
         if (thisElo > statsMaxElo) statsMaxElo = thisElo; // Обновляем рекордный ЭЛО
+        document.getElementById('user-max-rating').textContent = statsMaxElo;
 
         // 2. Проверяем, была ли задача решена ИДЕАЛЬНО (без ошибок и подсказок)
         if (!hasHint && !hasMistake) {

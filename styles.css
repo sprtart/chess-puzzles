@@ -59,14 +59,40 @@
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
 
+/* Контейнер для текста (Имя + Рейтинг) */
+.user-text-wrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    line-height: 1.2;
+}
+
 #user-name {
-    font-size: min(4vw, 3vh);
+    font-size: min(4vw, 2.8vh); /* Чуть уменьшили, чтобы влезло две строки */
     font-weight: 800;
     color: var(--gray-700);
-    max-width: 40vw; /* Обрезаем длинные имена */
+    max-width: 35vw;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+}
+
+#user-best-elo-container {
+    font-size: min(3vw, 1.8vh);
+    font-weight: 600;
+    color: var(--gray-500); /* Сделаем чуть бледнее имени */
+    margin-top: 1px;
+}
+
+#user-max-rating {
+    color: #2563eb; /* Цвет акцента для цифр рекорда */
+    font-weight: 800;
+}
+
+/* Адаптация для ПК */
+@media (orientation: landscape) {
+    #user-name { font-size: 1.2vw; max-width: 12vw; }
+    #user-best-elo-container { font-size: 0.9vw; }
 }
 
 .btn-stats {
