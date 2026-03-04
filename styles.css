@@ -606,9 +606,9 @@
     border-radius: 1.5vw;
     display: flex;
     flex-direction: row;
-    align-items: center;
+    align-items: flex-end;
     min-width: 18vw;
-    gap: 3vw;   
+    gap: 3vw;
 }
 
 
@@ -1183,4 +1183,8 @@
 .dark-mode #user-max-rating {
     color: #ebebeb;
     font-weight: 800;
+}
+
+.dark-mode .stat-value {
+    color: #ebebeb;
 }
