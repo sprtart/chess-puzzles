@@ -1110,52 +1110,57 @@
 
 
 
-/* --- ТЕМНАЯ ТЕМА --- */
+/* --- ТЕМНАЯ ТЕМА (CHESS.COM STYLE) --- */
 body.dark-mode {
-    --gray-100: #111827; /* Почти черный фон */
-    --gray-200: #374151;
-    --gray-400: #9ca3af;
-    --gray-500: #d1d5db;
-    --gray-700: #f3f4f6; /* Светлый текст */
+    --gray-100: #161512; /* Глубокий темный фон страницы */
+    --gray-200: #312e2b; /* Цвет границ */
+    --gray-400: #bababa;
+    --gray-500: #959492;
+    --gray-700: #ffffff; /* Белый текст */
     --gray-800: #ffffff;
-    
-    /* Цвета доски для темной темы (более приглушенные) */
-    --board-light: #4b5563; 
-    --board-dark: #1f2937;
-    
-    background-image: radial-gradient(#1f2937 1px, transparent 1px);
+
+    /* Доска в темной теме остается той же зеленой, 
+       либо можно чуть приглушить яркость (по желанию) */
+    --board-light: #eeeed2;
+    --board-dark: #769656;
+
+    background-image: none;
+    background-color: #161512;
 }
 
-/* Корректировка карточек и модалок */
+/* Карточки и панели в стиле Chess.com */
 body.dark-mode #profile-header,
 body.dark-mode .stat-card,
 body.dark-mode .modal-box,
 body.dark-mode .btn-stats,
 body.dark-mode .btn-hint,
 body.dark-mode #promotion-dialog {
-    background-color: #1f2937;
-    color: var(--gray-700);
-    border-color: #374151;
-    box-shadow: 0 4px 0 #000000;
+    background-color: #262421; /* Фирменный цвет панелей Chess.com */
+    color: #ffffff;
+    border: none;
+    box-shadow: 0 4px 0 #1a1917; /* Темная тень под кнопками */
 }
 
+/* Кнопки при нажатии */
 body.dark-mode .btn-stats:active,
 body.dark-mode .btn-hint:active {
-    box-shadow: 0 0px 0 #000000;
+    box-shadow: 0 0px 0 #1a1917;
+    transform: translateY(4px);
 }
 
-body.dark-mode .stat-label {
-    color: var(--gray-400);
-}
+/* Координаты на доске */
+body.dark-mode .square.light .coord { color: #769656; } /* Цвет темной клетки */
+body.dark-mode .square.dark .coord { color: #eeeed2; }  /* Цвет светлой клетки */
 
-body.dark-mode .prom-option {
-    background-color: #374151;
+/* Специальный стиль для кнопки подсказки в темной теме (зеленоватая) */
+body.dark-mode .btn-hint {
+    background-color: #81b64c; /* Зеленая кнопка как на чесс ком */
+    color: #fff;
+    box-shadow: 0 4px 0 #457520;
 }
-
-body.dark-mode .prom-option:hover {
-    background-color: #4b5563;
+body.dark-mode .btn-hint:active {
+    box-shadow: 0 0px 0 #457520;
 }
-
-/* Подсветка ходов в темной теме */
-body.dark-mode .square.enemy-move::before { background-color: rgba(245, 158, 11, 0.4); }
-body.dark-mode .square.selected::before { background-color: rgba(245, 158, 11, 0.6); }
+body.dark-mode .btn-hint svg {
+    fill: #fff;
+}
