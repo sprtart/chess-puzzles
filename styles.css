@@ -156,7 +156,7 @@
         flex-direction: column;
         gap: 4vw; /* Отступ между профилем и нижней статистикой */
         width: 25vw; 
-        min-width: 240px;
+        /*min-width: 240px;*/
     }
 
     #profile-header {
@@ -1028,8 +1028,7 @@
         display: flex;
         flex-direction: column;
         gap: 2vw;
-        width: 25vw;
-        /* min-width: 240px; */
+        width: 26vw;
     }
 
     .top-bar {
@@ -1091,7 +1090,7 @@
 
 /* --- Стандартный альбом (Ноутбуки, мониторы 16:10) --- */
 /* Соотношение 1.26 - 1.45 */
-@media (min-aspect-ratio: 111/100) { 
+@media (min-aspect-ratio: 125/100) { 
     .chess-board {
         width: 85vh;
         height: 85vh;
