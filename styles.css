@@ -934,6 +934,13 @@
         height: 7vh;
         border-radius: 2vw;
     }
+
+    .dark-mode .stat-card {
+        background-color: #262421; /* Фирменный цвет панелей Chess.com */
+        color: #ffffff;
+        border: none;
+        box-shadow: 0 4px 0 #1a1917; /* Темная тень под кнопками */
+    }
 }
 
 @media (aspect-ratio: 4/4) {
