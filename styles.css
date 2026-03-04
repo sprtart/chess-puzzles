@@ -1098,7 +1098,13 @@
         box-shadow: 0 10px 30px rgba(0,0,0,0.3);
         border-radius: 5px;
     }
-
+    #profile-header {
+        order: -1;
+        display: flex;
+        margin-bottom: 8px;
+        padding: 2vh 2vw;
+        border-radius: 25px;
+    }
 }
 
 /* --- Широкий формат (Full HD 16:9) --- */
