@@ -924,21 +924,28 @@ function finalizeMove(moveStr, isOpponent, f, t) {
     } else if (currentStep < puzzles[currentPuzzleIndex].moves.length) {
         isLocked = true;
         setTimeout(() => playMove(puzzles[currentPuzzleIndex].moves[currentStep], true), 600);
-} else {
+    } else {
         // ЗАДАЧА ЗАВЕРШЕНА
         const thisElo = Number(puzzles[currentPuzzleIndex].elo);
-        const randomDelta = Math.floor(Math.random() * 16) + 100; 
+        // Оставляем твою дельту как была
+        const randomDelta = Math.floor(Math.random() * 16) + 80; 
 
-        // 1. Считаем ЛЮБУЮ решенную задачу (даже если были ошибки)
+        // 1. Считаем ЛЮБУЮ решенную задачу для общей статистики
         statsTotalSolved++; 
-        if (thisElo > statsMaxElo) statsMaxElo = thisElo; // Обновляем рекордный ЭЛО
-        document.getElementById('user-max-rating').textContent = statsMaxElo;
 
         // 2. Проверяем, была ли задача решена ИДЕАЛЬНО (без ошибок и подсказок)
         if (!hasHint && !hasMistake) {
-            if (Platform.vibrate) Platform.vibrate('success'); // Вибрация победы
+            if (Platform.vibrate) Platform.vibrate('success');
             
-            statsFlawless++; // <--- ПЛЮС ИДЕАЛЬНАЯ ЗАДАЧА
+            statsFlawless++; 
+            
+            // ОБНОВЛЯЕМ РЕКОРД ТОЛЬКО ПРИ ИДЕАЛЬНОМ РЕШЕНИИ
+            if (thisElo > statsMaxElo) {
+                statsMaxElo = thisElo;
+                // Обновляем число в профиле под именем
+                const maxRatingEl = document.getElementById('user-max-rating');
+                if (maxRatingEl) maxRatingEl.textContent = statsMaxElo;
+            }
             
             currentElo += randomDelta;
             let pointsToAdd = (previousPuzzleElo === null) ? 15 : Math.max(5, Math.abs(thisElo - previousPuzzleElo));
@@ -949,15 +956,15 @@ function finalizeMove(moveStr, isOpponent, f, t) {
             totalScore += pointsToAdd;
             showPointsAnimation(pointsToAdd); 
             
-        } else if (hasMistake && !hasHint) {
-            // Если были ошибки, понижаем рейтинг, очки не даем
+        } else {
+            // Если были ошибки или подсказки, очки не даем и понижаем текущий Elo поиска
             currentElo = Math.max(100, currentElo - randomDelta); 
         }
 
-        saveCurrentStats(); // Сохраняем всю статистику разом
+        saveCurrentStats(); // Сохраняем обновленный statsMaxElo и прочее
         previousPuzzleElo = thisElo;
         setTimeout(startPuzzle, 800);
-    }
+        }
 }
 
 function applyHint() {
