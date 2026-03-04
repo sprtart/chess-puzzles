@@ -56,7 +56,7 @@
             </div>
     <!-- Группа кнопок действий -->
     <div class="header-actions" style="display: flex; gap: 8px;">
-        
+
         <button class="btn-stats" onclick="showStatsModal()">
             <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 11V3H8v6H2v12h20V11h-6zm-6-6h4v14h-4V5zm-6 6h4v8H4v-8zm16 8h-4v-6h4v6z"/></svg>
         </button>
@@ -444,6 +444,7 @@ async function initGame() {
     // Загружаем статистику из ВК
     const savedStats = await Platform.getStats();
     totalScore = savedStats.score || 0;
+    document.getElementById('score-display').textContent = totalScore;
     statsTotalSolved = savedStats.solved || 0;
     statsFlawless = savedStats.flawless || 0;
     statsTotalMistakes = savedStats.mistakes || 0;
@@ -1068,38 +1069,36 @@ function finalizeMove(moveStr, isOpponent, f, t) {
         statsTotalSolved++; 
 
         // 2. Проверяем, была ли задача решена ИДЕАЛЬНО (без ошибок и подсказок)
-        if (!hasHint && !hasMistake) {
-            if (Platform.vibrate) Platform.vibrate('success');
-            
-            statsFlawless++; 
-            
-            const currentPuzzle = puzzles[currentPuzzleIndex];
-            if (currentPuzzle && currentPuzzle.id) {
-                solvedIds.add(currentPuzzle.id);
-                Platform.saveSolvedIds(Array.from(solvedIds)); // Сохраняем в память
-            }
+if (!hasHint && !hasMistake) {
+    if (Platform.vibrate) Platform.vibrate('success');
+    
+    statsFlawless++; 
+    
+    // Обновляем рекордный Эло
+    if (thisElo > statsMaxElo) {
+        statsMaxElo = thisElo;
+        const maxRatingEl = document.getElementById('user-max-rating');
+        if (maxRatingEl) maxRatingEl.textContent = statsMaxElo;
+    }
+    
+    currentElo += randomDelta;
+    
+    // Считаем, сколько очков добавить
+    let pointsToAdd = (previousPuzzleElo === null) ? 15 : Math.max(5, Math.abs(thisElo - previousPuzzleElo));
+    
+    // ОБНОВЛЯЕМ ОБЩИЙ СЧЕТ
+    totalScore += pointsToAdd; 
+    document.getElementById('score-display').textContent = totalScore;
+    
+    // Анимация вылетающих очков
+    showPointsAnimation(pointsToAdd); 
+    
+} else if (hasMistake && !hasHint) {
+    currentElo = Math.max(100, currentElo - randomDelta); 
+}
 
-            // ОБНОВЛЯЕМ РЕКОРД ТОЛЬКО ПРИ ИДЕАЛЬНОМ РЕШЕНИИ
-            if (thisElo > statsMaxElo) {
-                statsMaxElo = thisElo;
-                // Обновляем число в профиле под именем
-                const maxRatingEl = document.getElementById('user-max-rating');
-                if (maxRatingEl) maxRatingEl.textContent = statsMaxElo;
-            }
-            
-            currentElo += randomDelta;
-            let pointsToAdd = (previousPuzzleElo === null) ? 15 : Math.max(5, Math.abs(thisElo - previousPuzzleElo));
-            
-            sessionScore += pointsToAdd;
-            document.getElementById('score-display').textContent = sessionScore;
-            
-            totalScore += pointsToAdd;
-            showPointsAnimation(pointsToAdd); 
-            
-        } else {
-            // Если были ошибки или подсказки, очки не даем и понижаем текущий Elo поиска
-            currentElo = Math.max(100, currentElo - randomDelta); 
-        }
+// Сохраняем прогресс в ВК/Локально
+saveCurrentStats();
 
         saveCurrentStats(); // Сохраняем обновленный statsMaxElo и прочее
         previousPuzzleElo = thisElo;
