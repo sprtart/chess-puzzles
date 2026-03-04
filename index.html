@@ -49,7 +49,7 @@
                 <div class="user-text-wrapper">
                     <span id="user-name">Игрок</span>
                     <div id="user-best-elo-container">
-                        <span id="label-best-elo">Рекорд:</span>
+                        <span id="label-best-elo">макс. Эло</span>
                         <span id="user-max-rating">0</span>
                     </div>
                 </div>
@@ -87,7 +87,7 @@
 </div>
 
 <div id="stats-modal" class="modal-overlay hidden">
-    <div class="modal-box">
+    <div class="modal-box" onclick="event.stopPropagation()">
         <h2 id="modal-title">Статистика</h2>
         <div class="stat-row"><span id="t-score">Общий счет:</span> <b id="mdl-score">0</b></div>
         
