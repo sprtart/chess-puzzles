@@ -93,7 +93,7 @@
 /* Адаптация для ПК */
 @media (orientation: landscape) {
     #user-name { font-size: 1.2vw; max-width: 12vw; }
-    #user-best-elo-container { font-size: 0.9vw; }
+    #user-best-elo-container { font-size: 1.2vw; }
 }
 
 .btn-stats {
