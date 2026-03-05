@@ -1216,3 +1216,55 @@ background: #769656;
 /* Чтобы анимация не мешала во время игры, 
    ограничим transition только для UI элементов */
 .piece, .square { transition: none; }
+
+
+
+
+
+
+.leaderboard-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px;
+    border-radius: 8px;
+    margin-bottom: 4px;
+    background: var(--gray-100);
+}
+
+/* Подсветка самого игрока в списке */
+.leaderboard-row.is-me {
+    background: rgba(129, 182, 76, 0.2);
+    border: 1px solid #81b64c;
+}
+
+.rank-num {
+    font-weight: 900;
+    width: 24px;
+    color: var(--gray-500);
+}
+
+.top-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 4px;
+    object-fit: cover;
+}
+
+.top-name {
+    flex-grow: 1;
+    font-weight: 700;
+    font-size: 14px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.top-score {
+    font-weight: 900;
+    color: #81b64c;
+}
+
+/* Скроллбар для списка */
+#leaderboard-container::-webkit-scrollbar { width: 4px; }
+#leaderboard-container::-webkit-scrollbar-thumb { background: var(--gray-400); border-radius: 10px; }

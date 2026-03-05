@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <!-- Мета-тег для мобильных устройств -->
     <meta name="mobile-web-app-capable" content="yes">
-
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <!-- ПОДКЛЮЧАЕМ ТОЛЬКО SDK ВКОНТАКТЕ -->
     <script src="https://unpkg.com/@vkontakte/vk-bridge/dist/browser.min.js"></script>
     
@@ -96,6 +96,17 @@
                     <span id="hint-btn-text">Подсказка</span>
                 </button>
             </div>
+
+            <div id="leaderboard-modal" class="modal-overlay hidden" onclick="hideTopModal()">
+    <div class="modal-box" onclick="event.stopPropagation()" style="max-width: 360px; width: 90%;">
+        <h2 id="top-title">Рейтинг игроков</h2>
+        <div id="leaderboard-container" style="max-height: 60vh; overflow-y: auto; margin: 10px 0;">
+            <!-- Сюда будут вставляться строки игроков -->
+            <div id="top-loading" style="text-align: center; padding: 20px;">Загрузка...</div>
+        </div>
+        <button class="btn-close-modal" onclick="hideTopModal()">Закрыть</button>
+    </div>
+</div>
         </div>
 
     </div> <!-- Конец right-column -->
@@ -511,6 +522,10 @@ let statsMaxElo = 0;
 
 let solvedIds = new Set();
 
+const supabaseUrl = 'https://cgwbdbjgfxlzfxshzkza.supabase.co';
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNnd2JkYmpnZnhsemZ4c2h6a3phIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI2ODgxODAsImV4cCI6MjA4ODI2NDE4MH0.pmLla8tTFmGkn7ICYWgjGtkw1SHvPHRAcwQ-tPOUhcM';
+const supabase = supabaseJs.createClient(supabaseUrl, supabaseKey);
+
 const boardEl = document.getElementById('board');
 const follower = document.getElementById('drag-follower');
 
@@ -592,7 +607,21 @@ function startGameAfterAd() {
         startPuzzle();
     }, 500);
 }
+async function pushToGlobalLeaderboard() {
+    if (!Platform.user) return; // Если данных пользователя нет — выходим
 
+    const { error } = await supabase
+        .from('leaderboard')
+        .upsert({ 
+            vk_id: Platform.user.id, 
+            name: Platform.user.first_name + " " + (Platform.user.last_name || ""),
+            avatar: Platform.user.photo_100,
+            score: totalScore,
+            updated_at: new Date()
+        }, { onConflict: 'vk_id' }); // Если игрок уже есть — обновим его счет
+
+    if (error) console.error("Ошибка сохранения в мировой топ:", error);
+}
 function requestHint() {
     if (isLocked || hasHint || isAdLoading) return;
     
@@ -1107,8 +1136,42 @@ saveCurrentStats();
         previousPuzzleElo = thisElo;
         setTimeout(startPuzzle, 800);
         }
-}
 
+        pushToGlobalLeaderboard();
+}
+async function openLeaderboard() {
+    const modal = document.getElementById('leaderboard-modal');
+    const container = document.getElementById('leaderboard-container');
+    
+    modal.classList.remove('hidden');
+    container.innerHTML = '<div style="text-align:center; padding:20px;">Загрузка мирового топа...</div>';
+
+    try {
+        // Берем топ-50 игроков по счету
+        const { data, error } = await supabase
+            .from('leaderboard')
+            .select('*')
+            .order('score', { ascending: false })
+            .limit(50);
+
+        if (error) throw error;
+
+        // Преобразуем формат Supabase в формат, который понимает твоя функция отрисовки
+        const items = data.map(item => ({
+            user_id: item.vk_id,
+            first_name: item.name,
+            last_name: "",
+            score: item.score,
+            photo_100: item.avatar
+        }));
+
+        renderTopList(items);
+
+    } catch (e) {
+        console.error("Ошибка загрузки мирового топа:", e);
+        container.innerHTML = '<div style="text-align:center; color:red; padding:20px;">Ошибка связи с сервером</div>';
+    }
+}
 function applyHint() {
     hasHint = true;
     const correctMove = puzzles[currentPuzzleIndex].moves[currentStep];
