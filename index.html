@@ -1093,56 +1093,38 @@ function finalizeMove(moveStr, isOpponent, f, t) {
     } else if (currentStep < puzzles[currentPuzzleIndex].moves.length) {
         isLocked = true;
         setTimeout(() => playMove(puzzles[currentPuzzleIndex].moves[currentStep], true), 600);
-    } else {
+} else {
         // ЗАДАЧА ЗАВЕРШЕНА
         const thisElo = Number(puzzles[currentPuzzleIndex].elo);
-        // Оставляем твою дельту как была
         const randomDelta = Math.floor(Math.random() * 16) + 80; 
 
-        // 1. Считаем ЛЮБУЮ решенную задачу для общей статистики
         statsTotalSolved++; 
 
-        // 2. Проверяем, была ли задача решена ИДЕАЛЬНО (без ошибок и подсказок)
-if (!hasHint && !hasMistake) {
-    if (Platform.vibrate) Platform.vibrate('success');
-    
-    statsFlawless++; 
-    
-    // Обновляем рекордный Эло
-    if (thisElo > statsMaxElo) {
-        statsMaxElo = thisElo;
-        const maxRatingEl = document.getElementById('user-max-rating');
-        if (maxRatingEl) maxRatingEl.textContent = statsMaxElo;
-    }
-    
-    currentElo += randomDelta;
-    
-    // Считаем, сколько очков добавить
-    let pointsToAdd = (previousPuzzleElo === null) ? 15 : Math.max(5, Math.abs(thisElo - previousPuzzleElo));
-    
-    // ОБНОВЛЯЕМ ОБЩИЙ СЧЕТ
-    totalScore += pointsToAdd; 
-    document.getElementById('score-display').textContent = totalScore;
-    
-    // Анимация вылетающих очков
-    showPointsAnimation(pointsToAdd); 
-    
-} else if (hasMistake && !hasHint) {
-    currentElo = Math.max(100, currentElo - randomDelta); 
-}
-
-// Сохраняем прогресс в ВК/Локально
-saveCurrentStats();
-
-        saveCurrentStats(); // Сохраняем обновленный statsMaxElo и прочее
-        previousPuzzleElo = thisElo;
-        setTimeout(startPuzzle, 800);
-
-        pushToGlobalLeaderboard();
+        if (!hasHint && !hasMistake) {
+            if (Platform.vibrate) Platform.vibrate('success');
+            statsFlawless++; 
+            if (thisElo > statsMaxElo) {
+                statsMaxElo = thisElo;
+                document.getElementById('user-max-rating').textContent = statsMaxElo;
+            }
+            currentElo += randomDelta;
+            let pointsToAdd = (previousPuzzleElo === null) ? 15 : Math.max(5, Math.abs(thisElo - previousPuzzleElo));
+            totalScore += pointsToAdd; 
+            document.getElementById('score-display').textContent = totalScore;
+            showPointsAnimation(pointsToAdd); 
+        } else if (hasMistake && !hasHint) {
+            currentElo = Math.max(100, currentElo - randomDelta); 
         }
 
+        saveCurrentStats(); // Оставляем ОДИН раз
+        previousPuzzleElo = thisElo;
 
-}
+        // ВЫЗЫВАЕМ ТУТ (только когда задача решена!)
+        pushToGlobalLeaderboard(); 
+
+        setTimeout(startPuzzle, 800);
+    }
+} // Конец функции finalizeMove
 
 async function openLeaderboard() {
     const modal = document.getElementById('leaderboard-modal');
@@ -1309,17 +1291,22 @@ function updateModalTexts() {
 function renderTopList(items) {
     const container = document.getElementById('leaderboard-container');
     container.innerHTML = '';
+    
     if (!items || items.length === 0) {
         container.innerHTML = '<div style="text-align:center; padding:20px;">Здесь пока пусто</div>';
         return;
     }
+
     items.forEach((item, index) => {
-        const isMe = (Platform.user && item.user_id === Platform.user.id);
+        // Проверяем, не я ли это (по ID из ВК)
+        const isMe = (Platform.user && String(item.user_id) === String(Platform.user.id));
+        
         const row = document.createElement('div');
         row.className = `leaderboard-row ${isMe ? 'is-me' : ''}`;
+        
         row.innerHTML = `
             <div class="rank-num">${index + 1}</div>
-            <img class="top-avatar" src="${item.photo_100 || ''}" alt="">
+            <img class="top-avatar" src="${item.photo_100 || 'img/logo.png'}" alt="">
             <div class="top-name">${item.first_name}</div>
             <div class="top-score">${item.score}</div>
         `;
