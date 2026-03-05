@@ -1270,7 +1270,7 @@ background: #769656;
 
 .rank-num {
     font-weight: 900;
-    width: 24px;
+    width: 3vw;
     color: var(--gray-500);
 }
 
