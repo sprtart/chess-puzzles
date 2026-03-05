@@ -611,20 +611,21 @@ function startGameAfterAd() {
     }, 500);
 }
 async function pushToGlobalLeaderboard() {
-    if (!Platform.user) return; // Если данных пользователя нет — выходим
+    if (!Platform.user) return; 
 
     const { error } = await sb
         .from('leaderboard')
         .upsert({ 
             vk_id: Platform.user.id, 
-            name: Platform.user.first_name + " " + (Platform.user.last_name || ""),
+            name: Platform.user.first_name, 
             avatar: Platform.user.photo_100,
             score: totalScore,
             updated_at: new Date()
-        }, { onConflict: 'vk_id' }); // Если игрок уже есть — обновим его счет
+        }, { onConflict: 'vk_id' });
 
     if (error) console.error("Ошибка сохранения в мировой топ:", error);
 }
+
 function requestHint() {
     if (isLocked || hasHint || isAdLoading) return;
     
