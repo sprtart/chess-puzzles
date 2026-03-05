@@ -1174,7 +1174,7 @@
 .dark-mode .modal-box,
 .dark-mode .btn-hint,
 .dark-mode #promotion-dialog {
-    background-color: #ebebeb; /* Фирменный цвет панелей Chess.com */
+    background-color: var(--gray-900); /* Фирменный цвет панелей Chess.com */
     color: #161512;
     border: none;
     box-shadow: 0 4px 0 #262625; /* Темная тень под кнопками */
@@ -1208,7 +1208,7 @@ background: #769656;
     fill: #fff;
 }
 .dark-mode .top-top {
-    background-color: #ebebeb;
+    background-color: var(--gray-900);
     color: #769656;
     box-shadow: 0 4px 0 #c3c3c3;
 }
