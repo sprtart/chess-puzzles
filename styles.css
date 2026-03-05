@@ -1207,7 +1207,7 @@ background: #769656;
 .dark-mode .btn-hint svg {
     fill: #fff;
 }
-.dark-mode .top-top {
+.dark-mode .top-btn {
     background-color: var(--gray-900);
     color: #769656;
     box-shadow: 0 4px 0 #c3c3c3;
