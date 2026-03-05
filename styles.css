@@ -778,7 +778,7 @@
     .btn-hint {
         font-size: 5vw;
         padding: 4vw 8vw;
-        border-radius: 7vw;
+        border-radius: 7vw 1vw 1vw 7vw;
     }
     .game-container {
         gap: 5vw;
