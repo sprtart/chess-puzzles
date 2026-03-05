@@ -1160,6 +1160,48 @@ async function openLeaderboard() {
     }
 }
 
+// Функция для закрытия модального окна ТОПа
+function hideTopModal() {
+    const modal = document.getElementById('leaderboard-modal');
+    if (modal) {
+        modal.classList.add('hidden');
+    }
+}
+
+// Твоя существующая функция открытия (убедись, что она выглядит так)
+async function openLeaderboard() {
+    const modal = document.getElementById('leaderboard-modal');
+    const container = document.getElementById('leaderboard-container');
+    
+    modal.classList.remove('hidden');
+    container.innerHTML = '<div style="text-align:center; padding:20px;">Загрузка мирового топа...</div>';
+
+    try {
+        // Используем 'sb', как мы договорились ранее
+        const { data, error } = await sb
+            .from('leaderboard')
+            .select('*')
+            .order('score', { ascending: false })
+            .limit(50);
+
+        if (error) throw error;
+
+        // Преобразуем данные для отрисовки
+        const items = data.map(item => ({
+            user_id: item.vk_id,
+            first_name: item.name,
+            score: item.score,
+            photo_100: item.avatar
+        }));
+
+        renderTopList(items);
+
+    } catch (e) {
+        console.error("Ошибка загрузки мирового топа:", e);
+        container.innerHTML = '<div style="text-align:center; color:red; padding:20px;">Ошибка связи с сервером</div>';
+    }
+}
+
 function applyHint() {
     hasHint = true;
     const correctMove = puzzles[currentPuzzleIndex].moves[currentStep];
