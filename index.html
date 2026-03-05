@@ -95,10 +95,10 @@
                     </div>
                     <span id="hint-btn-text">Подсказка</span>
                 </button>
+                <button class="hint-btn" onclick="openLeaderboard()">
+                </button>
             </div>
-<button class="btn-stats" onclick="openLeaderboard()" style="background: #f59e0b; color: white;">
-    🏆
-</button>
+
             <div id="leaderboard-modal" class="modal-overlay hidden" onclick="hideTopModal()">
     <div class="modal-box" onclick="event.stopPropagation()" style="max-width: 360px; width: 90%;">
         <h2 id="top-title">Рейтинг игроков</h2>
@@ -1126,39 +1126,7 @@ function finalizeMove(moveStr, isOpponent, f, t) {
     }
 } // Конец функции finalizeMove
 
-async function openLeaderboard() {
-    const modal = document.getElementById('leaderboard-modal');
-    const container = document.getElementById('leaderboard-container');
-    
-    modal.classList.remove('hidden');
-    container.innerHTML = '<div style="text-align:center; padding:20px;">Загрузка мирового топа...</div>';
 
-    try {
-        // Берем топ-50 игроков по счету
-        const { data, error } = await sb
-            .from('leaderboard')
-            .select('*')
-            .order('score', { ascending: false })
-            .limit(50);
-
-        if (error) throw error;
-
-        // Преобразуем формат Supabase в формат, который понимает твоя функция отрисовки
-        const items = data.map(item => ({
-            user_id: item.vk_id,
-            first_name: item.name,
-            last_name: "",
-            score: item.score,
-            photo_100: item.avatar
-        }));
-
-        renderTopList(items);
-
-    } catch (e) {
-        console.error("Ошибка загрузки мирового топа:", e);
-        container.innerHTML = '<div style="text-align:center; color:red; padding:20px;">Ошибка связи с сервером</div>';
-    }
-}
 
 // Функция для закрытия модального окна ТОПа
 function hideTopModal() {
