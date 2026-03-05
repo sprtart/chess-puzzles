@@ -1229,7 +1229,7 @@ background: #769656;
     padding: 10px;
     border-radius: 8px;
     margin-bottom: 4px;
-    background: var(--gray-100);
+    background: var(--gray-800);
 }
 
 /* Подсветка самого игрока в списке */
