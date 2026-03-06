@@ -167,12 +167,15 @@ const Platform = {
 vkBridge.subscribe((e) => {
     if (e.detail.type === 'VKWebAppUpdateConfig') {
         const data = e.detail.data;
-        if (data.appearance === 'dark' || data.appearance === 'space_gray') {
-            document.documentElement.classList.add('dark-mode');
-        } else {
-            document.documentElement.classList.remove('dark-mode');
+        // Если пользователь НЕ менял тему в игре вручную, слушаемся приложение ВК
+        if (!localStorage.getItem('user-theme')) {
+            if (data.appearance === 'dark' || data.appearance === 'space_gray') {
+                document.documentElement.classList.add('dark-mode');
+            } else {
+                document.documentElement.classList.remove('dark-mode');
+            }
+            updateThemeIcons();
         }
-        updateThemeIcons(); // <-- ОБЯЗАТЕЛЬНО ДОБАВЬ ЭТУ СТРОКУ
     }
 });
 
@@ -401,7 +404,7 @@ function updateThemeIcons() {
 function toggleTheme() {
     const isDark = document.documentElement.classList.toggle('dark-mode');
     
-    // Сохраняем выбор пользователя, чтобы при следующем входе тема осталась
+    // Сохраняем, чтобы ручной выбор всегда был главнее настроек приложения
     localStorage.setItem('user-theme', isDark ? 'dark' : 'light');
     
     updateThemeIcons();
@@ -415,9 +418,13 @@ function checkSavedTheme() {
     const saved = localStorage.getItem('user-theme');
     const systemDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
     
+    // Если в памяти 'dark' ИЛИ если это первый заход и в системе темная тема
     if (saved === 'dark' || (saved === null && systemDark)) {
         document.documentElement.classList.add('dark-mode');
+    } else if (saved === 'light') {
+        document.documentElement.classList.remove('dark-mode');
     }
+    
     updateThemeIcons();
 }
 
