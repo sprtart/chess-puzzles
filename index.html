@@ -1388,6 +1388,52 @@ function renderTopList(items) {
 
 window.onload = initGame;
 
+
+// Фикс скролла лидерборда на мобильных (из Яндекс-версии)
+(function() {
+    let startY = 0;
+    let startScrollTop = 0;
+
+    document.addEventListener('touchstart', function(e) {
+        const container = document.getElementById('leaderboard-container');
+        // Проверяем, что нажатие произошло внутри списка лидеров
+        if (container && container.contains(e.target)) {
+            startY = e.touches[0].clientY;
+            startScrollTop = container.scrollTop;
+        }
+    }, { passive: true });
+
+    document.addEventListener('touchmove', function(e) {
+        const container = document.getElementById('leaderboard-container');
+        if (!container || !container.contains(e.target)) return;
+
+        const deltaY = startY - e.touches[0].clientY;
+        const newScrollTop = startScrollTop + deltaY;
+
+        // Определяем границы прокрутки
+        const maxScroll = container.scrollHeight - container.clientHeight;
+        const atTop = newScrollTop <= 0;
+        const atBottom = newScrollTop >= maxScroll;
+
+        // Если мы скроллим ВНУТРИ списка (не дошли до краев)
+        if (!atTop && !atBottom) {
+            container.scrollTop = newScrollTop;
+            // Блокируем стандартный скролл всей страницы браузером
+            if (e.cancelable) e.preventDefault();
+        } 
+        // Если дошли до верха и тянем вниз
+        else if (atTop && deltaY < 0) {
+            container.scrollTop = 0;
+            if (e.cancelable) e.preventDefault();
+        } 
+        // Если дошли до низа и тянем вверх
+        else if (atBottom && deltaY > 0) {
+            container.scrollTop = maxScroll;
+            if (e.cancelable) e.preventDefault();
+        }
+    }, { passive: false }); // Важно: false позволяет вызывать preventDefault
+})();
+
 </script>
 </body>
 </html>
