@@ -30,8 +30,8 @@
     align-items: center;
     width: min(80vw, 45vh);
     /*min-width: min(85vw, 72vh);*/
-    margin-bottom: 10px;
-    padding: 1.5vh 4vw;
+    margin-bottom: 3vw;
+    padding: 1.5vh 3.3vw;
     box-sizing: border-box;
     background-color: #ffffff;
     border-radius: 8vw;
@@ -57,8 +57,8 @@
     height: 6vh;
     border-radius: 50%;
     object-fit: cover;
-    background-color: white;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    background-color: #374151;
+    /*box-shadow: 0 2px 5px rgba(0,0,0,0.1);*/
 }
 
 /* Контейнер для текста (Имя + Рейтинг) */
@@ -74,7 +74,7 @@
     font-size: min(4.5vw, 3vh); /* Чуть уменьшили, чтобы влезло две строки */
     font-weight: 800;
     color: var(--gray-700);
-    max-width: 25vw;
+    max-width: 30vw;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -98,13 +98,13 @@
     #user-best-elo-container { font-size: 1.2vw; }
 }
 
-.btn-stats {
+.btn-stats, .btn-theme {
     width: 10vw;
     height: 10vw;
     border-radius: 50%;
     background: white;
     border: none;
-    box-shadow: 0 3px 0 var(--gray-200);
+    /*box-shadow: 0 3px 0 var(--gray-200);*/
     display: flex;
     align-items: center;
     justify-content: center;
@@ -116,7 +116,8 @@
     transform: translateY(3px);
     box-shadow: 0 0px 0 var(--gray-200);
 }
-.btn-stats svg { width: 24px; height: 24px; }
+.btn-stats svg { width: 5.5vw;
+    height: 5.5vw;}
 
 /* --- МОДАЛЬНОЕ ОКНО СТАТИСТИКИ --- */
 .modal-overlay {
@@ -201,7 +202,7 @@
 
     /* Адаптируем размеры профиля для ПК */
     #user-avatar { width: 3.5vw; height: 3.5vw; min-width: 40px; min-height: 40px; }
-    .btn-stats { width: 3.5vw; height: 3.5vw; min-width: 40px; min-height: 40px; border-radius: 1vw;}
+    .btn-stats, .btn-theme { width: 3.5vw; height: 3.5vw; min-width: 40px; min-height: 40px; border-radius: 1vw;}
     #user-name { font-size: 1.5vw; max-width: 12vw;}
     
     .side-panel {
@@ -316,6 +317,50 @@
             font-weight: bold;
             font-size: 14px;
         }
+
+
+        /* Контейнер со списком игроков */
+#leaderboard-container {
+    max-height: 60vh;
+    overflow-y: auto !important;
+    
+    /* ОЧЕНЬ ВАЖНО: перебиваем глобальный touch-action: none */
+    touch-action: pan-y !important; 
+    
+    /* Чтобы скролл не передавался на доску под окном */
+    overscroll-behavior: contain; 
+    
+    /* Плавность для iPhone */
+    -webkit-overflow-scrolling: touch; 
+    
+    /* Убедимся, что клики проходят */
+    pointer-events: auto !important; 
+}
+
+/* Убедитесь, что само модальное окно не блокирует скролл внутри себя */
+.modal-overlay {
+    touch-action: none; /* Фон не скроллится */
+}
+.modal-box {
+    touch-action: none; /* Сама коробка не скроллится */
+}
+
+/* Настройка ползунка для Chrome/Yandex/Safari */
+#leaderboard-container::-webkit-scrollbar {
+    width: 6px;
+}
+#leaderboard-container::-webkit-scrollbar-thumb {
+    background-color: #81b64c;
+    border-radius: 10px;
+}
+html, body {
+    overflow: hidden;
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    touch-action: none; /* Глобально запрещаем всё */
+}
+
 
         /* --- ВЕРХНЯЯ ПАНЕЛЬ (КАРТОЧКИ) --- */
         .game-container {
@@ -630,7 +675,7 @@
 }
 
 .stat-card {
-    padding: 1.5vw 3vw;
+    padding: 1.5vw 1vw;
     border-radius: 1.5vw;
     display: flex;
     flex-direction: row;
@@ -651,8 +696,33 @@
     font-weight: 900;
 }
 
+/* Анимация для кнопок темы */
+.theme-icon {
+    width: 5vw;
+    height: 5vw;
+    transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s;
+}
+
+/* Эффект вращения при появлении */
+#theme-toggle:active .theme-icon {
+    transform: scale(0.7) rotate(45deg);
+}
+
+/* Плавный переход для всех цветов при смене темы */
+* {
+    transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+}
+
+/* Чтобы анимация не мешала во время игры, 
+   ограничим transition только для UI элементов */
+.piece, .square { transition: none; }
 
 
+
+.modal-box {
+    max-width: 360px;
+    width: 90%;
+}
 
 
 
@@ -720,6 +790,7 @@
             gap: 1vw;
     }
 
+
         .video-icon svg {
         width: 3vw;
         height: 3vw;
@@ -762,9 +833,10 @@
     }
     .stat-label {
         font-size: 3.7vw;
-        font-weight: 900;
+        font-weight: 700;
         text-transform: uppercase;
     }
+
 
     .stat-value {
         font-size: 6vw;
@@ -781,16 +853,28 @@
         border-radius: 7vw 1vw 1vw 7vw;
     }
     .game-container {
-        gap: 5vw;
+        gap: 3vw;
     }
     #profile-header {
-        border-radius: 35px;
+        border-radius: 95px;
+        margin-bottom: 4vw;
     }
 }
 
 /* --- Широкие смартфоны (iPhone 8, старые Android 3:2) --- */
 /* Соотношение 0.63 - 0.72 */
 @media (min-aspect-ratio: 63/100) { 
+
+    #user-name {
+        font-size: min(4.5vw, 2.5vh);
+        max-width: 28vw;
+    }
+
+    #profile-header {
+        padding: 1.5vh 2.4vw;
+        margin-bottom: 3vw;
+    }
+
     .chess-board {
         width: 85vw;
         height: 85vw;
@@ -798,11 +882,11 @@
     }
         /* Шрифты ЧИСТО НА VW */
     .side-panel {
-        gap: 0vw;
+        gap: 2vw;
     }
     .stat-label {
         font-size: 3.7vw;
-        font-weight: 900;
+        font-weight: 700;
         text-transform: uppercase;
     }
     .stat-value {
@@ -813,12 +897,23 @@
     .bottom-bar {
         display: flex;
         justify-content: center;
+        gap: 1.3vw
     }
 
     .btn-hint {
-        font-size: 4vw;
-        padding: 2.5vw 5vw;
-        border-radius: 3vw;
+        font-size: 3.4vw;
+        padding: 3vw 6vw;
+        border-radius: 7vw 1vw 1vw 7vw;
+    }
+    .top-btn {
+        font-size: 3.4vw;
+        padding: 3vw 6vw;
+        border-radius: 1vw 7vw 7vw 1vw;
+    }
+    .btn-stats, .btn-theme {
+        width: 6vh;
+        height: 6vh;
+        border-radius: 50%;
     }
     .game-container {
         gap: 4vw;
@@ -828,18 +923,26 @@
 
 @media (min-aspect-ratio: 73/100) { 
 
+#user-name {
+    font-size: min(4.5vw, 2.5vh);
+    max-width: 24vw;
 
+}
+
+#profile-header {
+    padding: 1.5vh 2.4vw;
+}
     .chess-board {
         width: 65vh;
         height: 65vh;
     }
 
     .side-panel {
-        gap: 0vw;
+        gap: 2vw;
     }
     .stat-label {
         font-size: 3vw;
-        font-weight: 900;
+        font-weight: 700;
         text-transform: uppercase;
     }
 
@@ -851,12 +954,23 @@
     .bottom-bar {
         display: flex;
         justify-content: center;
+        gap: 1.1vw
     }
 
     .btn-hint {
-        font-size: 3vw;
-        padding: 2vw 5vw;
-        border-radius: 3vw;
+        font-size: 3.4vw;
+        padding: 2vw 4vw;
+        border-radius: 7vw 1vw 1vw 7vw;
+    }
+    .top-btn {
+        font-size: 3.4vw;
+        padding: 2vw 4vw;
+        border-radius: 1vw 7vw 7vw 1vw;
+    }
+    .btn-stats, .btn-theme {
+        width: 6vh;
+        height: 6vh;
+        border-radius: 50%;
     }
 
     .game-container {
@@ -871,13 +985,15 @@
         width: 65vh;
         height: 65vh;
     }
-
+#profile-header {
+    padding: 1.5vh 2vw;
+}
     .side-panel {
-        gap: 0vw;
+        gap: 2vw;
     }
     .stat-label {
         font-size: 3vw;
-        font-weight: 900;
+        font-weight: 700;
         text-transform: uppercase;
     }
 
@@ -889,19 +1005,34 @@
     .bottom-bar {
         display: flex;
         justify-content: center;
+        gap: 1.1vw
     }
 
     .btn-hint {
-        font-size: 3vw;
-        padding: 1.5vw 5vw;
-        border-radius: 2vw;
+        font-size: 3.4vw;
+        padding: 1.3vw 4vw;
+        border-radius: 7vw 1vw 1vw 7vw;
+    }
+    .top-btn {
+        font-size: 3.4vw;
+        padding: 1.3vw 4vw;
+        border-radius: 1vw 7vw 7vw 1vw;
+    }
+    .btn-stats, .btn-theme {
+        width: 6vh;
+        height: 6vh;
+        border-radius: 50%;
     }
 
     .game-container {
         gap: 2vw;
     }
-}
 
+#user-name {
+    font-size: min(3.5vw, 2.5vh);
+    max-width: 18vw;
+}
+}
 
 @media (min-aspect-ratio: 92/100) { 
 
@@ -918,7 +1049,7 @@
     }
     .stat-label {
         font-size: 3vw;
-        font-weight: 900;
+        font-weight: 700;
         text-transform: uppercase;
     }
 
@@ -930,12 +1061,18 @@
     .bottom-bar {
         display: flex;
         justify-content: center;
+        gap: 1vw;
     }
 
     .btn-hint {
-        font-size: 3vw;
-        padding: 1.5vw 5vw;
-        border-radius: 2vw;
+        font-size: 3.4vw;
+        padding: 1.3vw 4vw;
+        border-radius: 7vw 1vw 1vw 7vw;
+    }
+    .top-btn {
+        font-size: 3.4vw;
+        padding: 1.3vw 4vw;
+        border-radius: 1vw 7vw 7vw 1vw;
     }
 
     .game-container {
@@ -946,21 +1083,21 @@
         order: -1;
         display: flex;
         margin-bottom: 8px;
-        padding: 1.5vh 3vw;
-        border-radius: 25px;
+        padding: 1.5vh 2vw;
+        border-radius: 55px;
     }
 
-    .btn-stats {
-        width: 7vh;
-        height: 7vh;
-        border-radius: 2vw;
+    .btn-stats, .btn-theme {
+        width: 6vh;
+        height: 6vh;
+        border-radius: 50%;
     }
 
     .dark-mode .stat-card {
-        background-color: #262421; /* Фирменный цвет панелей Chess.com */
+        background-color: #262625; /* Фирменный цвет панелей Chess.com */
         color: #ffffff;
         border: none;
-        box-shadow: 0 4px 0 #1a1917; /* Темная тень под кнопками */
+        box-shadow: 0 4px 0 #262625; /* Темная тень под кнопками */
     }
 }
 
@@ -988,12 +1125,24 @@
     .bottom-bar {
         display: flex;
         justify-content: center;
+        gap: 1.1vw
     }
 
     .btn-hint {
         font-size: 2vw !important;
-        padding: 1vw 5vw !important;
-        border-radius: 2vw !important;
+        padding: 1vw 4vw !important;
+        border-radius: 7vw 1vw 1vw 7vw !important;
+    }
+
+    .top-btn {
+        font-size: 3.4vw;
+        padding: 1vw 4vw;
+        border-radius: 1vw 7vw 7vw 1vw;
+    }
+    .btn-stats, .btn-theme {
+        width: 5.5vh;
+        height: 5.5vh;
+        border-radius: 50%;
     }
     .game-container {
         gap: 1vw;
@@ -1006,13 +1155,42 @@
 
 
 
-@media (min-aspect-ratio: 101/100){ 
+@media (orientation: landscape){ 
+
+.modal-box {
+    max-width: 560px;
+    width: 90%;
+}
+
+.dark-mode .stat-value {
+    color: var(--gray-100) !important;
+}
 
 .dark-mode .stat-card {
-    background-color: #262421; /* Фирменный цвет панелей Chess.com */
+    background-color: var(--gray-900); /* Фирменный цвет панелей Chess.com */
     color: #ffffff;
     border: none;
     box-shadow: 0 4px 0 #1a1917; /* Темная тень под кнопками */
+}
+.dark-mode .top-btn {
+    background-color: var(--board-dark) !important;
+    color: var(--gray-900) !important;
+    box-shadow: 0 4px 0 #637d49;
+}
+.top-btn {
+    background-color: var(--board-dark) !important;
+    color: var(--gray-900) !important;
+    box-shadow: 0 4px 0 #8d6e53;
+}
+.dark-mode .btn-stats {
+    background-color: var(--board-dark) !important;
+    color: var(--gray-900) !important;
+    box-shadow: 0 4px 0 #637d49;
+}
+.btn-stats {
+    background-color: var(--board-dark) !important;
+    color: var(--gray-900) !important;
+    box-shadow: 0 4px 0 #8d6e53;
 }
     .game-container {
         flex-direction: row;
@@ -1020,7 +1198,11 @@
         align-items: center;
         gap: 2vw;
     }
-
+#user-avatar {
+    width: 6vh;
+    height: 6vh;
+    border-radius: 1.1vw;
+}
     .chess-board {
         width: 70vh;
         height: 70vh;
@@ -1030,17 +1212,32 @@
 
     .side-panel {
         align-items: stretch;
-        gap: 3vw;
+        gap: 1.5vw;
     }
-
+.theme-icon {
+    width: 3vw;
+    height: 3vw;
+}
     #user-name {
         font-size: 1.5vw;
         max-width: 9vw;
     }
-    .btn-stats {
-        width: 6vh;
+    .btn-theme {
+        width: 5vh;
         height: 5vh;
         border-radius: 1vw;
+    }
+
+    .btn-stats {
+        border-radius: 1.5vw 0.5vw 0.5vw 1.5vw;
+        font-size: 3.4vw;
+        width: 100%;
+        height: 10vh;
+    }
+    .top-btn {
+        font-size: 2.5vw;
+        padding: 0vw 3vw;
+        border-radius: 0.5vw 1.5vw 1.5vw 0.5vw;
     }
     .right-column {
         display: flex;
@@ -1049,8 +1246,8 @@
         width: 26vw;
     }
     .btn-stats svg {
-        width: 29px;
-        height: 29px;
+        width: 3.5vw;
+        height: 3.5vw;
     }
 
     .top-bar {
@@ -1058,9 +1255,10 @@
         gap: 1vw;
     }
 
+
     .stat-card {
         background: white;
-        padding: 1.5vw 3vw;
+        padding: 2vh 3vw;
         border-radius: 1.5vw;
         display: flex;
         flex-direction: column;
@@ -1069,13 +1267,13 @@
         gap: 0vw;
         width: 100%;
         box-sizing: border-box;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
     }
 
     .stat-label {
         font-size: 1.5vh;
         font-weight: 900;
         text-transform: uppercase;
+        color: var(--gray-700);
     }
 
     .stat-value {
@@ -1089,11 +1287,14 @@
     }
 
     .btn-hint {
-        font-size: 1.8vw;
-        padding: 2vw 3vw;
+        font-size: 2.3vw;
+        padding: 3vh 3vw;
         border-radius: 1.5vw;
         width: 100%;
         gap: 1vw;
+        background-color: #b58863;
+    box-shadow: 0 4px 0 #8d6e53;
+    color: #ffffff;
     }
 
     .video-icon svg {
@@ -1128,6 +1329,10 @@
         padding: 2vh 2vw;
         border-radius: 1.4vw;
     }
+        #user-name {
+        font-size: 1.5vw;
+        max-width: 12vw;
+    }
 }
 
 /* --- Широкий формат (Full HD 16:9) --- */
@@ -1139,10 +1344,18 @@
         box-shadow: 0 10px 30px rgba(0,0,0,0.3);
         border-radius: 5px;
     }
+    #user-name {
+        font-size: 1.5vw;
+        max-width: 12vw;
+    }
 }
-
-
-
+@media (min-aspect-ratio: 160/100) { 
+    /* Здесь можно разгуляться: большие шрифты, доска 85vh. */
+        #user-name {
+        font-size: 1.5vw;
+        max-width: 14vw;
+    }
+}
 
 /* --- ТЕМНАЯ ТЕМА (CHESS.COM STYLE) --- */
 .dark-mode {
@@ -1179,7 +1392,7 @@
     border: none;
     box-shadow: 0 4px 0 #262625; /* Темная тень под кнопками */
 }
-.dark-mode .btn-stats {
+.dark-mode .btn-theme {
 background: #769656;
     color: white;
     box-shadow: 0 0 0 #637d49;
@@ -1190,7 +1403,11 @@ background: #769656;
     box-shadow: 0 0px 0 #1a1917;
     transform: translateY(4px);
 }
-
+.dark-mode .btn-stats {
+    background: #769656;
+    color: white;
+    /*box-shadow: 0 0 0 #637d49;*/
+}
 /* Координаты на доске */
 .dark-mode .square.light .coord { color: #769656; } /* Цвет темной клетки */
 .dark-mode .square.dark .coord { color: #eeeed2; }  /* Цвет светлой клетки */
@@ -1210,39 +1427,27 @@ background: #769656;
 .dark-mode .top-btn {
     background-color: var(--gray-900);
     color: #769656;
-    box-shadow: 0 4px 0 #c3c3c3;
+    box-shadow: 0 4px 0 #637d49
 }
+/*
+.dark-mode .top-btn, .btn-stats {
+    background-color: var(--board-dark) !important;
+    color: var(--gray-900) !important;
+    box-shadow: 0 4px 0 #637d49 ;
+}*/
+
+
+
 
 .square.light .coord { color: var(--board-dark); }
 .square.dark .coord { color: var(--board-light); }
 
 
 .dark-mode .stat-value {
-    color: #ebebeb;
+    color: var(--gray-900);
 }
 
 
-
-/* Анимация для кнопок темы */
-.theme-icon {
-    width: 24px;
-    height: 24px;
-    transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s;
-}
-
-/* Эффект вращения при появлении */
-#theme-toggle:active .theme-icon {
-    transform: scale(0.7) rotate(45deg);
-}
-
-/* Плавный переход для всех цветов при смене темы */
-* {
-    transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
-}
-
-/* Чтобы анимация не мешала во время игры, 
-   ограничим transition только для UI элементов */
-.piece, .square { transition: none; }
 
 
 
@@ -1270,7 +1475,7 @@ background: #769656;
 
 .rank-num {
     font-weight: 900;
-    width: 3vw;
+    width: 24px;
     color: var(--gray-500);
 }
 
@@ -1298,3 +1503,37 @@ background: #769656;
 /* Скроллбар для списка */
 #leaderboard-container::-webkit-scrollbar { width: 4px; }
 #leaderboard-container::-webkit-scrollbar-thumb { background: var(--gray-400); border-radius: 10px; }
+
+
+
+
+@media (orientation: landscape) {
+
+    /* Показываем кнопку статистики в bottom-bar */
+    .bottom-bar .landscape-only {
+        display: flex !important;
+    }
+
+    /* Прячем кнопку статистики в профиле */
+    #profile-header .btn-stats:not(.landscape-only) {
+        display: none;
+    }
+
+    /* Статистика и Топ — в один ряд под профилем */
+    .bottom-bar {
+        display: flex;
+        flex-direction: row;
+        gap: 6px;
+        order: -1;
+    }
+
+    /* Прячем оригинальную кнопку помощь из bottom-bar */
+    .bottom-bar .btn-hint {
+        display: none;
+    }
+
+    /* Показываем отдельную кнопку помощь внизу */
+    .hint-landscape {
+        display: flex !important;
+    }
+}
