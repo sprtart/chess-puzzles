@@ -1158,7 +1158,7 @@ html, body {
 @media (orientation: landscape){ 
 
 .modal-box {
-    max-width: 560px;
+    max-width: 400px;
     width: 90%;
 }
 
