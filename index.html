@@ -1076,43 +1076,49 @@ function showPointsAnimation(points) {
 }
 
 function finalizeMove(moveStr, isOpponent, f, t) {
+    // 1. Звуки и Вибрация
     if (boardState[t.r][t.c] !== "") {
         safePlaySound(audioCapture);
-        if (!isOpponent) Platform.vibrate('capture'); // <--- ДОБАВИТЬ ЭТУ СТРОКУ (ВЗЯТИЕ)
+        if (!isOpponent) Platform.vibrate('capture'); // Вибрация при взятии
     } else {
         safePlaySound(audioMove);
-        if (!isOpponent) Platform.vibrate('move'); // <--- ДОБАВИТЬ ЭТУ СТРОКУ (ОБЫЧНЫЙ ХОД)
+        if (!isOpponent) Platform.vibrate('move');    // Обычная вибрация
     }
 
+    // 2. Логика превращения пешки
     let piece = boardState[f.r][f.c];
     if (moveStr.length === 5) {
         const prom = moveStr[4];
         piece = (piece === piece.toUpperCase()) ? prom.toUpperCase() : prom.toLowerCase();
     }
     
+    // 3. Рокировка
     if (piece.toLowerCase() === 'k' && Math.abs(f.c - t.c) === 2) {
         const rookCol = t.c > f.c ? [7, 5] : [0, 3];
         boardState[f.r][rookCol[1]] = boardState[f.r][rookCol[0]];
         boardState[f.r][rookCol[0]] = "";
     }
     
-    boardState[t.r][t.c] = piece; boardState[f.r][f.c] = "";
+    boardState[t.r][t.c] = piece; 
+    boardState[f.r][f.c] = "";
     currentStep++;
     renderBoard(); 
     
     if (isOpponent) { 
         isLocked = false; 
     } else if (currentStep < puzzles[currentPuzzleIndex].moves.length) {
+        // Промежуточный ход игрока
         isLocked = true;
         setTimeout(() => playMove(puzzles[currentPuzzleIndex].moves[currentStep], true), 600);
-} else {
-        // ЗАДАЧА ЗАВЕРШЕНА
+    } else {
+        // --- ЗАДАЧА ПОЛНОСТЬЮ РЕШЕНА ---
         const thisElo = Number(puzzles[currentPuzzleIndex].elo);
         const randomDelta = Math.floor(Math.random() * 16) + 80; 
 
         statsTotalSolved++; 
 
         if (!hasHint && !hasMistake) {
+            // Решено без ошибок
             if (Platform.vibrate) Platform.vibrate('success');
             statsFlawless++; 
             if (thisElo > statsMaxElo) {
@@ -1120,24 +1126,31 @@ function finalizeMove(moveStr, isOpponent, f, t) {
                 document.getElementById('user-max-rating').textContent = statsMaxElo;
             }
             currentElo += randomDelta;
+            
+            // СМАРТ-НАЧИСЛЕНИЕ ОЧКОВ
             let pointsToAdd = (previousPuzzleElo === null) ? 15 : Math.max(5, Math.abs(thisElo - previousPuzzleElo));
             totalScore += pointsToAdd; 
             document.getElementById('score-display').textContent = totalScore;
             showPointsAnimation(pointsToAdd); 
         } else if (hasMistake && !hasHint) {
+            // Была ошибка — понижаем внутренний рейтинг игрока для подбора задач полегче
             currentElo = Math.max(100, currentElo - randomDelta); 
         }
 
-        saveCurrentStats(); // Оставляем ОДИН раз
+        saveCurrentStats();
         previousPuzzleElo = thisElo;
 
-        // ВЫЗЫВАЕМ ТУТ (только когда задача решена!)
+        // Отправляем в Supabase (мировой топ)
         pushToGlobalLeaderboard(); 
 
-        setTimeout(startPuzzle, 800);
+        // ПЕРЕХОД К СЛЕДУЮЩЕЙ ЗАДАЧЕ (как в Яндексе)
+        setTimeout(() => {
+            // Останавливаем звуки и сообщаем о конце раунда перед загрузкой новой доски
+            Platform.gameplayStop(); 
+            startPuzzle();
+        }, 800); 
     }
-} // Конец функции finalizeMove
-
+}
 
 
 // Функция для закрытия модального окна ТОПа
@@ -1273,7 +1286,22 @@ function updateFollower(x, y) { follower.style.left = x + 'px'; follower.style.t
 
 document.addEventListener('contextmenu', e => e.preventDefault());
 document.addEventListener('dragstart', e => e.preventDefault());
-document.addEventListener('touchmove', e => { if (e.scale !== 1) e.preventDefault(); }, { passive: false });
+document.addEventListener('touchmove', function(e) {
+    const isInsideScroll = e.target.closest('#leaderboard-container');
+    if (isInsideScroll) {
+        // Если мы внутри списка лидеров, разрешаем стандартный скролл,
+        // но блокируем мультитач (зум)
+        if (e.touches.length > 1) {
+            if (e.cancelable) e.preventDefault();
+        }
+        return; 
+    }
+    // Во всех остальных частях игры (на доске, в меню) 
+    // полностью запрещаем скролл страницы
+    if (e.cancelable) {
+        e.preventDefault();
+    }
+}, { passive: false });
 
 
 function showStatsModal() {
