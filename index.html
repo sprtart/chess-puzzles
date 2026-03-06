@@ -1106,6 +1106,7 @@ function finalizeMove(moveStr, isOpponent, f, t) {
     
     if (isOpponent) { 
         isLocked = false; 
+        Platform.gameplayStart(); 
     } else if (currentStep < puzzles[currentPuzzleIndex].moves.length) {
         // Промежуточный ход игрока
         isLocked = true;
@@ -1151,6 +1152,7 @@ function finalizeMove(moveStr, isOpponent, f, t) {
         }, 800); 
     }
 }
+
 
 
 // Функция для закрытия модального окна ТОПа
