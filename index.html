@@ -331,16 +331,56 @@ vibrate(type) {
 },
 
 async getSolvedIds() {
+    let ids = [];
+    
+    // 1. Пытаемся взять данные из облака ВК
+    if (this.id === 'vk') {
+        try {
+            const data = await vkBridge.send('VKWebAppStorageGet', { keys: ['chess_solved_ids'] });
+            const cloudData = data.keys.find(k => k.key === 'chess_solved_ids')?.value;
+            if (cloudData && cloudData !== "") {
+                ids = JSON.parse(cloudData);
+                console.log("Прогресс загружен из облака ВК");
+                // Обновляем локальную копию на всякий случай
+                localStorage.setItem('chess_solved_ids', cloudData);
+                return ids;
+            }
+        } catch (e) {
+            console.warn("Ошибка загрузки из облака ВК:", e);
+        }
+    }
+
+    // 2. Если в облаке пусто или мы не в ВК, берем из localStorage
     try {
-        const saved = localStorage.getItem('chess_solved_ids');
-        return saved ? JSON.parse(saved) : [];
-    } catch (e) { return []; }
+        const local = localStorage.getItem('chess_solved_ids');
+        if (local) {
+            ids = JSON.parse(local);
+            console.log("Прогресс загружен локально");
+        }
+    } catch (e) { 
+        console.error("Ошибка чтения localStorage");
+    }
+    
+    return ids;
 },
 
 saveSolvedIds(idsArray) {
+    const strData = JSON.stringify(idsArray);
+
+    // 1. Сохраняем в облако ВК
+    if (this.id === 'vk') {
+        vkBridge.send('VKWebAppStorageSet', { 
+            key: 'chess_solved_ids', 
+            value: strData 
+        }).catch(e => console.error("Ошибка сохранения в облако:", e));
+    }
+
+    // 2. Дублируем в локальное хранилище для мгновенного доступа
     try {
-        localStorage.setItem('chess_solved_ids', JSON.stringify(idsArray));
-    } catch (e) { console.error("Ошибка сохранения прогресса"); }
+        localStorage.setItem('chess_solved_ids', strData);
+    } catch (e) { 
+        console.error("Ошибка сохранения в localStorage"); 
+    }
 }
 
 };
