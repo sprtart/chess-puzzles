@@ -1210,6 +1210,11 @@ function finalizeMove(moveStr, isOpponent, f, t) {
         setTimeout(() => playMove(puzzles[currentPuzzleIndex].moves[currentStep], true), 600);
     } else {
         // --- ЗАДАЧА ПОЛНОСТЬЮ РЕШЕНА ---
+
+        const currentId = puzzles[currentPuzzleIndex].id; // Берем ID текущей задачи
+        solvedIds.add(currentId);                         // Добавляем в локальный набор
+        Platform.saveSolvedIds(Array.from(solvedIds));    // Сохраняем весь список в облако ВК
+        
         const thisElo = Number(puzzles[currentPuzzleIndex].elo);
         const randomDelta = Math.floor(Math.random() * 16) + 80; 
 
