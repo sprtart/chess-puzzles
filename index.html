@@ -302,6 +302,22 @@ showInterstitial(onClose) {
         }
     },
 
+    showBanner() {
+        if (this.id === 'vk') {
+            vkBridge.send('VKWebAppShowBannerAd', {
+                banner_location: 'bottom'
+            })
+            .then((data) => {
+                if (data.result) {
+                    console.log("Баннер успешно показан");
+                }
+            })
+            .catch((error) => {
+                console.log("Ошибка показа баннера (или баннер недоступен):", error);
+            });
+        }
+    },
+
 preloadAds() {
         if (this.id === 'vk') {
             // Предзагрузка межэкранной рекламы
@@ -557,11 +573,12 @@ function safePlaySound(audioObj) {
 async function initGame() {
     await Platform.init();
 
-        Platform.preloadAds();
-    setInterval(() => Platform.preloadAds(), 60000); // Раз в минуту обновляем кэш рекламы
+    Platform.preloadAds();
+    setInterval(() => Platform.preloadAds(), 60000);
 
-// Принудительно проверяем тему из URL параметров ВК при старте
-        const urlParams = new URLSearchParams(window.location.search);
+    Platform.showBanner();
+
+    const urlParams = new URLSearchParams(window.location.search);
     const vkAppearance = urlParams.get('vk_appearance');
     if (vkAppearance === 'dark' || vkAppearance === 'space_gray') {
         document.body.classList.add('dark-mode');
