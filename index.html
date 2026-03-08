@@ -302,6 +302,15 @@ showInterstitial(onClose) {
         }
     },
 
+preloadAds() {
+        if (this.id === 'vk') {
+            // Предзагрузка межэкранной рекламы
+            vkBridge.send('VKWebAppCheckNativeAds', { ad_format: 'interstitial' }).catch(()=>{});
+            // Предзагрузка рекламы за вознаграждение (для кнопки "Подсказка")
+            vkBridge.send('VKWebAppCheckNativeAds', { ad_format: 'reward' }).catch(()=>{});
+        }
+    },
+
     // Пустышки (ВК не требует явного старта/стопа геймплея как Яндекс)
     gameplayStart() {
             console.log("Геймплей возобновлен");
@@ -548,6 +557,9 @@ function safePlaySound(audioObj) {
 async function initGame() {
     await Platform.init();
 
+        Platform.preloadAds();
+    setInterval(() => Platform.preloadAds(), 60000); // Раз в минуту обновляем кэш рекламы
+
 // Принудительно проверяем тему из URL параметров ВК при старте
         const urlParams = new URLSearchParams(window.location.search);
     const vkAppearance = urlParams.get('vk_appearance');
@@ -623,6 +635,11 @@ let hasMistake = false;
 let hasHint = false;
 let isAdLoading = false; 
 
+let gamesPlayedSinceAd = 0;
+let lastAdTime = Date.now(); // Отсчет времени с момента запуска
+const AD_COOLDOWN_MS = 4 * 60 * 1000; // 3 минуты
+const GAMES_BEFORE_AD = 5; // Показывать не раньше чем через 3 решенные задачи
+
 // --- НОВЫЕ ПЕРЕМЕННЫЕ СТАТИСТИКИ ---
 let totalScore = 0;   
 let statsTotalSolved = 0;
@@ -692,13 +709,8 @@ puzzles = endPuzzles.concat(midPuzzles);
 
         Platform.loadingReady();
 
-        let adGameStarted = false;
-        Platform.showInterstitial(() => {
-            if (!adGameStarted) {
-                adGameStarted = true;
-                startGameAfterAd();
-            }
-        });
+        // УБРАЛИ РЕКЛАМУ ПРИ СТАРТЕ, ПРОСТО ЗАПУСКАЕМ ИГРУ:
+        startGameAfterAd();
 
     } catch (e) {
         console.error("Ошибка загрузки данных:", e);
@@ -1246,12 +1258,26 @@ function finalizeMove(moveStr, isOpponent, f, t) {
         // Отправляем в Supabase (мировой топ)
         pushToGlobalLeaderboard(); 
 
-        // ПЕРЕХОД К СЛЕДУЮЩЕЙ ЗАДАЧЕ (как в Яндексе)
+// ПЕРЕХОД К СЛЕДУЮЩЕЙ ЗАДАЧЕ С ПРОВЕРКОЙ РЕКЛАМЫ
+        gamesPlayedSinceAd++;
+        const now = Date.now();
+        
         setTimeout(() => {
-            // Останавливаем звуки и сообщаем о конце раунда перед загрузкой новой доски
-            Platform.gameplayStop(); 
-            startPuzzle();
-        }, 800); 
+            Platform.gameplayStop(); // Останавливаем звуки
+
+            // Проверяем: прошло ли 3 минуты И решено ли 3 задачи?
+            if (gamesPlayedSinceAd >= GAMES_BEFORE_AD && (now - lastAdTime) >= AD_COOLDOWN_MS) {
+                // Показываем рекламу перед следующей задачей
+                Platform.showInterstitial(() => {
+                    lastAdTime = Date.now();
+                    gamesPlayedSinceAd = 0;
+                    startPuzzle();
+                });
+            } else {
+                // Иначе просто запускаем следующую задачу мгновенно
+                startPuzzle();
+            }
+        }, 800);
     }
 }
 
