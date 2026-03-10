@@ -751,39 +751,34 @@ let survivalSolvedCount = 0; // Счётчик решенных задач в т
 function startGameMode(mode) {
     gameMode = mode;
     
-    // 1. Прячем меню и окно поражения
     document.getElementById('main-menu').classList.add('hidden');
-    
-    const gameOverModal = document.getElementById('game-over-modal');
-    if (gameOverModal) gameOverModal.classList.add('hidden');
-    
-    // 2. Показываем игру
-    document.querySelector('.game-container').classList.remove('hidden-game');
+    document.getElementById('game-over-modal').classList.add('hidden');
+    document.querySelector('.game-container').style.display = '';
 
-    // 3. Настройка режима
+    // Скрываем индикатор жизней, раз мы их убрали
+    //document.getElementById('survival-lives').classList.add('hidden');
+    
     const labelBest = document.getElementById('label-best-elo');
     const valBest = document.getElementById('user-max-rating');
     const labelScore = document.getElementById('label-score');
     const valScore = document.getElementById('score-display');
 
     if (mode === 'survival') {
-        currentElo = 400; // Сброс сложности для Выживания
+        currentElo = 400; // ВСЕГДА начинаем с простых задач
         survivalStreak = 0;
         
         labelBest.textContent = lang === 'ru' ? 'Рекорд' : 'Record';
         valBest.textContent = statsMaxStreak;
-        
         labelScore.textContent = lang === 'ru' ? 'Серия' : 'Streak';
         valScore.textContent = survivalStreak;
     } else {
         // Обычный режим
         labelBest.textContent = i18n[lang].bestElo;
         valBest.textContent = statsMaxElo;
-        
         labelScore.textContent = i18n[lang].score;
         valScore.textContent = totalScore;
     }
-
+    document.querySelector('.game-container').classList.remove('hidden-game');
     startPuzzle();
 }
 
