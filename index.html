@@ -176,6 +176,7 @@
         
         <div class="stat-row"><span id="t-mistakes">Сделано ошибок:</span> <b id="mdl-mistakes">0</b></div>
         <div class="stat-row"><span id="t-max">Макс. рейтинг:</span> <b id="mdl-max-elo">0</b></div>
+        <div class="stat-row"><span id="t-max-streak">Макс. серия:</span> <b id="mdl-max-streak">0</b></div>
         <button class="btn-close-modal" onclick="hideStatsModal()" id="t-close">Закрыть</button>
     </div>
 </div>
@@ -525,7 +526,8 @@ const i18n = {
         lbError: "Ошибка связи с сервером",
         lbYou: " (Вы)",
         lbFriendsTitle: "Рекорд",
-        lbFriendsText: "Пока никто из ваших друзей не играл!\nВаш рекорд: "
+        lbFriendsText: "Пока никто из ваших друзей не играл!\nВаш рекорд: ",
+        tMaxStreak: "Макс. серия:"
     },
     en: {
         title: "Chess Puzzles: Find the Best Move",
@@ -554,7 +556,8 @@ const i18n = {
         lbError: "Server connection error",
         lbYou: " (You)",
         lbFriendsTitle: "Record",
-        lbFriendsText: "None of your friends have played yet!\nYour record: "
+        lbFriendsText: "None of your friends have played yet!\nYour record: ",
+        tMaxStreak: "Max Streak:"
     }
 };
 
@@ -622,6 +625,7 @@ function applyTranslations() {
     document.getElementById('t-mistakes').textContent = t.tMistakes;
     document.getElementById('t-max').textContent = t.tMax;
     document.getElementById('t-close').textContent = t.tClose;
+    document.getElementById('t-max-streak').textContent = t.tMaxStreak;
 
     // Модальное окно Лидерборда
     document.getElementById('top-title').textContent = t.lbTitle;
@@ -724,12 +728,19 @@ function updateDropdownThemeText() {
 
 // Переход в главное меню
 function goHome() {
-    // Скрываем игровой контейнер
+    // 1. Прячем игровой контейнер
     document.querySelector('.game-container').style.display = 'none';
-    // Показываем меню
+    
+    // 2. Прячем окно поражения (если оно было открыто)
+    document.getElementById('game-over-modal').classList.add('hidden');
+    
+    // 3. Прячем модалки (на всякий случай)
+    document.getElementById('stats-modal').classList.add('hidden');
+    document.getElementById('leaderboard-modal').classList.add('hidden');
+    
+    // 4. Показываем меню
     document.getElementById('main-menu').classList.remove('hidden');
 }
-
 let survivalSolvedCount = 0; // Счётчик решенных задач в текущей попытке выживания
 
 function startGameMode(mode) {
@@ -1709,6 +1720,7 @@ function showStatsModal() {
     document.getElementById('mdl-flawless').textContent = statsFlawless; // <--- ДОБАВЛЕНО
     document.getElementById('mdl-mistakes').textContent = statsTotalMistakes;
     document.getElementById('mdl-max-elo').textContent = statsMaxElo;
+    document.getElementById('mdl-max-streak').textContent = statsMaxStreak;
     document.getElementById('stats-modal').classList.remove('hidden');
 }
 
