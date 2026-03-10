@@ -31,6 +31,44 @@
     <span id="loading-text">Загрузка: 0%</span>
 </div>
 
+<!-- ГЛАВНОЕ МЕНЮ -->
+<div id="main-menu" class="hidden">
+    <div class="menu-content">
+        <!-- Логотип и заголовок -->
+        <div class="menu-header">
+            <img src="img/logo.png" alt="Logo" class="menu-logo">
+            <h1 class="menu-title">Шахматные<br>задачи</h1>
+        </div>
+
+        <!-- Кнопки режимов игры -->
+        <div class="menu-play-buttons">
+            <button class="btn-play-big" onclick="startGameMode('standard')">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                <span>ОБЫЧНЫЙ</span>
+            </button>
+            <button class="btn-play-big btn-survival" onclick="startGameMode('survival')">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L4.5 20.29l.71.71L12 18l6.79 3 .71-.71z"/></svg>
+                <span>ВЫЖИВАНИЕ</span>
+            </button>
+        </div>
+
+        <!-- Нижние кнопки инструментов (как на твоем референсе) -->
+        <div class="menu-tools">
+            <button class="menu-tool-btn" onclick="toggleSound()" id="menu-sound-btn">
+                <svg class="icon-sound-on" viewBox="0 0 24 24" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
+                <svg class="icon-sound-off hidden" viewBox="0 0 24 24" fill="currentColor"><path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/></svg>
+            </button>
+            <button class="menu-tool-btn" onclick="toggleTheme()" id="menu-theme-btn">
+                <svg class="icon-sun" viewBox="0 0 24 24" fill="currentColor"><path d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zM2 13h2c.55 0 1-.45 1-1s-.45-1-1-1H2c-.55 0-1 .45-1 1s.45 1 1 1zm18 0h2c.55 0 1-.45 1-1s-.45-1-1-1h-2c-.55 0-1 .45-1 1s.45 1 1 1zM11 2v2c0 .55.45 1 1 1s1-.45 1-1V2c0-.55-.45-1-1-1s-1 .45-1 1zm0 18v2c0 .55.45 1 1 1s1-.45 1-1v-2c0-.55-.45-1-1-1s-1 .45-1 1zM5.99 4.58a.996.996 0 00-1.41 0 .996.996 0 000 1.41l1.06 1.06c.39.39 1.03.39 1.41 0s.39-1.03 0-1.41L5.99 4.58zm12.37 12.37a.996.996 0 00-1.41 0 .996.996 0 000 1.41l1.06 1.06c.39.39 1.03.39 1.41 0s.39-1.03 0-1.41l-1.06-1.06zm1.06-10.96a.996.996 0 000-1.41.996.996 0 00-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0l1.06-1.06zM7.05 18.36a.996.996 0 000-1.41.996.996 0 00-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0l1.06-1.06z"/></svg>
+                <svg class="icon-moon hidden" viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+            </button>
+            <button class="menu-tool-btn" onclick="showStatsModal()">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 11V3H8v6H2v12h20V11h-6zm-6-6h4v14h-4V5zm-6 6h4v8H4v-8zm16 8h-4v-6h4v6z"/></svg>
+            </button>
+        </div>
+    </div>
+</div>
+
 <div class="game-container">
     
     <!-- КОЛОНКА 1 (ЛЕВАЯ НА ПК): Только доска -->
@@ -60,16 +98,9 @@
             <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 11V3H8v6H2v12h20V11h-6zm-6-6h4v14h-4V5zm-6 6h4v8H4v-8zm16 8h-4v-6h4v6z"/></svg>
         </button>
         
-        <button id="theme-toggle" class="btn-theme" onclick="toggleTheme()">
-            <!-- Иконка Солнца -->
-            <svg id="sun-icon" class="theme-icon" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zM2 13h2c.55 0 1-.45 1-1s-.45-1-1-1H2c-.55 0-1 .45-1 1s.45 1 1 1zm18 0h2c.55 0 1-.45 1-1s-.45-1-1-1h-2c-.55 0-1 .45-1 1s.45 1 1 1zM11 2v2c0 .55.45 1 1 1s1-.45 1-1V2c0-.55-.45-1-1-1s-1 .45-1 1zm0 18v2c0 .55.45 1 1 1s1-.45 1-1v-2c0-.55-.45-1-1-1s-1 .45-1 1zM5.99 4.58a.996.996 0 00-1.41 0 .996.996 0 000 1.41l1.06 1.06c.39.39 1.03.39 1.41 0s.39-1.03 0-1.41L5.99 4.58zm12.37 12.37a.996.996 0 00-1.41 0 .996.996 0 000 1.41l1.06 1.06c.39.39 1.03.39 1.41 0s.39-1.03 0-1.41l-1.06-1.06zm1.06-10.96a.996.996 0 000-1.41.996.996 0 00-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0l1.06-1.06zM7.05 18.36a.996.996 0 000-1.41.996.996 0 00-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0l1.06-1.06z"/>
-            </svg>
-            <!-- Иконка Луны -->
-            <svg id="moon-icon" class="theme-icon hidden" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
-            </svg>
-        </button>
+<button id="settings-toggle" class="btn-theme" onclick="toggleSettingsDropdown(event)">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.06-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61 l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41 h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.73,8.87 C2.62,9.08,2.66,9.34,2.86,9.48l2.03,1.58C4.84,11.36,4.8,11.69,4.8,12s0.02,0.64,0.06,0.94l-2.03,1.58 c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54 c0.05,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.44-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96 c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.49-0.12-0.61L19.14,12.94z M12,15.6c-1.98,0-3.6-1.62-3.6-3.6 s1.62-3.6,3.6-3.6s3.6,1.62,3.6,3.6S13.98,15.6,12,15.6z"/></svg>
+</button>
 
     </div>
         </div>
@@ -88,6 +119,9 @@
                 </div>
             </div>
 <div class="bottom-bar">
+    <button class="btn-home top-btn" onclick="goHome()">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+</button>
     <button id="hint-btn" onclick="requestHint()" class="btn-hint">
         <div class="video-icon">
             <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M21 4H3C1.895 4 1 4.895 1 6V18C1 19.105 1.895 20 3 20H21C22.105 20 23 19.105 23 18V6C23 4.895 22.105 4 21 4ZM21 18H3V6H21V18ZM9.5 15L16 11.5L9.5 8V15Z"/></svg>
@@ -109,7 +143,12 @@
     </div>
     <span>Помощь</span>
 </button>
-
+<button onclick="goHome()" class="btn-home hint-landscape" style="display:none; width:100%; margin-top:-4px;">
+    <div class="video-icon">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+    </div>
+    <span>Домой</span>
+</button>
             <div id="leaderboard-modal" class="modal-overlay hidden" onclick="hideTopModal()">
     <div class="modal-box" onclick="event.stopPropagation()">
         <h2 id="top-title">Рейтинг игроков</h2>
@@ -151,6 +190,17 @@
 </div>
 
 <div id="drag-follower"></div>
+
+<div id="settings-dropdown" class="hidden">
+    <button class="dropdown-btn" onclick="toggleSound()">
+        <span class="dropdown-icon" id="drop-sound-icon">🔊</span>
+        <span id="drop-sound-text">Звук: Вкл</span>
+    </button>
+    <button class="dropdown-btn" onclick="toggleTheme()">
+        <span class="dropdown-icon" id="drop-theme-icon">☀️</span>
+        <span id="drop-theme-text">Тема: Светлая</span>
+    </button>
+</div>
 
 <script>
 // ==========================================
@@ -569,6 +619,114 @@ function safePlaySound(audioObj) {
     }
 }
 
+// --- ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ДЛЯ МЕНЮ И ЗВУКА ---
+let isSoundEnabled = true;
+let gameMode = 'standard'; // 'standard' или 'survival'
+let lives = 3; // Для режима выживания
+
+// Открытие / Закрытие выпадающего меню настроек
+function toggleSettingsDropdown(event) {
+    const dropdown = document.getElementById('settings-dropdown');
+    const btn = document.getElementById('settings-toggle');
+    
+    if (dropdown.classList.contains('hidden')) {
+        // Позиционируем меню прямо под кнопкой
+        const rect = btn.getBoundingClientRect();
+        dropdown.style.top = (rect.bottom + 10) + 'px';
+        dropdown.style.right = (window.innerWidth - rect.right) + 'px'; // Выравниваем по правому краю кнопки
+        dropdown.classList.remove('hidden');
+    } else {
+        dropdown.classList.add('hidden');
+    }
+    
+    // Предотвращаем всплытие клика, чтобы меню не закрылось сразу же
+    event.stopPropagation();
+}
+
+// Закрываем меню при клике в любое другое место
+document.addEventListener('click', (e) => {
+    const dropdown = document.getElementById('settings-dropdown');
+    const btn = document.getElementById('settings-toggle');
+    if (!dropdown.classList.contains('hidden') && !dropdown.contains(e.target) && !btn.contains(e.target)) {
+        dropdown.classList.add('hidden');
+    }
+});
+
+// Управление звуком
+function toggleSound() {
+    isSoundEnabled = !isSoundEnabled;
+    setAllAudioMute(!isSoundEnabled);
+
+    // Обновляем текст в выпадающем меню
+    const dropText = document.getElementById('drop-sound-text');
+    const dropIcon = document.getElementById('drop-sound-icon');
+    if (dropText) {
+        dropText.textContent = isSoundEnabled ? 'Звук: Вкл' : 'Звук: Выкл';
+        dropIcon.textContent = isSoundEnabled ? '🔊' : '🔇';
+    }
+
+    // Обновляем иконку в главном меню
+    const iconOn = document.querySelector('.icon-sound-on');
+    const iconOff = document.querySelector('.icon-sound-off');
+    if (iconOn && iconOff) {
+        if (isSoundEnabled) {
+            iconOn.classList.remove('hidden');
+            iconOff.classList.add('hidden');
+        } else {
+            iconOn.classList.add('hidden');
+            iconOff.classList.remove('hidden');
+        }
+    }
+
+    // Сохраняем настройку
+    localStorage.setItem('chess-sound', isSoundEnabled);
+}
+
+// Изменяем твою существующую функцию toggleTheme, чтобы она обновляла текст в меню
+const originalToggleTheme = toggleTheme;
+toggleTheme = function() {
+    originalToggleTheme(); // Вызываем старую логику
+    updateDropdownThemeText();
+}
+
+function updateDropdownThemeText() {
+    const isDark = document.documentElement.classList.contains('dark-mode');
+    const dropText = document.getElementById('drop-theme-text');
+    const dropIcon = document.getElementById('drop-theme-icon');
+    if (dropText) {
+        dropText.textContent = isDark ? 'Тема: Тёмная' : 'Тема: Светлая';
+        dropIcon.textContent = isDark ? '🌙' : '☀️';
+    }
+}
+
+// Переход в главное меню
+function goHome() {
+    // Скрываем игровой контейнер
+    document.querySelector('.game-container').style.display = 'none';
+    // Показываем меню
+    document.getElementById('main-menu').classList.remove('hidden');
+}
+
+// Запуск игры из меню
+function startGameMode(mode) {
+    gameMode = mode;
+    
+    if (mode === 'survival') {
+        lives = 3;
+        // Здесь в будущем добавим UI для отображения жизней
+        console.log("Режим выживания активирован");
+    }
+
+    // Скрываем меню
+    document.getElementById('main-menu').classList.add('hidden');
+    
+    // Показываем игровой контейнер
+    document.querySelector('.game-container').style.display = '';
+    
+    // Запускаем задачу
+    startPuzzle();
+}
+
 
 async function initGame() {
     await Platform.init();
@@ -617,6 +775,19 @@ async function initGame() {
 
     const savedIds = await Platform.getSolvedIds();
     solvedIds = new Set(savedIds); 
+
+// Внутри initGame() добавь:
+const savedSound = localStorage.getItem('chess-sound');
+if (savedSound === 'false') {
+    isSoundEnabled = true; // Ставим true, чтобы toggleSound() инвертировал в false
+    toggleSound();
+} else {
+    // Если ничего нет или true, просто применяем начальные значения
+    setAllAudioMute(false);
+}
+
+// Вызываем обновление текста темы в дропдауне при старте
+updateDropdownThemeText();
 
     loadData(); 
 }
@@ -743,7 +914,14 @@ function startGameAfterAd() {
     
     setTimeout(() => {
         loadingScreen.style.display = 'none';
-        startPuzzle();
+        
+        // ВАЖНОЕ ИЗМЕНЕНИЕ: 
+        // Вместо startPuzzle() мы показываем Главное меню
+        document.getElementById('main-menu').classList.remove('hidden');
+        
+        // А сам игровой контейнер пока прячем
+        document.querySelector('.game-container').style.display = 'none';
+        
     }, 500);
 }
 async function pushToGlobalLeaderboard() {
