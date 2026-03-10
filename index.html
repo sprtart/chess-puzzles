@@ -69,7 +69,7 @@
     </div>
 </div>
 
-<div class="game-container">
+<div class="game-container hidden-game">
     
     <!-- КОЛОНКА 1 (ЛЕВАЯ НА ПК): Только доска -->
     <div id="board-wrapper">
@@ -780,7 +780,7 @@ function startGameMode(mode) {
         labelScore.textContent = i18n[lang].score;
         valScore.textContent = totalScore;
     }
-
+    document.querySelector('.game-container').classList.remove('hidden-game');
     startPuzzle();
 }
 

@@ -360,7 +360,9 @@ html, body {
     height: 100%;
     touch-action: none; /* Глобально запрещаем всё */
 }
-
+.game-container.hidden-game {
+    display: none !important;
+}
 
         /* --- ВЕРХНЯЯ ПАНЕЛЬ (КАРТОЧКИ) --- */
         .game-container {
