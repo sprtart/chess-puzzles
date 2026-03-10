@@ -81,7 +81,7 @@
         
         <!-- Блок профиля -->
         <div id="profile-header">
-            <div class="user-info">
+            <div class="user-info" onclick="showStatsModal()" style="cursor: pointer;" title="Показать статистику">
 <img id="user-avatar" src="img/p/wQ.svg" alt="Аватар">                <!-- Оборачиваем имя и рейтинг в контейнер -->
                 <div class="user-text-wrapper">
                     <span id="user-name">Игрок</span>
@@ -94,9 +94,10 @@
     <!-- Группа кнопок действий -->
     <div class="header-actions" style="display: flex; gap: 8px;">
 
-        <button class="btn-stats" onclick="showStatsModal()">
-            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 11V3H8v6H2v12h20V11h-6zm-6-6h4v14h-4V5zm-6 6h4v8H4v-8zm16 8h-4v-6h4v6z"/></svg>
-        </button>
+<button class="btn-stats" onclick="goHome()">
+    <!-- Иконка Домика -->
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+</button>
         
 <button id="settings-toggle" class="btn-theme" onclick="toggleSettingsDropdown(event)">
     <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.06-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61 l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41 h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.73,8.87 C2.62,9.08,2.66,9.34,2.86,9.48l2.03,1.58C4.84,11.36,4.8,11.69,4.8,12s0.02,0.64,0.06,0.94l-2.03,1.58 c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54 c0.05,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.44-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96 c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.49-0.12-0.61L19.14,12.94z M12,15.6c-1.98,0-3.6-1.62-3.6-3.6 s1.62-3.6,3.6-3.6s3.6,1.62,3.6,3.6S13.98,15.6,12,15.6z"/></svg>
@@ -119,17 +120,16 @@
                 </div>
             </div>
 <div class="bottom-bar">
-    <button class="btn-home top-btn" onclick="goHome()">
-    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
-</button>
+
     <button id="hint-btn" onclick="requestHint()" class="btn-hint">
         <div class="video-icon">
             <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M21 4H3C1.895 4 1 4.895 1 6V18C1 19.105 1.895 20 3 20H21C22.105 20 23 19.105 23 18V6C23 4.895 22.105 4 21 4ZM21 18H3V6H21V18ZM9.5 15L16 11.5L9.5 8V15Z"/></svg>
         </div>
         <span id="hint-btn-text">Помощь</span>
     </button>
-<button class="btn-stats landscape-only" onclick="showStatsModal()" style="display:none;">
-    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 11V3H8v6H2v12h20V11h-6zm-6-6h4v14h-4V5zm-6 6h4v8H4v-8zm16 8h-4v-6h4v6z"/></svg>
+<button class="btn-stats landscape-only" onclick="goHome()" style="display:none;">
+    <!-- Иконка Домика -->
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
 </button>
     <button class="top-btn" onclick="openLeaderboard()">
         <span id="top-btn-text">Топ</span>
@@ -143,12 +143,7 @@
     </div>
     <span>Помощь</span>
 </button>
-<button onclick="goHome()" class="btn-home hint-landscape" style="display:none; width:100%; margin-top:-4px;">
-    <div class="video-icon">
-        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
-    </div>
-    <span>Домой</span>
-</button>
+
             <div id="leaderboard-modal" class="modal-overlay hidden" onclick="hideTopModal()">
     <div class="modal-box" onclick="event.stopPropagation()">
         <h2 id="top-title">Рейтинг игроков</h2>
