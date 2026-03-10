@@ -96,7 +96,13 @@
 
 <button class="btn-stats" onclick="goHome()">
     <!-- Иконка Домика -->
-    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+<svg viewBox="0 0 24 24" fill="currentColor">
+    <path d="M12 2.5L2 11.5h3v9h5v-6h4v6h5v-9h3L12 2.5z" 
+          stroke="currentColor" 
+          stroke-width="2" 
+          stroke-linejoin="round" 
+          stroke-linecap="round"/>
+</svg>
 </button>
         
 <button id="settings-toggle" class="btn-theme" onclick="toggleSettingsDropdown(event)">
@@ -105,14 +111,6 @@
 
     </div>
         </div>
-
-        <!-- Нижняя панель статистики -->
-        <div class="side-panel">
-            <div id="survival-lives" class="hidden">
-    <span class="heart">❤️</span>
-    <span class="heart">❤️</span>
-    <span class="heart">❤️</span>
-</div>
             <div class="top-bar">
                 <div class="stat-card">
                     <span class="stat-label" id="label-rating">Рейтинг</span>
