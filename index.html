@@ -594,14 +594,18 @@ function checkSavedTheme() {
     const saved = localStorage.getItem('user-theme');
     const systemDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
     
-    // Если в памяти 'dark' ИЛИ если это первый заход и в системе темная тема
-    if (saved === 'dark' || (saved === null && systemDark)) {
+    console.log("Текущая сохраненная тема:", saved); // Для отладки в консоли
+    
+    if (saved === 'dark') {
         document.documentElement.classList.add('dark-mode');
     } else if (saved === 'light') {
         document.documentElement.classList.remove('dark-mode');
+    } else if (systemDark) { // Если нет записи, но в системе темная
+        document.documentElement.classList.add('dark-mode');
     }
     
     updateThemeIcons();
+    updateDropdownThemeText();
 }
 
 
