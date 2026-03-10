@@ -634,7 +634,8 @@ function saveCurrentStats() {
         flawless: statsFlawless,
         mistakes: statsTotalMistakes,
         maxElo: statsMaxElo,
-        currentElo: currentElo
+        currentElo: currentElo,
+        maxStreak: statsMaxStreak
     });
 }
 
@@ -734,22 +735,40 @@ let survivalSolvedCount = 0; // Счётчик решенных задач в т
 function startGameMode(mode) {
     gameMode = mode;
     
-    // Скрываем все окна
     document.getElementById('main-menu').classList.add('hidden');
     document.getElementById('game-over-modal').classList.add('hidden');
-    
-    // Показываем игру
     document.querySelector('.game-container').style.display = '';
 
     const livesContainer = document.getElementById('survival-lives');
     
+    // Элементы текста, которые будем менять
+    const labelBest = document.getElementById('label-best-elo');
+    const valBest = document.getElementById('user-max-rating');
+    const labelScore = document.getElementById('label-score');
+    const valScore = document.getElementById('score-display');
+
     if (mode === 'survival') {
         lives = 3;
-        survivalSolvedCount = 0;
+        survivalStreak = 0;
         livesContainer.classList.remove('hidden');
         updateLivesUI();
+        
+        // --- ДИЗАЙН ВЫЖИВАНИЯ ---
+        labelBest.textContent = lang === 'ru' ? 'Рекорд' : 'Record';
+        valBest.textContent = statsMaxStreak;
+        
+        labelScore.textContent = lang === 'ru' ? 'Серия' : 'Streak';
+        valScore.textContent = survivalStreak;
+        
     } else {
         livesContainer.classList.add('hidden');
+        
+        // --- ДИЗАЙН ОБЫЧНОГО РЕЖИМА ---
+        labelBest.textContent = i18n[lang].bestElo; // 'макс. Эло'
+        valBest.textContent = statsMaxElo;
+        
+        labelScore.textContent = i18n[lang].score; // 'Очки'
+        valScore.textContent = totalScore;
     }
 
     startPuzzle();
@@ -792,6 +811,7 @@ async function initGame() {
     statsFlawless = savedStats.flawless || 0;
     statsTotalMistakes = savedStats.mistakes || 0;
     statsMaxElo = savedStats.maxElo || 0;
+    statsMaxStreak = savedStats.maxStreak || 0;
 
     currentElo = savedStats.currentElo || 400; 
 
@@ -872,6 +892,9 @@ let statsTotalSolved = 0;
 let statsFlawless = 0;
 let statsTotalMistakes = 0;
 let statsMaxElo = 0;
+
+let survivalStreak = 0; // Текущая серия в выживании
+let statsMaxStreak = 0; // Максимальная серия (Рекорд)
 
 let solvedIds = new Set();
 
@@ -1358,7 +1381,7 @@ function handleMoveError(fromPos, toPos) {
         if (lives <= 0) {
             // Конец игры
             setTimeout(() => {
-                document.getElementById('survival-score').textContent = survivalSolvedCount;
+                ddocument.getElementById('survival-score').textContent = survivalStreak;
                 document.getElementById('game-over-modal').classList.remove('hidden');
             }, 500);
         }
@@ -1481,36 +1504,48 @@ function finalizeMove(moveStr, isOpponent, f, t) {
         const thisElo = Number(puzzles[currentPuzzleIndex].elo);
         const randomDelta = Math.floor(Math.random() * 16) + 80; 
 
-        statsTotalSolved++; 
-        
-                if (gameMode === 'survival' && !hasMistake) {
-            survivalSolvedCount++; // Увеличиваем счетчик выживания
-        }
+statsTotalSolved++; 
 
-        if (!hasHint && !hasMistake) {
-            // Решено без ошибок
-            if (Platform.vibrate) Platform.vibrate('success');
-            statsFlawless++; 
-            if (thisElo > statsMaxElo) {
-                statsMaxElo = thisElo;
-                document.getElementById('user-max-rating').textContent = statsMaxElo;
-            }
-            currentElo += randomDelta;
+        if (gameMode === 'survival') {
+            // --- ЛОГИКА ВЫЖИВАНИЯ ---
+            survivalStreak++;
+            document.getElementById('score-display').textContent = survivalStreak;
             
-            // СМАРТ-НАЧИСЛЕНИЕ ОЧКОВ
-            let pointsToAdd = (previousPuzzleElo === null) ? 15 : Math.max(5, Math.abs(thisElo - previousPuzzleElo));
-            totalScore += pointsToAdd; 
-            document.getElementById('score-display').textContent = totalScore;
-            showPointsAnimation(pointsToAdd); 
-        } else if (hasMistake && !hasHint) {
-            // Была ошибка — понижаем внутренний рейтинг игрока для подбора задач полегче
-            currentElo = Math.max(100, currentElo - randomDelta); 
+            // Если побили рекорд — обновляем
+            if (survivalStreak > statsMaxStreak) {
+                statsMaxStreak = survivalStreak;
+                document.getElementById('user-max-rating').textContent = statsMaxStreak;
+            }
+            // Немного поднимаем сложность
+            currentElo += 15; 
+            
+        } else {
+            // --- ЛОГИКА ОБЫЧНОГО РЕЖИМА ---
+            if (!hasHint && !hasMistake) {
+                if (Platform.vibrate) Platform.vibrate('success');
+                statsFlawless++; 
+                if (thisElo > statsMaxElo) {
+                    statsMaxElo = thisElo;
+                    document.getElementById('user-max-rating').textContent = statsMaxElo;
+                }
+                currentElo += randomDelta;
+                
+                let pointsToAdd = (previousPuzzleElo === null) ? 15 : Math.max(5, Math.abs(thisElo - previousPuzzleElo));
+                totalScore += pointsToAdd; 
+                document.getElementById('score-display').textContent = totalScore;
+                showPointsAnimation(pointsToAdd); 
+            } else if (hasMistake && !hasHint) {
+                currentElo = Math.max(100, currentElo - randomDelta); 
+            }
         }
 
         saveCurrentStats();
         previousPuzzleElo = thisElo;
 
-        // Отправляем в Supabase (мировой топ)
+        // Отправляем в Supabase только для обычного режима (пока что)
+        if (gameMode === 'standard') {
+            pushToGlobalLeaderboard(); 
+        }
         pushToGlobalLeaderboard(); 
 
 // ПЕРЕХОД К СЛЕДУЮЩЕЙ ЗАДАЧЕ С ПРОВЕРКОЙ РЕКЛАМЫ
