@@ -378,15 +378,20 @@ preloadAds() {
     },
 
     // Пустышки (ВК не требует явного старта/стопа геймплея как Яндекс)
-    gameplayStart() {
-            console.log("Геймплей возобновлен");
-            setAllAudioMute(false); // Включаем звук
-        },
+gameplayStart() {
+        console.log("Геймплей возобновлен");
+        // Если переменная существует и звук выключен игроком — оставляем выключенным
+        if (typeof isSoundEnabled !== 'undefined' && !isSoundEnabled) {
+            setAllAudioMute(true);
+        } else {
+            setAllAudioMute(false);
+        }
+    },
 
-        gameplayStop() {
-            console.log("Геймплей приостановлен (реклама)");
-            setAllAudioMute(true); // Выключаем звук
-        },
+    gameplayStop() {
+        console.log("Геймплей приостановлен (реклама)");
+        setAllAudioMute(true); // Выключаем звук на время рекламы всегда
+    },
     loadingReady() {},
 
     // --- НОВАЯ ФУНКЦИЯ ДЛЯ ВИБРАЦИИ ---
@@ -612,6 +617,8 @@ function saveCurrentStats() {
 }
 
 function safePlaySound(audioObj) {
+    if (typeof isSoundEnabled !== 'undefined' && !isSoundEnabled) return; 
+    
     if (!audioObj) return;
     const promise = audioObj.play();
     if (promise !== undefined) {
