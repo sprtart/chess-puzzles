@@ -1667,3 +1667,17 @@ background: #769656;
 @media (orientation: landscape) {
     .btn-home svg { width: 3vw; height: 3vw; }
 }
+
+
+.dropdown-icon-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+}
+.drop-svg {
+    width: 24px;
+    height: 24px;
+    fill: currentColor;
+}
