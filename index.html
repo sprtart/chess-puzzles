@@ -487,7 +487,7 @@ saveSolvedIds(idsArray) {
 
 };
 // ==========================================
-
+/*
 (function() {
     const urlParams = new URLSearchParams(window.location.search);
     const appearance = urlParams.get('vk_appearance');
@@ -495,7 +495,7 @@ saveSolvedIds(idsArray) {
         document.documentElement.classList.add('dark-mode'); // Применяем к html
     }
 })();
-
+*/
 let lang = 'ru'; 
 
 const i18n = {
@@ -592,18 +592,21 @@ function toggleTheme() {
 // Вызови это в конце Platform.init() или в начале initGame()
 function checkSavedTheme() {
     const saved = localStorage.getItem('user-theme');
-    const systemDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-    
-    console.log("Текущая сохраненная тема:", saved); // Для отладки в консоли
-    
+    const urlParams = new URLSearchParams(window.location.search);
+    const vkAppearance = urlParams.get('vk_appearance'); // Смотрим, что прислал ВК
+
+    // 1. Если Игрок выбрал тему вручную — слушаемся его
     if (saved === 'dark') {
         document.documentElement.classList.add('dark-mode');
     } else if (saved === 'light') {
         document.documentElement.classList.remove('dark-mode');
-    } else if (systemDark) { // Если нет записи, но в системе темная
+    } 
+    // 2. Если Игрок ничего не выбирал (saved === null) — ставим ТЕМНУЮ по умолчанию
+    else {
         document.documentElement.classList.add('dark-mode');
     }
-    
+
+    // 3. Обновляем иконки, чтобы они соответствовали состоянию
     updateThemeIcons();
     updateDropdownThemeText();
 }
@@ -795,6 +798,8 @@ function updateLivesUI() {
 async function initGame() {
     await Platform.init();
 
+     checkSavedTheme();
+
     Platform.preloadAds();
     setInterval(() => Platform.preloadAds(), 60000);
 
@@ -841,18 +846,18 @@ async function initGame() {
     const savedIds = await Platform.getSolvedIds();
     solvedIds = new Set(savedIds); 
 
-// Внутри initGame() добавь:
-const savedSound = localStorage.getItem('chess-sound');
-if (savedSound === 'false') {
-    isSoundEnabled = true; // Ставим true, чтобы toggleSound() инвертировал в false
-    toggleSound();
-} else {
-    // Если ничего нет или true, просто применяем начальные значения
-    setAllAudioMute(false);
-}
+    // Внутри initGame() добавь:
+    const savedSound = localStorage.getItem('chess-sound');
+    if (savedSound === 'false') {
+        isSoundEnabled = true; // Ставим true, чтобы toggleSound() инвертировал в false
+        toggleSound();
+    } else {
+        // Если ничего нет или true, просто применяем начальные значения
+        setAllAudioMute(false);
+    }
 
-// Вызываем обновление текста темы в дропдауне при старте
-updateDropdownThemeText();
+    // Вызываем обновление текста темы в дропдауне при старте
+    updateDropdownThemeText();
 
     loadData(); 
 }
