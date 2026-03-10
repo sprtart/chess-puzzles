@@ -704,10 +704,10 @@ toggleTheme = function() {
 function updateDropdownThemeText() {
     const isDark = document.documentElement.classList.contains('dark-mode');
     const dropText = document.getElementById('drop-theme-text');
-    const dropIcon = document.getElementById('drop-theme-icon');
+    
+    // Меняем только текст, так как иконки (SVG) теперь переключаются в updateThemeIcons
     if (dropText) {
         dropText.textContent = isDark ? 'Тема: Тёмная' : 'Тема: Светлая';
-        dropIcon.textContent = isDark ? '🌙' : '☀️';
     }
 }
 
