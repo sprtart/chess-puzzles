@@ -739,35 +739,27 @@ function startGameMode(mode) {
     document.getElementById('game-over-modal').classList.add('hidden');
     document.querySelector('.game-container').style.display = '';
 
-    const livesContainer = document.getElementById('survival-lives');
+    // Скрываем индикатор жизней, раз мы их убрали
+    document.getElementById('survival-lives').classList.add('hidden');
     
-    // Элементы текста, которые будем менять
     const labelBest = document.getElementById('label-best-elo');
     const valBest = document.getElementById('user-max-rating');
     const labelScore = document.getElementById('label-score');
     const valScore = document.getElementById('score-display');
 
     if (mode === 'survival') {
-        lives = 3;
+        currentElo = 400; // ВСЕГДА начинаем с простых задач
         survivalStreak = 0;
-        livesContainer.classList.remove('hidden');
-        updateLivesUI();
         
-        // --- ДИЗАЙН ВЫЖИВАНИЯ ---
         labelBest.textContent = lang === 'ru' ? 'Рекорд' : 'Record';
         valBest.textContent = statsMaxStreak;
-        
         labelScore.textContent = lang === 'ru' ? 'Серия' : 'Streak';
         valScore.textContent = survivalStreak;
-        
     } else {
-        livesContainer.classList.add('hidden');
-        
-        // --- ДИЗАЙН ОБЫЧНОГО РЕЖИМА ---
-        labelBest.textContent = i18n[lang].bestElo; // 'макс. Эло'
+        // Обычный режим
+        labelBest.textContent = i18n[lang].bestElo;
         valBest.textContent = statsMaxElo;
-        
-        labelScore.textContent = i18n[lang].score; // 'Очки'
+        labelScore.textContent = i18n[lang].score;
         valScore.textContent = totalScore;
     }
 
@@ -1369,30 +1361,24 @@ function handleMoveError(fromPos, toPos) {
     hasMistake = true;
     safePlaySound(audioError); 
 
-    statsTotalMistakes++; // Считаем ошибку
-    saveCurrentStats();   // Сохраняем
+    statsTotalMistakes++; 
+    saveCurrentStats();   
     Platform.vibrate('error');
 
-    // --- ЛОГИКА ВЫЖИВАНИЯ ---
+    // --- ЛОГИКА ВЫЖИВАНИЯ (ОШИБКА = СРАЗУ КОНЕЦ) ---
     if (gameMode === 'survival') {
-        lives--;
-        updateLivesUI();
-        
-        if (lives <= 0) {
-            // Конец игры
-            setTimeout(() => {
-                ddocument.getElementById('survival-score').textContent = survivalStreak;
-                document.getElementById('game-over-modal').classList.remove('hidden');
-            }, 500);
-        }
+        setTimeout(() => {
+            document.getElementById('survival-score').textContent = survivalStreak;
+            document.getElementById('game-over-modal').classList.remove('hidden');
+        }, 500);
+        return; // Прерываем функцию, чтобы дальше ничего не отрисовывалось
     }
 
+    // --- ЛОГИКА ОБЫЧНОГО РЕЖИМА ---
     const fromSq = document.querySelector(`[data-pos="${fromPos}"]`);
     const toSq = document.querySelector(`[data-pos="${toPos}"]`);
-
     if (fromSq) fromSq.classList.add('error-move');
     if (toSq) toSq.classList.add('error-move');
-
     const boardWrapper = document.getElementById('board-wrapper');
     boardWrapper.classList.add('shake');
 
@@ -1401,14 +1387,9 @@ function handleMoveError(fromPos, toPos) {
         if (fromSq) fromSq.classList.remove('error-move');
         if (toSq) toSq.classList.remove('error-move');
         selectedSq = null;
-        
-        // Если жизней больше 0, перерисовываем доску и даем играть дальше
-        if (gameMode !== 'survival' || lives > 0) {
-            renderBoard();
-        }
+        renderBoard();
     }, 400);
 }
-
 function selectPromotion(type) {
     document.getElementById('promotion-dialog').classList.add('hidden');
     
@@ -1506,19 +1487,16 @@ function finalizeMove(moveStr, isOpponent, f, t) {
 
 statsTotalSolved++; 
 
-        if (gameMode === 'survival') {
-            // --- ЛОГИКА ВЫЖИВАНИЯ ---
+if (gameMode === 'survival') {
             survivalStreak++;
             document.getElementById('score-display').textContent = survivalStreak;
             
-            // Если побили рекорд — обновляем
             if (survivalStreak > statsMaxStreak) {
                 statsMaxStreak = survivalStreak;
                 document.getElementById('user-max-rating').textContent = statsMaxStreak;
             }
-            // Немного поднимаем сложность
-            currentElo += 15; 
-            
+            // Поднимаем сложность: чем дольше серия, тем выше Эло
+            currentElo += 50; 
         } else {
             // --- ЛОГИКА ОБЫЧНОГО РЕЖИМА ---
             if (!hasHint && !hasMistake) {
