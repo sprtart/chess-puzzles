@@ -1802,7 +1802,7 @@ function renderTopList(items) {
         row.innerHTML = `
             <div class="rank-num">${index + 1}</div>
             <img class="top-avatar" src="${item.photo_100 || 'img/logo.png'}" alt="">
-            <div class="top-name">${item.first_name}${isMe ? i18n[lang].lbYou : ''}</div>
+            <div class="top-name">${item.first_name}</div>
             <div class="top-score">${item.score}</div>
         `;
         container.appendChild(row);
