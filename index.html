@@ -108,6 +108,11 @@
 
         <!-- Нижняя панель статистики -->
         <div class="side-panel">
+            <div id="survival-lives" class="hidden">
+    <span class="heart">❤️</span>
+    <span class="heart">❤️</span>
+    <span class="heart">❤️</span>
+</div>
             <div class="top-bar">
                 <div class="stat-card">
                     <span class="stat-label" id="label-rating">Рейтинг</span>
@@ -207,6 +212,16 @@
         </div>
         <span id="drop-theme-text">Тема: Светлая</span>
     </button>
+</div>
+<div id="game-over-modal" class="modal-overlay hidden">
+    <div class="modal-box" style="align-items: center;">
+        <h2 style="color: #ef4444; font-size: 28px;">Игра окончена</h2>
+        <p style="color: var(--gray-500); font-weight: bold; margin: 0;">Решено задач: <span id="survival-score" style="color: var(--gray-800); font-size: 24px;">0</span></p>
+        <div style="display: flex; gap: 10px; width: 100%; margin-top: 15px;">
+            <button class="btn-close-modal" onclick="goHome()" style="flex: 1; background: var(--gray-200);">В меню</button>
+            <button class="btn-close-modal" onclick="startGameMode('survival')" style="flex: 1; background: #10b981; color: white;">Заново</button>
+        </div>
+    </div>
 </div>
 <script>
 // ==========================================
@@ -714,26 +729,42 @@ function goHome() {
     document.getElementById('main-menu').classList.remove('hidden');
 }
 
-// Запуск игры из меню
+let survivalSolvedCount = 0; // Счётчик решенных задач в текущей попытке выживания
+
 function startGameMode(mode) {
     gameMode = mode;
     
+    // Скрываем все окна
+    document.getElementById('main-menu').classList.add('hidden');
+    document.getElementById('game-over-modal').classList.add('hidden');
+    
+    // Показываем игру
+    document.querySelector('.game-container').style.display = '';
+
+    const livesContainer = document.getElementById('survival-lives');
+    
     if (mode === 'survival') {
         lives = 3;
-        // Здесь в будущем добавим UI для отображения жизней
-        console.log("Режим выживания активирован");
+        survivalSolvedCount = 0;
+        livesContainer.classList.remove('hidden');
+        updateLivesUI();
+    } else {
+        livesContainer.classList.add('hidden');
     }
 
-    // Скрываем меню
-    document.getElementById('main-menu').classList.add('hidden');
-    
-    // Показываем игровой контейнер
-    document.querySelector('.game-container').style.display = '';
-    
-    // Запускаем задачу
     startPuzzle();
 }
 
+function updateLivesUI() {
+    const hearts = document.querySelectorAll('#survival-lives .heart');
+    hearts.forEach((heart, index) => {
+        if (index < lives) {
+            heart.classList.remove('lost');
+        } else {
+            heart.classList.add('lost');
+        }
+    });
+}
 
 async function initGame() {
     await Platform.init();
@@ -1317,8 +1348,22 @@ function handleMoveError(fromPos, toPos) {
 
     statsTotalMistakes++; // Считаем ошибку
     saveCurrentStats();   // Сохраняем
-
     Platform.vibrate('error');
+
+    // --- ЛОГИКА ВЫЖИВАНИЯ ---
+    if (gameMode === 'survival') {
+        lives--;
+        updateLivesUI();
+        
+        if (lives <= 0) {
+            // Конец игры
+            setTimeout(() => {
+                document.getElementById('survival-score').textContent = survivalSolvedCount;
+                document.getElementById('game-over-modal').classList.remove('hidden');
+            }, 500);
+        }
+    }
+
     const fromSq = document.querySelector(`[data-pos="${fromPos}"]`);
     const toSq = document.querySelector(`[data-pos="${toPos}"]`);
 
@@ -1333,7 +1378,11 @@ function handleMoveError(fromPos, toPos) {
         if (fromSq) fromSq.classList.remove('error-move');
         if (toSq) toSq.classList.remove('error-move');
         selectedSq = null;
-        renderBoard();
+        
+        // Если жизней больше 0, перерисовываем доску и даем играть дальше
+        if (gameMode !== 'survival' || lives > 0) {
+            renderBoard();
+        }
     }, 400);
 }
 
@@ -1433,6 +1482,10 @@ function finalizeMove(moveStr, isOpponent, f, t) {
         const randomDelta = Math.floor(Math.random() * 16) + 80; 
 
         statsTotalSolved++; 
+        
+                if (gameMode === 'survival' && !hasMistake) {
+            survivalSolvedCount++; // Увеличиваем счетчик выживания
+        }
 
         if (!hasHint && !hasMistake) {
             // Решено без ошибок

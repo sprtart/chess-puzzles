@@ -1681,3 +1681,28 @@ background: #769656;
     height: 24px;
     fill: currentColor;
 }
+
+
+
+
+
+
+
+
+#survival-lives {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    font-size: 28px;
+    /* Анимация пульсации для красоты */
+    animation: heartPulse 1.5s infinite;
+}
+@keyframes heartPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+.heart.lost {
+    filter: grayscale(100%);
+    opacity: 0.3;
+    animation: none;
+}
