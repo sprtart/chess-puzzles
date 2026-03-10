@@ -116,8 +116,8 @@
     transform: translateY(3px);
     box-shadow: 0 0px 0 var(--gray-200);
 }
-.btn-stats svg { width: 5.5vw;
-    height: 5.5vw;}
+.btn-stats svg { width: 6.5vw;
+    height: 6.5vw;}
 
 /* --- МОДАЛЬНОЕ ОКНО СТАТИСТИКИ --- */
 .modal-overlay {
