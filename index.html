@@ -1000,17 +1000,32 @@ function startGameAfterAd() {
 async function pushToGlobalLeaderboard() {
     if (!Platform.user) return; 
 
-    const { error } = await sb
-        .from('leaderboard')
-        .upsert({ 
-            vk_id: Platform.user.id, 
-            name: Platform.user.first_name, 
-            avatar: Platform.user.photo_100,
-            score: totalScore,
-            updated_at: new Date()
-        }, { onConflict: 'vk_id' });
+    if (gameMode === 'survival') {
+        // Отправляем в таблицу Выживания
+        const { error } = await sb
+            .from('leaderboard_survival')
+            .upsert({ 
+                vk_id: String(Platform.user.id), 
+                name: Platform.user.first_name, 
+                avatar: Platform.user.photo_100,
+                streak: statsMaxStreak, // Рекордная серия
+                updated_at: new Date()
+            }, { onConflict: 'vk_id' });
+        if (error) console.error("Ошибка сохранения в топ Выживания:", error);
 
-    if (error) console.error("Ошибка сохранения в мировой топ:", error);
+    } else {
+        // Отправляем в таблицу Стандартного режима
+        const { error } = await sb
+            .from('leaderboard')
+            .upsert({ 
+                vk_id: String(Platform.user.id), 
+                name: Platform.user.first_name, 
+                avatar: Platform.user.photo_100,
+                score: totalScore,
+                updated_at: new Date()
+            }, { onConflict: 'vk_id' });
+        if (error) console.error("Ошибка сохранения в мировой топ:", error);
+    }
 }
 
 function requestHint() {
@@ -1583,34 +1598,41 @@ function hideTopModal() {
 async function openLeaderboard() {
     const modal = document.getElementById('leaderboard-modal');
     const container = document.getElementById('leaderboard-container');
+    const title = document.getElementById('top-title');
     
     modal.classList.remove('hidden');
     container.innerHTML = `<div style="text-align:center; padding:20px;">${i18n[lang].lbLoading}</div>`;
 
+    // Определяем, какую таблицу и колонку запрашивать
+    const isSurvival = (gameMode === 'survival');
+    const tableName = isSurvival ? 'leaderboard_survival' : 'leaderboard';
+    const orderBy = isSurvival ? 'streak' : 'score';
+    
+    // Меняем заголовок в зависимости от режима
+    title.textContent = isSurvival ? "Топ Выживания" : i18n[lang].lbTitle;
+
     try {
-        // Используем 'sb', как мы договорились ранее
         const { data, error } = await sb
-            .from('leaderboard')
+            .from(tableName)
             .select('*')
-            .order('score', { ascending: false })
+            .order(orderBy, { ascending: false })
             .limit(50);
 
         if (error) throw error;
 
-        // Преобразуем данные для отрисовки
+        // Преобразуем данные (для выживания используем поле streak, для обычного - score)
         const items = data.map(item => ({
             user_id: item.vk_id,
             first_name: item.name,
-            score: item.score,
+            score: isSurvival ? item.streak : item.score, 
             photo_100: item.avatar
         }));
 
         renderTopList(items);
 
     } catch (e) {
-        console.error("Ошибка загрузки мирового топа:", e);
+        console.error("Ошибка загрузки топа:", e);
         container.innerHTML = `<div style="text-align:center; color:red; padding:20px;">${i18n[lang].lbError}</div>`;
-
     }
 }
 
