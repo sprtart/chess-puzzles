@@ -1001,18 +1001,16 @@ async function pushToGlobalLeaderboard() {
     if (!Platform.user) return; 
 
     if (gameMode === 'survival') {
-        // Отправляем в таблицу Выживания
         const { error } = await sb
             .from('leaderboard_survival')
             .upsert({ 
                 vk_id: String(Platform.user.id), 
                 name: Platform.user.first_name, 
                 avatar: Platform.user.photo_100,
-                streak: statsMaxStreak, // Рекордная серия
+                streak: statsMaxStreak,
                 updated_at: new Date()
-            }, { onConflict: 'vk_id' });
+            }, { onConflict: 'vk_id' }); // Убедись, что 'vk_id' совпадает с названием колонки
         if (error) console.error("Ошибка сохранения в топ Выживания:", error);
-
     } else {
         // Отправляем в таблицу Стандартного режима
         const { error } = await sb
