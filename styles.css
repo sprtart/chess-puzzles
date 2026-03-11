@@ -1585,9 +1585,9 @@ background: #769656;
     height: 130px;
     border-radius: 25px;
     border: none;
-    background-color: #f97316; /* Оранжевый */
+    background-color: #769656;
     color: white;
-    box-shadow: 0 8px 0 #c2410c;
+    box-shadow: 0 5px 0 #546d3b;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -1613,7 +1613,7 @@ background: #769656;
     height: 60px;
     border-radius: 16px;
     border: none;
-    background-color: #769656; /* Зеленый */
+    background-color: #769656;
     color: white;
     box-shadow: 0 5px 0 #546d3b;
     display: flex;
@@ -1621,6 +1621,11 @@ background: #769656;
     justify-content: center;
     cursor: pointer;
     transition: transform 0.1s, box-shadow 0.1s;
+}
+.dark-mode .menu-tool-btn {
+    background-color: #ebebeb;
+    color: #484544;
+    box-shadow: 0 5px 0 #a5a5a5;
 }
 .menu-tool-btn svg { width: 30px; height: 30px; }
 .menu-tool-btn:active { transform: translateY(5px); box-shadow: 0 0px 0 transparent; }
