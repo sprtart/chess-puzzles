@@ -96,7 +96,7 @@
                 <div class="user-text-wrapper">
                     <span id="user-name">Игрок</span>
                     <div id="user-best-elo-container">
-                        <span id="label-best-elo">макс. Эло</span>
+                        <span id="label-best-elo" data-i18n="bestElo">макс. Эло</span>
                         <span id="user-max-rating">0</span>
                     </div>
                 </div>
@@ -160,7 +160,7 @@
     <div class="video-icon">
         <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M21 4H3C1.895 4 1 4.895 1 6V18C1 19.105 1.895 20 3 20H21C22.105 20 23 19.105 23 18V6C23 4.895 22.105 4 21 4ZM21 18H3V6H21V18ZM9.5 15L16 11.5L9.5 8V15Z"/></svg>
     </div>
-    <span>Помощь</span>
+    <span data-i18n="hintBtn">Помощь</span>
 </button>
 
             <div id="leaderboard-modal" class="modal-overlay hidden" onclick="hideTopModal()">
@@ -170,7 +170,7 @@
             <!-- Сюда будут вставляться строки игроков -->
             <div id="top-loading" style="text-align: center; padding: 20px;">Загрузка...</div>
         </div>
-        <button class="btn-close-modal" onclick="hideTopModal()">Закрыть</button>
+        <button class="btn-close-modal" onclick="hideTopModal()" data-i18n="tClose">Закрыть</button>
     </div>
 </div>
         </div>
@@ -355,7 +355,7 @@ showLeaderboard() {
             }
         });
     } else {
-        alert("Очки: " + totalScore);
+        alert(i18n[lang].score + ": " + totalScore);
     }
 },
     
@@ -556,6 +556,7 @@ const i18n = {
 
         playStandard: "ОБЫЧНЫЙ",
         playSurvival: "ШТУРМ",
+        lbTitleSurvival: "Топ Штурма",
         soundOn: "Звук: Вкл",
         soundOff: "Звук: Выкл",
         themeLight: "Тема: Светлая",
@@ -568,7 +569,10 @@ const i18n = {
         gameOver: "Игра окончена",
         solvedTasks: "Решено задач:",
         toMenu: "В меню",
-        again: "Заново"
+        again: "Заново",
+        record: "Рекорд",
+        streak: "Серия",
+        menuTitle: "Шахматные<br>задачи"
     },
     ru: {
         title: "Chess Puzzles: Find the Best Move",
@@ -602,6 +606,7 @@ const i18n = {
 
         playStandard: "STANDARD",
         playSurvival: "SURVIVAL",
+        lbTitleSurvival: "Survival Top",
         soundOn: "Sound: On",
         soundOff: "Sound: Off",
         themeLight: "Theme: Light",
@@ -614,7 +619,10 @@ const i18n = {
         gameOver: "Game Over",
         solvedTasks: "Tasks solved:",
         toMenu: "To Menu",
-        again: "Again"
+        again: "Again",
+        record: "Record",
+        streak: "Streak",
+        menuTitle: "Chess<br>Puzzles"
     }
 };
 
@@ -671,7 +679,7 @@ function checkSavedTheme() {
 
 function applyTranslations() {
     const t = i18n[lang];
-    
+    document.querySelector('.menu-title').innerHTML = t.menuTitle;
     // Главный экран
     document.getElementById('page-title').textContent = t.title;
     document.getElementById('label-rating').textContent = t.rating;
@@ -800,7 +808,7 @@ function goHome() {
     document.getElementById('game-over-modal').classList.add('hidden');
 
     document.querySelector('#game-over-modal h2').textContent = i18n[lang].gameOver;
-document.querySelector('#game-over-modal p').innerHTML = `${i18n[lang].tasksSolved} <span id="survival-score">0</span>`;
+    document.querySelector('#game-over-modal p').innerHTML = `${i18n[lang].solvedTasks} <span id="survival-score">0</span>`;
     
     // 3. Прячем модалки (на всякий случай)
     document.getElementById('stats-modal').classList.add('hidden');
@@ -830,9 +838,9 @@ function startGameMode(mode) {
         currentElo = eloSurvival; // ВСЕГДА начинаем с простых задач
         survivalStreak = 0;
         
-        labelBest.textContent = lang === 'ru' ? 'Рекорд' : 'Record';
+        labelBest.textContent = i18n[lang].record;
         valBest.textContent = statsMaxStreak;
-        labelScore.textContent = lang === 'ru' ? 'Серия' : 'Streak';
+        labelScore.textContent = i18n[lang].streak;
         valScore.textContent = survivalStreak;
     } else {
         currentElo = eloStandard;
@@ -867,8 +875,9 @@ function startGameMode(mode) {
 function showTutorial(mode) {
     const t = i18n[lang];
     const modal = document.getElementById('tutorial-modal');
-    document.getElementById('tut-title').textContent = t.howToPlay;
-    document.getElementById('tut-text').innerHTML = (mode === 'survival') ? t.survivalTutText : t.standardTutText;
+    // Используем правильные ключи из словаря в зависимости от режима
+    document.getElementById('tut-title').textContent = (mode === 'survival') ? t.tutSurvivalTitle : t.tutStandardTitle;
+    document.getElementById('tut-text').innerHTML = (mode === 'survival') ? t.tutSurvivalText : t.tutStandardText;
     modal.classList.remove('hidden');
 }
 
@@ -1712,7 +1721,7 @@ async function openLeaderboard() {
     const orderBy = isSurvival ? 'streak' : 'score';
     
     // Меняем заголовок в зависимости от режима
-    title.textContent = isSurvival ? "Топ Выживания" : i18n[lang].lbTitle;
+    title.textContent = isSurvival ? i18n[lang].lbTitleSurvival : i18n[lang].lbTitle;
 
     try {
         const { data, error } = await sb
@@ -1861,13 +1870,13 @@ function showStatsModal() {
 function hideStatsModal() {
     document.getElementById('stats-modal').classList.add('hidden');
 }
-
+/*
 // Переводы для нового пункта
 const translationsExtensions = {
     ru: { mTitle: "Статистика", mScore: "Общий счет:", mSolv: "Всего решено:", mFlaw: "Решено без ошибок:", mMist: "Сделано ошибок:", mMax: "Макс. рейтинг задачи:", mClose: "Закрыть" },
     en: { mTitle: "Statistics", mScore: "Total Score:", mSolv: "Total Solved:", mFlaw: "Flawlessly Solved:", mMist: "Mistakes Made:", mMax: "Max Puzzle Rating:", mClose: "Close" }
 };
-
+*/
 function updateModalTexts() {
     const txt = translationsExtensions[lang];
     document.getElementById('modal-title').textContent = txt.mTitle;
