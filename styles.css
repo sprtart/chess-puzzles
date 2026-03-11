@@ -1247,7 +1247,7 @@ html, body {
     .right-column {
         display: flex;
         flex-direction: column;
-        gap: 3vw;
+        gap: 2vw;
         width: 26vw;
     }
     .btn-stats svg {
