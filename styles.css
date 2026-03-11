@@ -1757,8 +1757,8 @@ background: #769656;
 .m-sq.dark { background-color: var(--board-dark); }
 
 .m-piece {
-    width: 90%;
-    height: 90%;
+    width: 85%;
+    height: 85%;
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
