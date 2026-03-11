@@ -798,11 +798,15 @@ function startGameMode(mode) {
     document.querySelector('.game-container').classList.remove('hidden-game');
 
         // Проверка онбординга
-    const tutorialKey = 'tutorial_shown_' + mode;
+    /*const tutorialKey = 'tutorial_shown_' + mode;
     if (!localStorage.getItem(tutorialKey)) {
         showTutorial(mode);
         localStorage.setItem(tutorialKey, 'true');
-    }
+    }*/
+
+        // --- ТЕСТОВЫЙ РЕЖИМ: Окно будет открываться ВСЕГДА ---
+    showTutorial(mode); 
+
     startPuzzle();
 }
 
