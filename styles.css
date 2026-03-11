@@ -1614,9 +1614,9 @@ background: #769656;
     height: 60px;
     border-radius: 16px;
     border: none;
-    background-color: #769656;
+    background-color: var(--gray-1100);
     color: white;
-    box-shadow: 0 5px 0 #546d3b;
+    box-shadow: 0 5px 0 var(--gray-1200);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1737,7 +1737,7 @@ background: #769656;
     grid-template-columns: repeat(2, 1fr);
     width: 125px;
     height: 125px;
-    margin-bottom: 1rem;
+    /*margin-bottom: 1rem;*/
     border-radius: 12px;
     overflow: hidden;
     /* Тень, чтобы выглядело как элемент игры */
