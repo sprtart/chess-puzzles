@@ -1763,3 +1763,34 @@ background: #769656;
     background-repeat: no-repeat;
     background-position: center;
 }
+
+
+
+@media (orientation: landscape) {
+
+.btn-play-big {
+    width: 180px;
+    height: 180px;
+}
+.btn-play-big svg {
+    width: 91px;
+    height: 91px;
+}
+.btn-play-big span {
+    font-weight: 900;
+    font-size: 16px;
+    letter-spacing: 0.5px;
+}
+.menu-tool-btn {
+    width: 80px;
+    height: 80px;
+}
+.menu-tool-btn svg {
+    width: 55px;
+    height: 55px;
+}
+.menu-board-preview {
+    width: 180px;
+    height: 180px;
+}
+}
