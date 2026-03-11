@@ -1571,11 +1571,11 @@ background: #769656;
 .menu-title { font-size: 20px; 
     /*font-weight: 900;*/ 
     color: var(--gray-800); 
-    /*margin-top: 10px;*/
+    margin-top: 10px;
      line-height: 1.1; 
     }
 
-.menu-play-buttons { display: flex; gap: 20px; }
+.menu-play-buttons { display: flex; gap: 2vh; }
 
 .btn-play-big {
     width: 130px;
@@ -1603,7 +1603,7 @@ background: #769656;
 
 .btn-play-big:active { transform: translateY(8px); box-shadow: 0 0px 0 transparent; }
 
-.menu-tools { display: flex; gap: 15px; }
+.menu-tools { display: flex; gap: 1.5vh; }
 
 .menu-tool-btn {
     width: 60px;
@@ -1726,8 +1726,8 @@ background: #769656;
 .menu-board-preview {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    width: 120px;
-    height: 120px;
+    width: 100px;
+    height: 100px;
     /*margin-bottom: 1rem;*/
     border-radius: 12px;
     overflow: hidden;
