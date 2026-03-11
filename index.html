@@ -228,6 +228,17 @@
         </div>
     </div>
 </div>
+
+<div id="tutorial-modal" class="modal-overlay hidden">
+    <div class="modal-box">
+        <h2 id="tut-title">Как играть?</h2>
+        <div id="tut-content" style="font-size: 15px; color: var(--gray-700); line-height: 1.5;">
+            <!-- Сюда будем динамически вставлять текст в зависимости от режима -->
+            <p id="tut-text"></p>
+        </div>
+        <button class="btn-close-modal" onclick="closeTutorial()">Понятно!</button>
+    </div>
+</div>
 <script>
 // ==========================================
 // ОБЪЕКТ PLATFORM (ТОЛЬКО VK И LOCAL)
@@ -785,7 +796,34 @@ function startGameMode(mode) {
         valScore.textContent = totalScore;
     }
     document.querySelector('.game-container').classList.remove('hidden-game');
+
+        // Проверка онбординга
+    const tutorialKey = 'tutorial_shown_' + mode;
+    if (!localStorage.getItem(tutorialKey)) {
+        showTutorial(mode);
+        localStorage.setItem(tutorialKey, 'true');
+    }
     startPuzzle();
+}
+
+function showTutorial(mode) {
+    const modal = document.getElementById('tutorial-modal');
+    const title = document.getElementById('tut-title');
+    const text = document.getElementById('tut-text');
+    
+    if (mode === 'survival') {
+        title.textContent = "Режим Выживание";
+        text.innerHTML = "<b>Твоя цель:</b> решить как можно больше задач подряд.<br><br><b>Важно:</b> каждая ошибка завершает игру. После каждой решенной задачи сложность будет расти!";
+    } else {
+        title.textContent = "Как играть";
+        text.innerHTML = "Найди лучший ход на доске! За правильные решения ты получаешь очки и повышаешь свой рейтинг.";
+    }
+    
+    modal.classList.remove('hidden');
+}
+
+function closeTutorial() {
+    document.getElementById('tutorial-modal').classList.add('hidden');
 }
 
 function updateLivesUI() {
