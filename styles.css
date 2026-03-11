@@ -475,8 +475,8 @@ html, body {
     padding: 4vw 7vw;
     background-color: var(--gray-1000);
     border: none;
-    box-shadow: 0 4px 0 var(--gray-400);
-    color: var(--gray-1200);
+    box-shadow: 0 4px 0 #b9bdc3;
+    color: var(--gray-1100);
     font-weight: 900;
     text-transform: uppercase;
     letter-spacing: 0.1em;
@@ -1741,7 +1741,10 @@ background: #769656;
     border-radius: 12px;
     overflow: hidden;
     /* Тень, чтобы выглядело как элемент игры */
-    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    box-shadow: 0 5px 0px rgb(185 185 185);
+}
+.dark-mode .menu-board-preview {
+    box-shadow: 0 5px 0px rgb(71 71 71);
 }
 
 .m-sq {
