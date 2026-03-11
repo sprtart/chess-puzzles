@@ -54,11 +54,11 @@
             stroke-linejoin="round" 
             stroke-linecap="round"
           /></svg>
-                <span>ОБЫЧНЫЙ</span>
+                <span data-i18n="playStandard">ОБЫЧНЫЙ</span>
             </button>
             <button class="btn-play-big btn-survival" onclick="startGameMode('survival')">
                 <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L4.5 20.29l.71.71L12 18l6.79 3 .71-.71z"/></svg>
-                <span>ШТУРМ</span>
+                <span data-i18n="playSurvival">ШТУРМ</span>
             </button>
         </div>
 
@@ -214,7 +214,7 @@
             <!-- Иконка Звук Выкл -->
             <svg class="icon-sound-off drop-svg hidden" viewBox="0 0 24 24" fill="currentColor"><path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/></svg>
         </div>
-        <span id="drop-sound-text">Звук: Вкл</span>
+        <span id="drop-sound-text" data-i18n="soundOn">Звук: Вкл</span>
     </button>
     
     <!-- Кнопка темы -->
@@ -225,28 +225,28 @@
             <!-- Твоя оригинальная Луна -->
             <svg class="icon-moon drop-svg hidden" viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
         </div>
-        <span id="drop-theme-text">Тема: Светлая</span>
+        <span id="drop-theme-text" data-i18n="themeLight">Тема: Светлая</span>
     </button>
 </div>
 <div id="game-over-modal" class="modal-overlay hidden">
     <div class="modal-box" style="align-items: center;">
-        <h2 style="color: #ef4444; font-size: 28px;">Игра окончена</h2>
-        <p style="color: var(--gray-500); font-weight: bold; margin: 0;">Решено задач: <span id="survival-score" style="color: var(--gray-800); font-size: 24px;">0</span></p>
+        <h2 style="color: #ef4444; font-size: 28px;" data-i18n="gameOver">Игра окончена</h2>
+        <p style="color: var(--gray-500); font-weight: bold; margin: 0;" data-i18n="tasksSolved">Решено задач: <span id="survival-score" style="color: var(--gray-800); font-size: 24px;">0</span></p>
         <div style="display: flex; gap: 10px; width: 100%; margin-top: 15px;">
-            <button class="btn-close-modal" onclick="goHome()" style="flex: 1; background: var(--gray-200);">В меню</button>
-            <button class="btn-close-modal" onclick="startGameMode('survival')" style="flex: 1; background: #10b981; color: white;">Заново</button>
+            <button class="btn-close-modal" onclick="goHome()" style="flex: 1; background: var(--gray-200);" data-i18n="toMenu">В меню</button>
+            <button class="btn-close-modal" onclick="startGameMode('survival')" style="flex: 1; background: #10b981; color: white;" data-i18n="again">Заново</button>
         </div>
     </div>
 </div>
 
 <div id="tutorial-modal" class="modal-overlay hidden">
     <div class="modal-box">
-        <h2 id="tut-title">Как играть?</h2>
+        <h2 id="tut-title" data-i18n="howToPlay">Как играть?</h2>
         <div id="tut-content" style="font-size: 15px; color: var(--gray-700); line-height: 1.5;">
             <!-- Сюда будем динамически вставлять текст в зависимости от режима -->
             <p id="tut-text"></p>
         </div>
-        <button class="btn-close-modal" onclick="closeTutorial()">Понятно!</button>
+        <button class="btn-close-modal" onclick="closeTutorial()" data-i18n="understood">Понятно!</button>
     </div>
 </div>
 <script>
@@ -511,17 +511,17 @@ saveSolvedIds(idsArray) {
 }
 
 };
-// ==========================================
-/*
-(function() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const appearance = urlParams.get('vk_appearance');
-    if (appearance === 'dark' || appearance === 'space_gray') {
-        document.documentElement.classList.add('dark-mode'); // Применяем к html
-    }
-})();
-*/
+
 let lang = 'ru'; 
+
+function translatePage() {
+    const t = i18n[lang];
+    // Переводит все элементы с атрибутом data-i18n
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (t[key]) el.textContent = t[key];
+    });
+}
 
 const i18n = {
     ru: {
@@ -552,7 +552,23 @@ const i18n = {
         lbYou: " (Вы)",
         lbFriendsTitle: "Рекорд",
         lbFriendsText: "Пока никто из ваших друзей не играл!\nВаш рекорд: ",
-        tMaxStreak: "Макс. серия:"
+        tMaxStreak: "Макс. серия:",
+
+        playStandard: "ОБЫЧНЫЙ",
+        playSurvival: "ШТУРМ",
+        soundOn: "Звук: Вкл",
+        soundOff: "Звук: Выкл",
+        themeLight: "Тема: Светлая",
+        themeDark: "Тема: Тёмная",
+        tutSurvivalTitle: "Режим Выживание",
+        tutSurvivalText: "<b>Твоя цель:</b> решить как можно больше задач подряд.<br><br><b>Важно:</b> каждая ошибка завершает игру. После каждой решенной задачи сложность будет расти!",
+        tutStandardTitle: "Как играть",
+        tutStandardText: "Найди лучший ход на доске! За правильные решения ты получаешь очки и повышаешь свой рейтинг.<br><br>• Нажми на <b>профиль</b>, чтобы увидеть свою статистику.<br>• Жми <b>«Топ»</b>, чтобы узнать свое место в рейтинге.",
+        understood: "Понятно!",
+        gameOver: "Игра окончена",
+        solvedTasks: "Решено задач:",
+        toMenu: "В меню",
+        again: "Заново"
     },
     en: {
         title: "Chess Puzzles: Find the Best Move",
@@ -582,7 +598,23 @@ const i18n = {
         lbYou: " (You)",
         lbFriendsTitle: "Record",
         lbFriendsText: "None of your friends have played yet!\nYour record: ",
-        tMaxStreak: "Max Streak:"
+        tMaxStreak: "Max Streak:",
+
+        playStandard: "STANDARD",
+        playSurvival: "SURVIVAL",
+        soundOn: "Sound: On",
+        soundOff: "Sound: Off",
+        themeLight: "Theme: Light",
+        themeDark: "Theme: Dark",
+        tutSurvivalTitle: "Survival Mode",
+        tutSurvivalText: "<b>Goal:</b> Solve as many puzzles as possible in a row.<br><br><b>Important:</b> Each mistake ends the game. Difficulty increases after each solved puzzle!",
+        tutStandardTitle: "How to play",
+        tutStandardText: "Find the best move on the board! Correct solutions give you points and increase your rating.<br><br>• Tap the <b>profile</b> to see your stats.<br>• Tap <b>«Top»</b> to see the leaderboard.",
+        understood: "Got it!",
+        gameOver: "Game Over",
+        solvedTasks: "Tasks solved:",
+        toMenu: "To Menu",
+        again: "Again"
     }
 };
 
@@ -721,11 +753,12 @@ document.addEventListener('click', (e) => {
 // Управление звуком
 function toggleSound() {
     isSoundEnabled = !isSoundEnabled;
+    document.getElementById('drop-sound-text').textContent = isSoundEnabled ? i18n[lang].soundOn : i18n[lang].soundOff;
     setAllAudioMute(!isSoundEnabled);
 
     // Меняем текст в выпадающем меню
-    const dropText = document.getElementById('drop-sound-text');
-    if (dropText) dropText.textContent = isSoundEnabled ? 'Звук: Вкл' : 'Звук: Выкл';
+    //const dropText = document.getElementById('drop-sound-text');
+    //if (dropText) dropText.textContent = isSoundEnabled ? 'Звук: Вкл' : 'Звук: Выкл';
 
     // Переключаем ВСЕ иконки звука на странице
     document.querySelectorAll('.icon-sound-on').forEach(el => {
@@ -750,12 +783,12 @@ toggleTheme = function() {
 
 function updateDropdownThemeText() {
     const isDark = document.documentElement.classList.contains('dark-mode');
-    const dropText = document.getElementById('drop-theme-text');
-    
+    document.getElementById('drop-theme-text').textContent = isDark ? i18n[lang].themeDark : i18n[lang].themeLight;
+
     // Меняем только текст, так как иконки (SVG) теперь переключаются в updateThemeIcons
-    if (dropText) {
+    /*if (dropText) {
         dropText.textContent = isDark ? 'Тема: Тёмная' : 'Тема: Светлая';
-    }
+    }*/
 }
 
 // Переход в главное меню
@@ -765,6 +798,9 @@ function goHome() {
     
     // 2. Прячем окно поражения (если оно было открыто)
     document.getElementById('game-over-modal').classList.add('hidden');
+
+    document.querySelector('#game-over-modal h2').textContent = i18n[lang].gameOver;
+document.querySelector('#game-over-modal p').innerHTML = `${i18n[lang].tasksSolved} <span id="survival-score">0</span>`;
     
     // 3. Прячем модалки (на всякий случай)
     document.getElementById('stats-modal').classList.add('hidden');
@@ -829,23 +865,10 @@ function startGameMode(mode) {
 }
 
 function showTutorial(mode) {
-
-    isLocked = true; 
-
+    const t = i18n[lang];
     const modal = document.getElementById('tutorial-modal');
-    const title = document.getElementById('tut-title');
-    const text = document.getElementById('tut-text');
-    
-    if (mode === 'survival') {
-        title.textContent = "Режим Выживание";
-        text.innerHTML = "<b>Твоя цель:</b> решить как можно больше задач подряд.<br><br><b>Важно:</b> каждая ошибка завершает игру. После каждой решенной задачи сложность будет расти!";
-    } else {
-        title.textContent = "Как играть";
-        text.innerHTML = "Найди лучший ход на доске! За правильные решения ты получаешь очки и повышаешь свой рейтинг.<br><br>" +
-                         "• Нажми на <b>профиль</b>, чтобы увидеть свою статистику.<br>" +
-                         "• Жми <b>«Топ»</b>, чтобы узнать свое место в рейтинге.<br>";
-    }
-    
+    document.getElementById('tut-title').textContent = t.howToPlay;
+    document.getElementById('tut-text').innerHTML = (mode === 'survival') ? t.survivalTutText : t.standardTutText;
     modal.classList.remove('hidden');
 }
 
@@ -889,6 +912,7 @@ async function initGame() {
     lang = Platform.getLang();
     if (lang !== 'ru' && lang !== 'en') lang = 'en'; 
     applyTranslations();
+    translatePage();
 
     // Загружаем статистику из ВК
     const savedStats = await Platform.getStats();
