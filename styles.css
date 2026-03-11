@@ -1573,9 +1573,10 @@ background: #769656;
 .menu-logo { width: 120px; height: 120px; animation: bounce 2s infinite ease-in-out; }
 .menu-title { font-size: 20px; 
     /*font-weight: 900;*/ 
-    color: var(--gray-800); 
+    color: var(--gray-1200); 
     margin-top: 10px;
      line-height: 1.1; 
+     display: none;
     }
 
 .menu-play-buttons { display: flex; gap: 2vh; }
@@ -1734,13 +1735,13 @@ background: #769656;
 .menu-board-preview {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    width: 100px;
-    height: 100px;
-    /*margin-bottom: 1rem;*/
+    width: 125px;
+    height: 125px;
+    margin-bottom: 1rem;
     border-radius: 12px;
     overflow: hidden;
     /* Тень, чтобы выглядело как элемент игры */
-    /*box-shadow: 0 4px 10px rgba(0,0,0,0.2);*/
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
 }
 
 .m-sq {
