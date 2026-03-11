@@ -1710,6 +1710,9 @@ background: #769656;
 }
 
 
+
+
+
 .menu-board-preview {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
