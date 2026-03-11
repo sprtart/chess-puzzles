@@ -180,18 +180,71 @@
 </div>
 
 <div id="stats-modal" class="modal-overlay hidden">
-    <div class="modal-box" onclick="event.stopPropagation()">
+    <div class="modal-box modern-stats-box" onclick="event.stopPropagation()">
         <h2 id="modal-title">Статистика</h2>
-        <div class="stat-row"><span id="t-score">Общий счет:</span> <b id="mdl-score">0</b></div>
         
-        <div class="stat-row"><span id="t-solved">Всего решено:</span> <b id="mdl-solved">0</b></div>
-        <!-- НОВАЯ СТРОКА: -->
-        <div class="stat-row"><span id="t-flawless">Решено без ошибок:</span> <b id="mdl-flawless" style="color:#16a34a;">0</b></div>
-        
-        <div class="stat-row"><span id="t-mistakes">Сделано ошибок:</span> <b id="mdl-mistakes">0</b></div>
-        <div class="stat-row"><span id="t-max">Макс. рейтинг:</span> <b id="mdl-max-elo">0</b></div>
-        <div class="stat-row"><span id="t-max-streak">Макс. серия:</span> <b id="mdl-max-streak">0</b></div>
-        <button class="btn-close-modal" onclick="hideStatsModal()" id="t-close">Закрыть</button>
+        <!-- Главный показатель (Общий счет) -->
+        <div class="stat-hero-card">
+            <div class="stat-hero-icon">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            </div>
+            <div class="stat-hero-info">
+                <span id="t-score">Общий счет</span>
+                <b id="mdl-score">0</b>
+            </div>
+        </div>
+
+        <!-- Сетка с остальной статистикой -->
+        <div class="stats-grid">
+            
+            <!-- Решено всего -->
+            <div class="stat-mini-card">
+                <div class="stat-icon blue">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+                </div>
+                <b id="mdl-solved">0</b>
+                <span id="t-solved">Всего решено</span>
+            </div>
+
+            <!-- Идеально -->
+            <div class="stat-mini-card">
+                <div class="stat-icon green">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>
+                </div>
+                <b id="mdl-flawless" style="color: inherit;">0</b>
+                <span id="t-flawless">Без ошибок</span>
+            </div>
+
+            <!-- Макс. рейтинг -->
+            <div class="stat-mini-card">
+                <div class="stat-icon gold">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 20h20M5 20V8l4 4 3-8 3 8 4-4v12"/></svg>
+                </div>
+                <b id="mdl-max-elo">0</b>
+                <span id="t-max">Макс. рейтинг</span>
+            </div>
+
+            <!-- Макс. серия -->
+            <div class="stat-mini-card">
+                <div class="stat-icon orange">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.5 19c-1.5 1-3.5 1-5 0s-4-2.5-4-5c0-2.5 1.5-4.5 3-5.5.5-3.5 3-5.5 3-5.5s.5 2 0 4.5c1.5 1 3 3 3 5 0 2.5-1 4.5-2.5 6.5z"/></svg>
+                </div>
+                <b id="mdl-max-streak">0</b>
+                <span id="t-max-streak">Макс. серия</span>
+            </div>
+
+            <!-- Ошибки -->
+            <div class="stat-mini-card">
+                <div class="stat-icon red">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+                </div>
+                <b id="mdl-mistakes">0</b>
+                <span id="t-mistakes">Сделано ошибок</span>
+            </div>
+
+        </div>
+
+        <button class="btn-close-modal" onclick="hideStatsModal()" id="t-close" style="margin-top: 20px;">Закрыть</button>
     </div>
 </div>
 
