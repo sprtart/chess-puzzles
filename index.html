@@ -803,19 +803,29 @@ function startGameMode(mode) {
     document.querySelector('.game-container').classList.remove('hidden-game');
 
         // Проверка онбординга
-    const tutorialKey = 'tutorial_shown_' + mode;
-    if (!localStorage.getItem(tutorialKey)) {
+    /*    const tutorialKey = 'tutorial_shown_' + mode;
+    const needTutorial = !localStorage.getItem(tutorialKey);
+
+    if (needTutorial) {
         showTutorial(mode);
         localStorage.setItem(tutorialKey, 'true');
-    }
+        // ВАЖНО: блокируем доску, пока игрок не нажмет "Понятно!"
+        isLocked = true; 
+    } else {
+        // Если инструкцию не показываем, разблокируем доску для хода компа
+        isLocked = false; 
+    }*/
 
         // --- ТЕСТОВЫЙ РЕЖИМ: Окно будет открываться ВСЕГДА ---
-    //showTutorial(mode); 
+    showTutorial(mode); 
 
-    startPuzzle();
+    startPuzzle(needTutorial);
 }
 
 function showTutorial(mode) {
+
+    isLocked = true; 
+
     const modal = document.getElementById('tutorial-modal');
     const title = document.getElementById('tut-title');
     const text = document.getElementById('tut-text');
@@ -835,6 +845,12 @@ function showTutorial(mode) {
 
 function closeTutorial() {
     document.getElementById('tutorial-modal').classList.add('hidden');
+    isLocked = false; // Разблокируем игру
+    
+    // Делаем первый ход компа после того, как игрок закрыл инструкцию
+    if (puzzles[currentPuzzleIndex] && puzzles[currentPuzzleIndex].moves) {
+        playMove(puzzles[currentPuzzleIndex].moves[currentStep], true);
+    }
 }
 
 function updateLivesUI() {
@@ -1109,7 +1125,7 @@ function requestHint() {
     );
 }
 
-function startPuzzle() {
+function startPuzzle(skipAutoMove) {
     hasMistake = false;
     hasHint = false;
 
@@ -1170,11 +1186,11 @@ function startPuzzle() {
             
             renderBoard(); 
             
-            setTimeout(() => {
-                if (puzzles[currentPuzzleIndex] && puzzles[currentPuzzleIndex].moves) {
-                    playMove(puzzles[currentPuzzleIndex].moves[currentStep], true);
-                }
-            }, 100);
+    setTimeout(() => {
+        if (!skipAutoMove && puzzles[currentPuzzleIndex] && puzzles[currentPuzzleIndex].moves) {
+            playMove(puzzles[currentPuzzleIndex].moves[currentStep], true);
+        }
+    }, 100);
         }
     }, 100);
 }
