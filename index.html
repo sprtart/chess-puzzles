@@ -36,7 +36,12 @@
     <div class="menu-content">
         <!-- Логотип и заголовок -->
         <div class="menu-header">
-            <img src="img/logo.png" alt="Logo" class="menu-logo">
+            <div class="menu-board-preview">
+    <div class="m-sq light"><div class="m-piece" style="background-image: url('img/p/wR.svg')"></div></div>
+    <div class="m-sq dark"><div class="m-piece" style="background-image: url('img/p/bQ.svg')"></div></div>
+    <div class="m-sq dark"><div class="m-piece" style="background-image: url('img/p/bN.svg')"></div></div>
+    <div class="m-sq light"><div class="m-piece" style="background-image: url('img/p/wB.svg')"></div></div>
+</div>
             <h1 class="menu-title">Шахматные<br>задачи</h1>
         </div>
 
@@ -798,14 +803,14 @@ function startGameMode(mode) {
     document.querySelector('.game-container').classList.remove('hidden-game');
 
         // Проверка онбординга
-    /*const tutorialKey = 'tutorial_shown_' + mode;
+    const tutorialKey = 'tutorial_shown_' + mode;
     if (!localStorage.getItem(tutorialKey)) {
         showTutorial(mode);
         localStorage.setItem(tutorialKey, 'true');
-    }*/
+    }
 
         // --- ТЕСТОВЫЙ РЕЖИМ: Окно будет открываться ВСЕГДА ---
-    showTutorial(mode); 
+    //showTutorial(mode); 
 
     startPuzzle();
 }

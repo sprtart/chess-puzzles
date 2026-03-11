@@ -1708,3 +1708,33 @@ background: #769656;
     opacity: 0.3;
     animation: none;
 }
+
+
+.menu-board-preview {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    width: 120px;
+    height: 120px;
+    margin-bottom: 2rem;
+    border-radius: 12px;
+    overflow: hidden;
+    /* Тень, чтобы выглядело как элемент игры */
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+.m-sq {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.m-sq.light { background-color: var(--board-light); } /* Твои цвета доски */
+.m-sq.dark { background-color: var(--board-dark); }
+
+.m-piece {
+    width: 80%;
+    height: 80%;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+}
