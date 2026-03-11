@@ -75,7 +75,7 @@
 #user-name {
     font-size: min(4.5vw, 3vh); /* Чуть уменьшили, чтобы влезло две строки */
     font-weight: 800;
-    color: var(--gray-700);
+    color: var(--gray-1200);
     max-width: 30vw;
     white-space: nowrap;
     overflow: hidden;
@@ -85,12 +85,12 @@
 #user-best-elo-container {
     font-size: min(3vw, 1.8vh);
     font-weight: 600;
-    color: var(--gray-500); /* Сделаем чуть бледнее имени */
+    color: var(--gray-1200); /* Сделаем чуть бледнее имени */
     margin-top: 1px;
 }
 
 #user-max-rating {
-    color: #374151; /* Цвет акцента для цифр рекорда */
+    color: var(--gray-1200); /* Цвет акцента для цифр рекорда */
     font-weight: 800;
 }
 
@@ -415,7 +415,7 @@ html, body {
         .stat-value {
             font-size: 24px;
             font-weight: 900;
-            color: var(--gray-700);
+            color: var(--gray-1100);
             line-height: 1.1;
         }
 
