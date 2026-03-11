@@ -1561,9 +1561,19 @@ background: #769656;
     gap: 4vh;
 }
 
-.menu-header { text-align: center; }
+.menu-header { 
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+ }
 .menu-logo { width: 120px; height: 120px; animation: bounce 2s infinite ease-in-out; }
-.menu-title { font-size: 32px; font-weight: 900; color: var(--gray-800); margin-top: 10px; line-height: 1.1; }
+.menu-title { font-size: 20px; 
+    /*font-weight: 900;*/ 
+    color: var(--gray-800); 
+    /*margin-top: 10px;*/
+     line-height: 1.1; 
+    }
 
 .menu-play-buttons { display: flex; gap: 20px; }
 
@@ -1718,11 +1728,11 @@ background: #769656;
     grid-template-columns: repeat(2, 1fr);
     width: 120px;
     height: 120px;
-    margin-bottom: 2rem;
+    /*margin-bottom: 1rem;*/
     border-radius: 12px;
     overflow: hidden;
     /* Тень, чтобы выглядело как элемент игры */
-    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    /*box-shadow: 0 4px 10px rgba(0,0,0,0.2);*/
 }
 
 .m-sq {
