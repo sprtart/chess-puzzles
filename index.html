@@ -803,7 +803,7 @@ function startGameMode(mode) {
     document.querySelector('.game-container').classList.remove('hidden-game');
 
         // Проверка онбординга
-    /*    const tutorialKey = 'tutorial_shown_' + mode;
+        const tutorialKey = 'tutorial_shown_' + mode;
     const needTutorial = !localStorage.getItem(tutorialKey);
 
     if (needTutorial) {
@@ -814,10 +814,10 @@ function startGameMode(mode) {
     } else {
         // Если инструкцию не показываем, разблокируем доску для хода компа
         isLocked = false; 
-    }*/
+    }
 
         // --- ТЕСТОВЫЙ РЕЖИМ: Окно будет открываться ВСЕГДА ---
-    showTutorial(mode); 
+    //showTutorial(mode); 
 
     startPuzzle(needTutorial);
 }
