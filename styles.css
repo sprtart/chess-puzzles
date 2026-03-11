@@ -479,7 +479,7 @@ html, body {
     color: var(--gray-1200);
     font-weight: 900;
     text-transform: uppercase;
-    letter-spacing: 0.01em;
+    letter-spacing: 0.1em;
     transition: transform 0.1s, box-shadow 0.1s;
     cursor: pointer;
     outline: none;
@@ -501,7 +501,7 @@ html, body {
     font-weight: 900;
     font-size: 5vw;
     text-transform: uppercase;
-    letter-spacing: 0.01em;
+    letter-spacing: 0.1em;
     transition: transform 0.1s, box-shadow 0.1s;
     cursor: pointer;
     outline: none;
