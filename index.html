@@ -670,7 +670,7 @@ function saveCurrentStats() {
         flawless: statsFlawless,
         mistakes: statsTotalMistakes,
         maxElo: statsMaxElo,
-        currentElo: currentElo,
+        eloStandard: eloStandard,
         maxStreak: statsMaxStreak
     });
 }
@@ -791,7 +791,7 @@ function startGameMode(mode) {
     const valScore = document.getElementById('score-display');
 
     if (mode === 'survival') {
-        currentElo = 400; // ВСЕГДА начинаем с простых задач
+        currentElo = eloSurvival; // ВСЕГДА начинаем с простых задач
         survivalStreak = 0;
         
         labelBest.textContent = lang === 'ru' ? 'Рекорд' : 'Record';
@@ -799,6 +799,7 @@ function startGameMode(mode) {
         labelScore.textContent = lang === 'ru' ? 'Серия' : 'Streak';
         valScore.textContent = survivalStreak;
     } else {
+        currentElo = eloStandard;
         // Обычный режим
         labelBest.textContent = i18n[lang].bestElo;
         valBest.textContent = statsMaxElo;
@@ -899,7 +900,9 @@ async function initGame() {
     statsMaxElo = savedStats.maxElo || 0;
     statsMaxStreak = savedStats.maxStreak || 0;
 
-    currentElo = savedStats.currentElo || 400; 
+    eloStandard = savedStats.eloStandard || 400; 
+    eloSurvival = 400; // Штурм всегда с 400
+
 
     document.getElementById('user-max-rating').textContent = statsMaxElo;
     
@@ -960,7 +963,9 @@ let puzzles =[], currentPuzzleIndex = 0, currentStep = 0;
 let boardState =[], isLocked = true, selectedSq = null, playerColor = 'w';
 let lastMoveSquares =[], hintSquare = null;
 
-let currentElo = 400;
+let eloStandard = 400; // Для обычного режима
+let eloSurvival = 400; // Для штурма
+
 let sessionScore = 0; 
 let previousPuzzleElo = null;
 let hasMistake = false;
@@ -1604,6 +1609,7 @@ if (gameMode === 'survival') {
             }
             // Поднимаем сложность: чем дольше серия, тем выше Эло
             currentElo += 50; 
+            currentElo = eloSurvival;
         } else {
             // --- ЛОГИКА ОБЫЧНОГО РЕЖИМА ---
             if (!hasHint && !hasMistake) {
@@ -1613,7 +1619,8 @@ if (gameMode === 'survival') {
                     statsMaxElo = thisElo;
                     document.getElementById('user-max-rating').textContent = statsMaxElo;
                 }
-                currentElo += randomDelta;
+                eloStandard += randomDelta;
+                currentElo = eloStandard;
                 
                 let pointsToAdd = (previousPuzzleElo === null) ? 15 : Math.max(5, Math.abs(thisElo - previousPuzzleElo));
                 totalScore += pointsToAdd; 
