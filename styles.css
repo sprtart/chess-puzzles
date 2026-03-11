@@ -1613,9 +1613,9 @@ background: #769656;
     height: 60px;
     border-radius: 16px;
     border: none;
-    background-color: #10b981; /* Зеленый */
+    background-color: #769656; /* Зеленый */
     color: white;
-    box-shadow: 0 5px 0 #047857;
+    box-shadow: 0 5px 0 #546d3b;
     display: flex;
     align-items: center;
     justify-content: center;
