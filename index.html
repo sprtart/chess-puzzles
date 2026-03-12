@@ -837,8 +837,10 @@ function startGameMode(mode) {
     const valScore = document.getElementById('score-display');
 
     if (mode === 'survival') {
+    // Сбрасываем кнопку обратно
     const hintBtn = document.getElementById('hint-btn');
     hintBtn.onclick = requestHint;
+    hintBtn.querySelector('.video-icon').style.display = ''; // возвращаем SVG
     document.getElementById('hint-btn-text').textContent = i18n[lang].hintBtn;
 
         currentElo = eloSurvival; // ВСЕГДА начинаем с простых задач
@@ -1517,18 +1519,15 @@ function handleMoveError(fromPos, toPos) {
     Platform.vibrate('error');
 
     // --- ЛОГИКА ВЫЖИВАНИЯ (ОШИБКА = СРАЗУ КОНЕЦ) ---
+// СТАЛО:
 if (gameMode === 'survival') {
     setTimeout(() => {
-        // Обновляем панель: показываем финальный счёт
-        document.getElementById('label-score').textContent = i18n[lang].solvedTasks || 'Решено:';
-        document.getElementById('score-display').textContent = survivalStreak;
-
-        // Меняем кнопку "Помощь" на "Заново"
+        // Меняем кнопку "Помощь" на "Заново" (без иконки)
         const hintBtn = document.getElementById('hint-btn');
         hintBtn.onclick = () => startGameMode('survival');
+        hintBtn.querySelector('.video-icon').style.display = 'none'; // скрываем SVG
         document.getElementById('hint-btn-text').textContent = i18n[lang].again;
 
-        // Блокируем доску
         isLocked = true;
     }, 500);
     return;
