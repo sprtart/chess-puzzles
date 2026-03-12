@@ -1635,17 +1635,17 @@ function finalizeMove(moveStr, isOpponent, f, t) {
 statsTotalSolved++; 
 
 if (gameMode === 'survival') {
-            survivalStreak++;
-            document.getElementById('score-display').textContent = survivalStreak;
-            
-            if (survivalStreak > statsMaxStreak) {
-                statsMaxStreak = survivalStreak;
-                document.getElementById('user-max-rating').textContent = statsMaxStreak;
-            }
-            // Поднимаем сложность: чем дольше серия, тем выше Эло
-            currentElo += 50; 
-            currentElo = eloSurvival;
-        } else {
+    survivalStreak++;
+    document.getElementById('score-display').textContent = survivalStreak;
+    
+    if (survivalStreak > statsMaxStreak) {
+        statsMaxStreak = survivalStreak;
+        document.getElementById('user-max-rating').textContent = statsMaxStreak;
+    }
+    // Поднимаем сложность: чем дольше серия, тем выше Эло
+    currentElo += 50; 
+} else {
+    // --- ЛОГИКА ОБЫЧНОГО РЕЖИМА --- else {
             // --- ЛОГИКА ОБЫЧНОГО РЕЖИМА ---
             if (!hasHint && !hasMistake) {
                 if (Platform.vibrate) Platform.vibrate('success');
