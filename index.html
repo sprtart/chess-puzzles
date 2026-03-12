@@ -837,6 +837,9 @@ function startGameMode(mode) {
     const valScore = document.getElementById('score-display');
 
     if (mode === 'survival') {
+        survivalFailed = false;
+            survivalStreak = 0; // <- здесь уже должно быть
+    document.getElementById('score-display').textContent = survivalStreak;
     // Сбрасываем ОБЕ кнопки обратно
     const hintBtns = document.querySelectorAll('.btn-hint');
     hintBtns.forEach(btn => {
@@ -1018,7 +1021,7 @@ let previousPuzzleElo = null;
 let hasMistake = false;
 let hasHint = false;
 let isAdLoading = false; 
-
+let survivalFailed = false;
 let gamesPlayedSinceAd = 0;
 let lastAdTime = Date.now(); // Отсчет времени с момента запуска
 const AD_COOLDOWN_MS = 4 * 60 * 1000; // 3 минуты
@@ -1533,16 +1536,78 @@ function checkLogicMove(tr, tc) {
 function handleMoveError(fromPos, toPos) {
     hasMistake = true;
     safePlaySound(audioError); 
-
     statsTotalMistakes++; 
     saveCurrentStats();   
     Platform.vibrate('error');
 
-    // --- ЛОГИКА ВЫЖИВАНИЯ (ОШИБКА = СРАЗУ КОНЕЦ) ---
-// СТАЛО:
-if (gameMode === 'survival') {
+    const piece = boardState[posToIdx(fromPos).r][posToIdx(fromPos).c];
+    const capturedPiece = boardState[posToIdx(toPos).r][posToIdx(toPos).c];
+    const boardWrapper = document.getElementById('board-wrapper');
+
+    // Перемещаем фигуру на целевую клетку
+    boardState[posToIdx(toPos).r][posToIdx(toPos).c] = piece;
+    boardState[posToIdx(fromPos).r][posToIdx(fromPos).c] = "";
+    renderBoard();
+    showPieceBadge(toPos, 'wrong');
+    boardWrapper.classList.add('shake');
+
+    // Анимация возврата фигуры обратно
     setTimeout(() => {
-        // Меняем ОБЕ кнопки — для портрета и для альбомной
+        boardWrapper.classList.remove('shake');
+
+        const toSqEl = document.querySelector(`[data-pos="${toPos}"]`);
+        const fromSqEl = document.querySelector(`[data-pos="${fromPos}"]`);
+        const pieceEl = toSqEl?.querySelector('.piece');
+
+        if (pieceEl && fromSqEl) {
+            const tR = toSqEl.getBoundingClientRect();
+            const fR = fromSqEl.getBoundingClientRect();
+            
+            document.querySelectorAll('.piece-badge').forEach(el => el.remove());
+
+            // Восстанавливаем доску СРАЗУ (вражеская фигура появляется)
+            boardState[posToIdx(fromPos).r][posToIdx(fromPos).c] = piece;
+            boardState[posToIdx(toPos).r][posToIdx(toPos).c] = capturedPiece;
+            selectedSq = null;
+            renderBoard();
+
+            // Анимируем нашу фигуру через follower
+            follower.style.backgroundImage = `url('${PIECE_IMAGES[piece]}')`;
+            follower.style.width = tR.width + 'px';
+            follower.style.height = tR.height + 'px';
+            follower.style.left = (tR.left + tR.width/2) + 'px';
+            follower.style.top = (tR.top + tR.height/2) + 'px';
+            follower.style.transition = 'none';
+            follower.style.display = 'block';
+
+            // Прячем нашу фигуру на стартовой клетке пока летит
+            const ourPieceEl = document.querySelector(`[data-pos="${fromPos}"]`)?.querySelector('.piece');
+            if (ourPieceEl) ourPieceEl.style.opacity = '0';
+
+            requestAnimationFrame(() => {
+                follower.style.transition = 'left 0.25s ease-in-out, top 0.25s ease-in-out';
+                follower.style.left = (fR.left + fR.width/2) + 'px';
+                follower.style.top = (fR.top + fR.height/2) + 'px';
+            });
+
+            setTimeout(() => {
+                follower.style.display = 'none';
+                follower.style.transition = 'none';
+                if (ourPieceEl) ourPieceEl.style.opacity = '1';
+            }, 260);
+        } else {
+            document.querySelectorAll('.piece-badge').forEach(el => el.remove());
+            boardState[posToIdx(fromPos).r][posToIdx(fromPos).c] = piece;
+            boardState[posToIdx(toPos).r][posToIdx(toPos).c] = capturedPiece; // восстанавливаем фигуру соперника
+            selectedSq = null;
+            renderBoard();
+        }
+    }, 400);
+
+    if (gameMode === 'survival') {
+        //survivalStreak = 0;
+        //document.getElementById('score-display').textContent = survivalStreak;
+        
         const hintBtns = document.querySelectorAll('.btn-hint');
         hintBtns.forEach(btn => {
             btn.onclick = () => startGameMode('survival');
@@ -1552,26 +1617,8 @@ if (gameMode === 'survival') {
             if (text) text.textContent = i18n[lang].again;
         });
 
-        isLocked = true;
-    }, 500);
-    return;
-}
-
-    // --- ЛОГИКА ОБЫЧНОГО РЕЖИМА ---
-    const fromSq = document.querySelector(`[data-pos="${fromPos}"]`);
-    const toSq = document.querySelector(`[data-pos="${toPos}"]`);
-    if (fromSq) fromSq.classList.add('error-move');
-    if (toSq) toSq.classList.add('error-move');
-    const boardWrapper = document.getElementById('board-wrapper');
-    boardWrapper.classList.add('shake');
-
-    setTimeout(() => {
-        boardWrapper.classList.remove('shake');
-        if (fromSq) fromSq.classList.remove('error-move');
-        if (toSq) toSq.classList.remove('error-move');
-        selectedSq = null;
-        renderBoard();
-    }, 400);
+        survivalFailed = true;
+    }
 }
 function selectPromotion(type) {
     document.getElementById('promotion-dialog').classList.add('hidden');
@@ -1660,7 +1707,7 @@ function finalizeMove(moveStr, isOpponent, f, t) {
         setTimeout(() => playMove(puzzles[currentPuzzleIndex].moves[currentStep], true), 600);
     } else {
         // --- ЗАДАЧА ПОЛНОСТЬЮ РЕШЕНА ---
-
+        showPieceBadge(idxToPos(t.r, t.c), 'correct');
         const currentId = puzzles[currentPuzzleIndex].id; // Берем ID текущей задачи
         solvedIds.add(currentId);                         // Добавляем в локальный набор
         Platform.saveSolvedIds(Array.from(solvedIds));    // Сохраняем весь список в облако ВК
@@ -1668,19 +1715,27 @@ function finalizeMove(moveStr, isOpponent, f, t) {
         const thisElo = Number(puzzles[currentPuzzleIndex].elo);
         const randomDelta = Math.floor(Math.random() * 16) + 80; 
 
-statsTotalSolved++; 
+        statsTotalSolved++; 
 
-if (gameMode === 'survival') {
-    survivalStreak++;
-    document.getElementById('score-display').textContent = survivalStreak;
-    
-    if (survivalStreak > statsMaxStreak) {
-        statsMaxStreak = survivalStreak;
-        document.getElementById('user-max-rating').textContent = statsMaxStreak;
-    }
-    // Поднимаем сложность: чем дольше серия, тем выше Эло
-   currentElo += Math.floor(Math.random() * 23) + 33;
-} else {
+        if (gameMode === 'survival') {
+            
+            if (survivalFailed) {
+                // Задача решена после ошибки — начинаем заново автоматически
+                survivalFailed = false;
+                setTimeout(() => startGameMode('survival'), 800);
+                return;
+            }
+
+            survivalStreak++;
+            document.getElementById('score-display').textContent = survivalStreak;
+            
+            if (survivalStreak > statsMaxStreak) {
+                statsMaxStreak = survivalStreak;
+                document.getElementById('user-max-rating').textContent = statsMaxStreak;
+            }
+            // Поднимаем сложность: чем дольше серия, тем выше Эло
+        currentElo += Math.floor(Math.random() * 23) + 33;
+        } else {
     // --- ЛОГИКА ОБЫЧНОГО РЕЖИМА --- else {
             // --- ЛОГИКА ОБЫЧНОГО РЕЖИМА ---
             if (!hasHint && !hasMistake) {
@@ -1734,7 +1789,45 @@ if (gameMode === 'survival') {
     }
 }
 
+function showPieceBadge(pos, type) {
+    document.querySelectorAll('.piece-badge').forEach(el => el.remove());
 
+    const sq = document.querySelector(`[data-pos="${pos}"]`);
+    if (!sq) return;
+
+    const boardWrapper = document.getElementById('board-wrapper');
+    const sqRect = sq.getBoundingClientRect();
+    const wrapRect = boardWrapper.getBoundingClientRect();
+
+    const badge = document.createElement('div');
+    badge.className = `piece-badge ${type}`;
+
+    const col = pos.charCodeAt(0) - 97; // a=0, h=7
+
+    const isRightEdge = (playerColor === 'w' && col >= 7) || (playerColor === 'b' && col <= 0);
+
+    const badgeSize = sqRect.width * 0.4;
+    const halfBadge = badgeSize / 2;
+
+    // Если крайний правый столбец (h) — рисуем слева
+    if (col >= 7) {
+        badge.style.left = (sqRect.left - wrapRect.left - halfBadge) + 'px';
+    } else {
+        badge.style.left = (sqRect.right - wrapRect.left - halfBadge) + 'px';
+    }
+    badge.style.top = (sqRect.top - wrapRect.top - halfBadge) + 'px';
+    badge.style.width = badgeSize + 'px';
+    badge.style.height = badgeSize + 'px';
+    badge.style.zIndex = 100;
+
+    if (type === 'correct') {
+        badge.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`;
+    } else {
+        badge.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>`;
+    }
+    boardWrapper.appendChild(badge); // Добавляем в wrapper, а не в клетку
+    setTimeout(() => badge.remove(), 800);
+}
 
 // Функция для закрытия модального окна ТОПа
 function hideTopModal() {
