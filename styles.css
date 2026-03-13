@@ -1581,6 +1581,14 @@ background: #769656;
 
 .menu-play-buttons { display: flex; gap: 2vh; }
 
+.btn-piece {
+    width: 60%;
+    height: 60%;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
 .btn-play-big {
     width: 130px;
     height: 130px;
@@ -1593,7 +1601,7 @@ background: #769656;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    /*gap: 10px;*/
+    gap: 5px;
     cursor: pointer;
     transition: transform 0.1s, box-shadow 0.1s;
 }
@@ -1822,4 +1830,5 @@ background: #769656;
     height: 70%;
 
 }
+
 
