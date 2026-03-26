@@ -2112,7 +2112,7 @@ background: var(--board-dark);
         object-fit: cover;
     }
     .user-info-text { display: flex; flex-direction: column; align-items: flex-start; }
-    #user-name-l { font-size: 2.2vh; font-weight: 800; color: var(--text-main); }
+    #user-name-l { font-size: 2.5vh; font-weight: 800; color: var(--text-main); }
     .label-best-elo { font-size: 1.5vh; color: var(--text-gray); }
     
     .rating-main-card { padding: 2vh; }
@@ -2134,12 +2134,12 @@ background: var(--board-dark);
     }
     .btn-action:active { transform: scale(0.96); }
     .btn-action svg {
-        width: 4vh;
+        width: 4vh; fill: currentColor;
     }
     .green-btn { background: var(--board-dark); }
     .green-btn:hover { background: var(--board-dark); }
-    .btn-help { grid-column: span 2; font-size: 2.2vh; }
-    .btn-top { font-size: 2.2vh; }
+    .btn-help { grid-column: span 2; font-size: 3.5vh; }
+    .btn-top { font-size: 3.5vh; }
 
     .btn-settings-small {
         position: absolute;
