@@ -226,7 +226,7 @@ html, body, button, span, div, h1, h2, b {
 
 .modal-box {
     background: var(--gray-1000);
-    padding: 24px;
+    padding: 18px;
     border-radius: 20px;
     width: 85%;
     max-width: 320px;
@@ -235,6 +235,7 @@ html, body, button, span, div, h1, h2, b {
     flex-direction: column;
     gap: 10px;
     animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        align-items: center;
 }
 @keyframes popIn { 0% { transform: scale(0.8); } 100% { transform: scale(1); } }
 
@@ -1408,7 +1409,7 @@ html, body {
 @media (orientation: landscape){ 
 
 .modal-box {
-    max-width: 450px;
+    max-width: 550px;
     width: 90%;
 }
 
@@ -1677,7 +1678,9 @@ background: var(--board-dark);
 
 
 
-
+.leader-box {
+    padding: 0px;
+}
 
 
 
@@ -2142,11 +2145,6 @@ background: var(--board-dark);
     .btn-help { grid-column: span 2; font-size: 3.5vh; }
     .btn-top { font-size: 3.5vh; }
 
-.profile-alb{
-    display: flex;
-    gap: 1vw;
-}
-
     .btn-settings-small {
         /*position: absolute;
         top: 21%;
@@ -2233,17 +2231,21 @@ body {
 
 
 
-
+.profile-alb{
+    display: flex;
+    gap: 1vw;
+}
 
 
 /* Основной контейнер внутри модалки */
 #leaderboard-container {
     background: var(--gray-1000);
-    /*border-radius: 24px;*/
+    border-radius:0 0 20px 20px;
     /*padding: 10px;*/
     display: flex;
     flex-direction: column;
-    gap: 1S2px;
+    gap: 1px;
+    width: 100%;
 }
 
 /* --- ПЬЕДЕСТАЛ (ТОП-3) --- */
@@ -2252,7 +2254,7 @@ body {
     align-items: flex-end;
     /* gap: 1vw; */
     padding: 4vh 0 2vh;
-    justify-content: space-around;
+    justify-content: center;
 }
 
 .podium-item {
@@ -2345,7 +2347,7 @@ body {
     display: flex;
     align-items: center;
     padding: .8vh 20px;
-    border-radius: 16px;
+    border-radius: 0px;
     background: var(--gray-100);
     /*transition: background 0.2s;*/
 }
@@ -2358,12 +2360,12 @@ body {
     /*width: 30px;*/
     font-weight: 900;
     color: var(--gray-800);
-    font-size: 2vh;
+    font-size: 14px;
 }
 
 .row-avatar {
-    width: 6vh;
-    height: 6vh;
+    width: 40px;
+    height: 40[x];
     border-radius: 25%;
     /* margin: 0 12px; */
     object-fit: cover;
@@ -2372,13 +2374,13 @@ body {
 .row-name {
     flex-grow: 1;
     font-weight: 700;
-    font-size: 2.5vh;
+    font-size: 15px;
     color: var(--gray-800);
 }
 
 .row-score {
     font-weight: 800;
-    font-size: 2.5vh;
+    font-size: 14px;
     color: var(--gray-800);
 }
 
@@ -2403,7 +2405,39 @@ body {
 }
 
 
+/* Стили для крестика закрытия */
+.btn-close-cross {
+    position: absolute;
+    top: -18px;
+    right: -18px;
+    background: transparent;
+    border: none;
+    color: #ffffff; /* Серый цвет, хорошо смотрится и в светлой, и в темной теме */
+    cursor: pointer;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.2s ease, transform 0.2s ease;
+    z-index: 100;
+    background-color: var(--dak-ui);
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+}
 
+.btn-close-cross:hover {
+    color: #ffffff; /* При наведении становится красным */
+    transform: scale(1.1); /* Слегка увеличивается */
+}
+
+/* Для темной темы (если у тебя есть класс .dark-mode) */
+.dark-mode .btn-close-cross {
+    color: #ffffff;
+}
+.dark-mode .btn-close-cross:hover {
+    color: #ffffff;
+}
 
 
 /* Стили для выбора цвета в меню */
@@ -2468,9 +2502,11 @@ body.board-grey {
     display: flex;
     background: var(--gray-100); /* Светло-серый фон */
     border-radius: 14px;
-    padding: 4px;
+    /*padding: 4px;*/
     /*margin-bottom: 20px;*/
     gap: 4px;
+    margin-top: 25px;
+    width: 80%;
 }
 
 .tab-btn {
@@ -2479,7 +2515,7 @@ body.board-grey {
     padding: 2vh;
     border-radius: 10px;
     font-weight: 800;
-    font-size: 1.8vh;
+    font-size: 14px;
     color: var(--gray-800);
     background: transparent;
     cursor: pointer;

@@ -240,11 +240,21 @@
     </div> <!-- Конец right-column -->
 </div>
         <!-- Модалка Топа (одна на обе версии) -->
+        <!-- Модалка Топа (одна на обе версии) -->
 <div id="leaderboard-modal" class="modal-overlay hidden" onclick="hideTopModal()">
-    <div class="modal-box" onclick="event.stopPropagation()">
+    <!-- Обязательно добавь position: relative, чтобы крестик позиционировался относительно окна -->
+    <div class="modal-box leader-box" onclick="event.stopPropagation()" style="position: relative;">
         
+        <!-- НОВАЯ КНОПКА-КРЕСТИК -->
+        <button class="btn-close-cross" onclick="hideTopModal()">
+    <svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="18" y1="6" x2="6" y2="18"></line>
+        <line x1="6" y1="6" x2="18" y2="18"></line>
+    </svg>
+        </button>
+
         <!-- ПЕРЕКЛЮЧАТЕЛЬ (TABS) -->
-        <div class="leaderboard-tabs">
+        <div class="leaderboard-tabs"> <!-- Добавил отступ, чтобы крестик не налез на табы -->
             <button id="tab-standard" class="tab-btn active" onclick="switchLeaderboardTab('standard')">
                 <span data-i18n="playStandard">Задачи</span>
             </button>
@@ -258,9 +268,11 @@
             <div style="text-align:center; padding:40px;" id="top-loading">Загрузка...</div>
         </div>
 
-        <button class="btn-close-modal" onclick="hideTopModal()" data-i18n="tClose">Закрыть</button>
+        <!-- СТАРУЮ КНОПКУ ЗДЕСЬ УДАЛИЛИ -->
+        
     </div>
 </div>
+
 <div id="stats-modal" class="modal-overlay hidden" onclick="hideStatsModal()">
     <div class="modal-box stats-grid-box" onclick="event.stopPropagation()">
         
