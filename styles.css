@@ -2336,7 +2336,7 @@ body {
 .leaderboard-list {
     display: flex;
     flex-direction: column;
-    gap: .5vh;
+    /*gap: .5vh;*/
     overflow-y: auto !important;
     max-height: 40vh;
         touch-action: pan-y !important; 
