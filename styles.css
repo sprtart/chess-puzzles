@@ -2130,7 +2130,7 @@ background: var(--board-dark);
     .stat-subtext { font-size: 1vw; color: var(--text-gray); margin-top: -6px; margin-bottom: 5px; }
     #user-winrate-l { color: var(--board-dark) !important; }
     
-    .action-grid { display: grid; grid-template-columns: 1fr 6vw; gap: 1vw; }
+    .action-grid { display: grid; grid-template-columns: 1fr 6vw; gap: 1vh; }
     .btn-action {
         border: none; border-radius:1.3vw; color: white; font-weight: 800;
         display: flex; align-items: center; justify-content: center; gap: .4vw;
