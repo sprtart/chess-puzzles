@@ -1794,11 +1794,11 @@ function handleMoveError(fromPos, toPos) {
     boardState[posToIdx(fromPos).r][posToIdx(fromPos).c] = "";
     renderBoard();
     showPieceBadge(toPos, 'wrong');
-    boardWrapper.classList.add('shake');
+    //boardWrapper.classList.add('shake');
 
     // Анимация возврата фигуры обратно
     setTimeout(() => {
-        boardWrapper.classList.remove('shake');
+        //boardWrapper.classList.remove('shake');
 
         const toSqEl = document.querySelector(`[data-pos="${toPos}"]`);
         const fromSqEl = document.querySelector(`[data-pos="${fromPos}"]`);
