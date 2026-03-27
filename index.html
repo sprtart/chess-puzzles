@@ -2337,7 +2337,6 @@ function updateModalTexts() {
 
 
 
-
 function renderTopList(items) {
     const container = document.getElementById('leaderboard-container');
     container.innerHTML = '';
@@ -2347,8 +2346,8 @@ function renderTopList(items) {
         return;
     }
 
+    // Проверка ID игрока именно для ВКонтакте
     const myId = (Platform.user && Platform.user.id) ? String(Platform.user.id) : null;
-    let myOriginalRow = null; // Здесь сохраним ссылку на твою реальную строку в списке
 
     // 1. ПЬЕДЕСТАЛ (Топ-3)
     const podiumContainer = document.createElement('div');
@@ -2361,11 +2360,15 @@ function renderTopList(items) {
         const isMe = (myId && String(p.user_id) === myId);
         const item = document.createElement('div');
         item.className = `podium-item place-${idx + 1} ${isMe ? 'is-me' : ''}`;
+        
+        // В ВК мы берем место просто по индексу массива (т.к. мы грузим Топ-50 по порядку)
+        const rankNum = idx + 1;
+
         item.innerHTML = `
             <div class="podium-avatar-wrapper">
                 ${idx === 0 ? '<svg class="crown-icon" viewBox="0 0 24 24"><path d="M5 16L3 5L8.5 10L12 4L15.5 10L21 5L19 16H5Z"/></svg>' : ''}
                 <img class="podium-avatar" src="${p.photo_100 || 'img/logo.png'}" alt="">
-                <div class="rank-badge">${idx + 1}</div>
+                <div class="rank-badge">${rankNum}</div>
             </div>
             <div class="podium-name">${isMe ? (i18n[lang].lbYou || 'Вы') : p.first_name}</div>
             <div class="podium-score">${p.score}</div>
@@ -2374,16 +2377,17 @@ function renderTopList(items) {
     });
     container.appendChild(podiumContainer);
 
-    // 2. СПИСОК (4-50 места)
+    // 2. СПИСОК (с 4-го места и до 50-го)
     const listContainer = document.createElement('div');
     listContainer.className = 'leaderboard-list';
 
     items.forEach((item, index) => {
-        if (index < 3) return; 
+        if (index < 3) return; // Первые три уже на пьедестале
 
         const isMe = (myId && String(item.user_id) === myId);
         const row = document.createElement('div');
         row.className = `leaderboard-row ${isMe ? 'is-me' : ''}`;
+        
         row.innerHTML = `
             <div class="row-rank">${index + 1}</div>
             <img class="row-avatar" src="${item.photo_100 || 'img/logo.png'}" alt="">
@@ -2391,41 +2395,9 @@ function renderTopList(items) {
             <div class="row-score">${item.score}</div>
         `;
         listContainer.appendChild(row);
-
-        // Если это строка текущего игрока - запоминаем её
-        if (isMe) myOriginalRow = row;
     });
+    
     container.appendChild(listContainer);
-
-    // 3. ЛОГИКА ЛИПКОЙ СТРОКИ
-    // Если игрок найден в списке (не на пьедестале), создаем "липкий" дубликат
-    if (myOriginalRow) {
-        const stickyRow = myOriginalRow.cloneNode(true);
-        stickyRow.classList.add('sticky-me');
-        container.appendChild(stickyRow);
-
-        // Настраиваем слежку: если реальная строка ушла из видимости - показываем липкую
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                // Если реальная строка НЕ видна
-                if (!entry.isIntersecting) {
-                    const rect = myOriginalRow.getBoundingClientRect();
-                    const contRect = listContainer.getBoundingClientRect();
-                    // Показываем липкую, только если мы ниже текущего экрана
-                    if (rect.top > contRect.bottom) {
-                        stickyRow.style.display = 'flex';
-                    } else {
-                        stickyRow.style.display = 'none';
-                    }
-                } else {
-                    // Если реальную строку видно - прячем дубликат
-                    stickyRow.style.display = 'none';
-                }
-            });
-        }, { root: listContainer, threshold: 0.1 });
-
-        observer.observe(myOriginalRow);
-    }
 }
 
 window.onload = initGame;
