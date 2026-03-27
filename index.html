@@ -413,7 +413,7 @@ const Platform = {
 
                 await Promise.race([initPromise, timeoutPromise]);
                 
-                vkBridge.subscribe((e) => {
+                /*vkBridge.subscribe((e) => {
                     if (e.detail.type === 'VKWebAppUpdateConfig') {
                         const data = e.detail.data;
                         if (!localStorage.getItem('user-theme')) {
@@ -425,7 +425,7 @@ const Platform = {
                             updateThemeIcons();
                         }
                     }
-                });
+                });*/
 
                 this.id = 'vk';
                 const userData = await vkBridge.send('VKWebAppGetUserInfo');
@@ -869,39 +869,21 @@ function toggleTheme() {
 
 // Вызови это в конце Platform.init() или в начале initGame()
 function checkSavedTheme() {
-    const saved = localStorage.getItem('user-theme'); // Ручной выбор игрока
-    
-    // 1. Если Игрок уже выбирал тему вручную — всегда слушаемся его
+    const saved = localStorage.getItem('user-theme');
+
+    // 1. Если Игрок выбрал тему вручную — слушаемся его выбора
     if (saved === 'dark') {
         document.documentElement.classList.add('dark-mode');
     } else if (saved === 'light') {
         document.documentElement.classList.remove('dark-mode');
     } 
     
-    // 2. Если ручного выбора нет, проверяем окружение
+    // 2. Если Игрок ничего не выбирал (зашел первый раз) — СТАВИМ ТЕМНУЮ
     else {
-        const urlParams = new URLSearchParams(window.location.search);
-        const vkAppearance = urlParams.get('vk_appearance'); // Параметр от ВК
-
-        // Проверяем ВК
-        if (vkAppearance === 'dark' || vkAppearance === 'space_gray') {
-            document.documentElement.classList.add('dark-mode');
-        } else if (vkAppearance === 'light') {
-            document.documentElement.classList.remove('dark-mode');
-        }
-        
-        // 3. Если и ВК не прислал тему (играем просто в браузере), смотрим настройки устройства
-        else {
-            const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-            if (prefersDark) {
-                document.documentElement.classList.add('dark-mode');
-            } else {
-                document.documentElement.classList.remove('dark-mode');
-            }
-        }
+        document.documentElement.classList.add('dark-mode');
     }
 
-    // Обновляем иконки и текст в меню
+    // Обновляем иконки и текст в выпадающем списке
     updateThemeIcons();
     updateDropdownThemeText();
 }
