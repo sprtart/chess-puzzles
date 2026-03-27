@@ -2216,6 +2216,9 @@ body {
 #rank-standard-menu{
     margin: 0 0 .8vw;
 }
+#rank-survival-menu {
+     margin: 0 0 .8vw;
+}
 
 /* Для альбомной ориентации можно чуть увеличить */
 @media (orientation: landscape) {
