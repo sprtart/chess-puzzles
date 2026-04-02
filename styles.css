@@ -2160,7 +2160,7 @@ background: var(--board-dark);
     .stat-subtext { font-size: 1vw; color: var(--text-gray); margin-top: -6px; margin-bottom: 5px; }
     #user-winrate-l { color: var(--board-dark) !important; }
     
-    .action-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 1vh; }
+    .action-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1vh; }
     .btn-action {
         border: none; border-radius:1.3vw; color: var(--text-game_pl); font-weight: 800;
         display: flex; align-items: center; justify-content: center; gap: .4vw;
@@ -2172,8 +2172,8 @@ background: var(--board-dark);
     }
     .green-btn { background: var(--board-dark); }
     .green-btn:hover { background: var(--board-dark); }
-    .btn-help { grid-column: span 5; font-size: 3.5vh; }
-    .btn-top { font-size: 3.5vh; grid-column: span 3; }
+    .btn-help { grid-column: span 2; font-size: 3.5vh; }
+    .btn-top { font-size: 3.5vh; grid-column: span 1; }
 
     .btn-settings-small {
         /*position: absolute;
