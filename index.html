@@ -1778,12 +1778,9 @@ function handleMoveError(fromPos, toPos) {
     boardState[posToIdx(fromPos).r][posToIdx(fromPos).c] = "";
     renderBoard();
     showPieceBadge(toPos, 'wrong');
-    //boardWrapper.classList.add('shake');
 
     // Анимация возврата фигуры обратно
     setTimeout(() => {
-        // boardWrapper.classList.remove('shake');
-
         const toSqEl = document.querySelector(`[data-pos="${toPos}"]`);
         const fromSqEl = document.querySelector(`[data-pos="${fromPos}"]`);
         const pieceEl = toSqEl?.querySelector('.piece');
@@ -1834,18 +1831,12 @@ function handleMoveError(fromPos, toPos) {
     }, 400);
 
     if (gameMode === 'survival') {
-        //survivalStreak = 0;
-        //document.getElementById('score-display').textContent = survivalStreak;
+        // Мгновенно обнуляем серию в памяти и на обоих экранах (портрет/альбом)
+        survivalStreak = 0;
+        updateDualText('score-display', survivalStreak);
         
-        const hintBtns = document.querySelectorAll('.btn-hint');
-        hintBtns.forEach(btn => {
-            btn.onclick = () => startGameMode('survival');
-            const icon = btn.querySelector('.video-icon');
-            if (icon) icon.style.display = 'none';
-            const text = btn.querySelector('span');
-            if (text) text.textContent = i18n[lang].again;
-        });
-
+        // Ставим флаг провала. Когда игрок найдет правильный ход в этой задаче,
+        // ваша функция finalizeMove увидит этот флаг и бесшовно сбросит сложность до базовой.
         survivalFailed = true;
     }
 }
